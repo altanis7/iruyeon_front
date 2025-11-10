@@ -1,8 +1,11 @@
+import { Routes, Route } from "react-router-dom";
+import { LoginForm } from "./components/login-form";
+
 const App = () => {
   return (
-    <>
-      <h1 className="text-4xl font-bold underline">Hello world!</h1>
-    </>
+    <Routes>
+      <Route path="/" element={<LoginForm />} />
+    </Routes>
   );
 };
 
