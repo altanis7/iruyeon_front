@@ -4,6 +4,17 @@ export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
+      // Pretendard 폰트 설정
+      fontFamily: {
+        sans: [
+          "Pretendard",
+          "-apple-system",
+          "BlinkMacSystemFont",
+          "system-ui",
+          "Roboto",
+          "sans-serif",
+        ],
+      },
       // 모바일 Safe Area 대응
       spacing: {
         safe: "env(safe-area-inset-bottom)",
