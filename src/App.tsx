@@ -1,11 +1,14 @@
+import { LoginForm } from "@/components/LoginForm";
 import { Routes, Route } from "react-router-dom";
-import { LoginForm } from "./components/login-form";
+import RootLayout from "@/components/layouts/RootLayout";
 
 const App = () => {
   return (
-    <Routes>
-      <Route path="/" element={<LoginForm />} />
-    </Routes>
+    <RootLayout>
+      <Routes>
+        <Route path="/" element={<LoginForm />} />
+      </Routes>
+    </RootLayout>
   );
 };
 

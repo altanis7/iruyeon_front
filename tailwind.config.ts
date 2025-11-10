@@ -34,6 +34,7 @@ export default {
       // 터치 타겟 최소 크기 (44x44px)
       minHeight: {
         touch: "44px",
+        dvh: "100dvh",
       },
       minWidth: {
         touch: "44px",

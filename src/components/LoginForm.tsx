@@ -9,56 +9,59 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
+    <div
+      className={cn("flex flex-col gap-6 w-full max-w-sm", className)}
+      {...props}
+    >
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">Login</CardTitle>
-          <CardDescription>
-            Enter your email below to login to your account
-          </CardDescription>
+          <CardTitle className="text-2xl text-center">이루연 로고</CardTitle>
+          <CardDescription>이루연 모바일 애플리케이션</CardDescription>
         </CardHeader>
         <CardContent>
           <form>
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">아이디</Label>
                 <Input
                   id="email"
                   type="email"
-                  placeholder="m@example.com"
+                  placeholder="휴대폰 번호를 입력하세요."
                   required
                 />
               </div>
               <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
-                  <a
-                    href="#"
-                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                  >
-                    Forgot your password?
-                  </a>
-                </div>
+                <Label htmlFor="password">비밀번호</Label>
+
                 <Input id="password" type="password" required />
               </div>
-              <Button type="submit" className="w-full">
-                Login
-              </Button>
-              <Button variant="outline" className="w-full">
-                Login with Google
-              </Button>
+              <div className="flex items-center gap-2">
+                <Checkbox id="auto-login" />
+                <Label
+                  htmlFor="auto-login"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  자동 로그인
+                </Label>
+              </div>
+              <div className="grid gap-2">
+                <Button type="submit" className="w-full">
+                  로그인
+                </Button>
+                <Button variant="outline" className="w-full">
+                  회원가입
+                </Button>
+              </div>
             </div>
             <div className="mt-4 text-center text-sm">
-              Don&apos;t have an account?{" "}
-              <a href="#" className="underline underline-offset-4">
-                Sign up
-              </a>
+              문의가 있으신 경우 02-514-3651로 연락 부탁드립니다.
             </div>
           </form>
         </CardContent>
