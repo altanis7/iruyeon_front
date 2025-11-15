@@ -17,7 +17,7 @@ import { useAuth } from "@/features/auth/hooks/useAuth";
 // 보호된 라우트 컴포넌트
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth();
-  return isAuthenticated ? <>{children}</> : <Navigate to="/" replace />;
+  return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />;
 }
 
 // 인증된 사용자용 라우트 컴포넌트 (로그인 페이지 접근 방지)
