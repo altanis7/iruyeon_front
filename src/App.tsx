@@ -4,6 +4,11 @@ import { HomePage } from "@/pages/HomePage";
 import { MatchPage } from "@/pages/MatchPage";
 import { SettingPage } from "@/pages/SettingPage";
 import { ProfilePage } from "@/pages/ProfilePage";
+import { ProfileDetailPage } from "@/pages/ProfileDetailPage";
+import { ProfileNewPage } from "@/pages/ProfileNewPage";
+import { ProfileEditPage } from "@/pages/ProfileEditPage";
+import { SentProfilesPage } from "@/pages/SentProfilesPage";
+import { ReceivedProfilesPage } from "@/pages/ReceivedProfilesPage";
 import { Routes, Route, Navigate } from "react-router-dom";
 import RootLayout from "@/shared/components/layouts/RootLayout";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -18,7 +23,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 // 인증된 사용자용 라우트 컴포넌트 (로그인 페이지 접근 방지)
 function AuthRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth();
-  return !isAuthenticated ? <>{children}</> : <Navigate to="/home" replace />;
+  return !isAuthenticated ? <>{children}</> : <Navigate to="/" replace />;
 }
 
 const App = () => {
@@ -76,6 +81,46 @@ const App = () => {
             element={
               <ProtectedRoute>
                 <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile/new"
+            element={
+              <ProtectedRoute>
+                <ProfileNewPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile/sent"
+            element={
+              <ProtectedRoute>
+                <SentProfilesPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile/received"
+            element={
+              <ProtectedRoute>
+                <ReceivedProfilesPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile/:id"
+            element={
+              <ProtectedRoute>
+                <ProfileDetailPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile/:id/edit"
+            element={
+              <ProtectedRoute>
+                <ProfileEditPage />
               </ProtectedRoute>
             }
           />
