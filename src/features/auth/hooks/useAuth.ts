@@ -25,7 +25,7 @@ export function useAuth() {
   const login = useCallback(() => {
     localStorage.setItem(AUTH_STORAGE_KEY, "true");
     setIsAuthenticated(true);
-    navigate("/home");
+    navigate("/");
   }, [navigate]);
 
   const logout = useCallback(() => {
