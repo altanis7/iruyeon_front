@@ -1,8 +1,25 @@
 import { LoginForm } from "@/features/auth/components/LoginForm";
 import { SignupPage } from "@/pages/SignupPage";
-import { Routes, Route } from "react-router-dom";
+import { HomePage } from "@/pages/HomePage";
+import { MatchPage } from "@/pages/MatchPage";
+import { SettingPage } from "@/pages/SettingPage";
+import { ProfilePage } from "@/pages/ProfilePage";
+import { Routes, Route, Navigate } from "react-router-dom";
 import RootLayout from "@/shared/components/layouts/RootLayout";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useAuth } from "@/features/auth/hooks/useAuth";
+
+// 보호된 라우트 컴포넌트
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated } = useAuth();
+  return isAuthenticated ? <>{children}</> : <Navigate to="/" replace />;
+}
+
+// 인증된 사용자용 라우트 컴포넌트 (로그인 페이지 접근 방지)
+function AuthRoute({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated } = useAuth();
+  return !isAuthenticated ? <>{children}</> : <Navigate to="/home" replace />;
+}
 
 const App = () => {
   const queryClient = new QueryClient();
@@ -11,8 +28,57 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       <RootLayout>
         <Routes>
-          <Route path="/" element={<LoginForm />} />
-          <Route path="/signup" element={<SignupPage />} />
+          {/* 인증 전 페이지 */}
+          <Route
+            path="/login"
+            element={
+              <AuthRoute>
+                <LoginForm />
+              </AuthRoute>
+            }
+          />
+          <Route
+            path="/signup"
+            element={
+              <AuthRoute>
+                <SignupPage />
+              </AuthRoute>
+            }
+          />
+
+          {/* 인증 후 페이지 */}
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <HomePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/match"
+            element={
+              <ProtectedRoute>
+                <MatchPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/setting"
+            element={
+              <ProtectedRoute>
+                <SettingPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </RootLayout>
     </QueryClientProvider>
