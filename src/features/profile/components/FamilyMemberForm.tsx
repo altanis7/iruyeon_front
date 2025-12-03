@@ -8,6 +8,7 @@ import { Label } from "@/shared/components/ui/label";
 import { Textarea } from "@/shared/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card";
 import { ProfileSelectDialog } from "./ProfileSelectDialog";
+import { ProfilePickerDialog } from "./ProfilePickerDialog";
 import { YearSelectDialog } from "./YearSelectDialog";
 import { EducationSelect } from "./EducationSelect";
 import {
@@ -39,15 +40,11 @@ export function FamilyMemberForm({
     onUpdate(index, { ...member, ...updates });
   };
 
-  const handleRelationConfirm = (values: string[]) => {
-    if (values.length > 0) {
-      const selectedRelation = values[0];
-      handleUpdate({
-        relation: selectedRelation,
-        customRelation: selectedRelation === "기타" ? member.customRelation : undefined,
-      });
-    }
-    setIsRelationDialogOpen(false);
+  const handleRelationConfirm = (value: string) => {
+    handleUpdate({
+      relation: value,
+      customRelation: value === "기타" ? member.customRelation : undefined,
+    });
   };
 
   const handleYearConfirm = (year: number) => {
@@ -55,18 +52,12 @@ export function FamilyMemberForm({
     setIsYearDialogOpen(false);
   };
 
-  const handleJobConfirm = (values: string[]) => {
-    if (values.length > 0) {
-      handleUpdate({ job: values[0] });
-    }
-    setIsJobDialogOpen(false);
+  const handleJobConfirm = (value: string) => {
+    handleUpdate({ job: value });
   };
 
-  const handleReligionConfirm = (values: string[]) => {
-    if (values.length > 0) {
-      handleUpdate({ religion: values[0] });
-    }
-    setIsReligionDialogOpen(false);
+  const handleReligionConfirm = (value: string) => {
+    handleUpdate({ religion: value });
   };
 
   const displayRelation = member.relation === "기타" && member.customRelation
@@ -202,14 +193,13 @@ export function FamilyMemberForm({
         </div>
 
         {/* 다이얼로그들 */}
-        <ProfileSelectDialog
+        <ProfilePickerDialog
           open={isRelationDialogOpen}
           onOpenChange={setIsRelationDialogOpen}
           title="관계 선택"
           options={[...FAMILY_RELATION_OPTIONS]}
-          selectedValues={member.relation ? [member.relation] : []}
+          selectedValue={member.relation || ""}
           onConfirm={handleRelationConfirm}
-          multiSelect={false}
         />
 
         <YearSelectDialog
@@ -222,24 +212,22 @@ export function FamilyMemberForm({
           maxAge={100}
         />
 
-        <ProfileSelectDialog
+        <ProfilePickerDialog
           open={isJobDialogOpen}
           onOpenChange={setIsJobDialogOpen}
           title="직업 선택"
           options={[...JOB_OPTIONS]}
-          selectedValues={member.job ? [member.job] : []}
+          selectedValue={member.job || ""}
           onConfirm={handleJobConfirm}
-          multiSelect={false}
         />
 
-        <ProfileSelectDialog
+        <ProfilePickerDialog
           open={isReligionDialogOpen}
           onOpenChange={setIsReligionDialogOpen}
           title="종교 선택"
           options={[...RELIGION_OPTIONS]}
-          selectedValues={member.religion ? [member.religion] : []}
+          selectedValue={member.religion || ""}
           onConfirm={handleReligionConfirm}
-          multiSelect={false}
         />
       </CardContent>
     </Card>

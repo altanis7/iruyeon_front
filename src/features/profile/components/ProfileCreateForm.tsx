@@ -12,6 +12,7 @@ import { Label } from "@/shared/components/ui/label";
 import { Textarea } from "@/shared/components/ui/textarea";
 import { PhotoUpload } from "./PhotoUpload";
 import { ProfileSelectDialog } from "./ProfileSelectDialog";
+import { ProfilePickerDialog } from "./ProfilePickerDialog";
 import { YearSelectDialog } from "./YearSelectDialog";
 import { EducationSelect } from "./EducationSelect";
 import { FamilyMembersSection } from "./FamilyMembersSection";
@@ -654,69 +655,59 @@ export function ProfileCreateForm() {
         }}
       />
 
-      <ProfileSelectDialog
+      <ProfilePickerDialog
         open={marriageTypeDialogOpen}
         onOpenChange={setMarriageTypeDialogOpen}
         title="성혼유형 선택"
         options={[...MARRIAGE_TYPE_OPTIONS]}
-        selectedValues={marriageType ? [marriageType] : []}
-        onConfirm={values => {
-          setValueUser("marriageType", values[0] || "");
-          setMarriageTypeDialogOpen(false);
+        selectedValue={marriageType || ""}
+        onConfirm={value => {
+          setValueUser("marriageType", value);
         }}
-        multiSelect={false}
       />
 
-      <ProfileSelectDialog
+      <ProfilePickerDialog
         open={jobDialogOpen}
         onOpenChange={setJobDialogOpen}
         title="직업 선택"
         options={[...JOB_OPTIONS]}
-        selectedValues={job ? [job] : []}
-        onConfirm={values => {
-          setValueUser("job", values[0] || "");
-          setJobDialogOpen(false);
+        selectedValue={job || ""}
+        onConfirm={value => {
+          setValueUser("job", value);
         }}
-        multiSelect={false}
       />
 
-      <ProfileSelectDialog
+      <ProfilePickerDialog
         open={assetsDialogOpen}
         onOpenChange={setAssetsDialogOpen}
         title="재산 선택"
         options={[...ASSET_OPTIONS]}
-        selectedValues={assets ? [assets] : []}
-        onConfirm={values => {
-          setValueUser("assets", values[0] || "");
-          setAssetsDialogOpen(false);
+        selectedValue={assets || ""}
+        onConfirm={value => {
+          setValueUser("assets", value);
         }}
-        multiSelect={false}
       />
 
-      <ProfileSelectDialog
+      <ProfilePickerDialog
         open={religionDialogOpen}
         onOpenChange={setReligionDialogOpen}
         title="종교 선택"
         options={[...RELIGION_OPTIONS]}
-        selectedValues={religion ? [religion] : []}
-        onConfirm={values => {
-          setValueUser("religion", values[0] || "");
-          setReligionDialogOpen(false);
+        selectedValue={religion || ""}
+        onConfirm={value => {
+          setValueUser("religion", value);
         }}
-        multiSelect={false}
       />
 
-      <ProfileSelectDialog
+      <ProfilePickerDialog
         open={hasChildrenDialogOpen}
         onOpenChange={setHasChildrenDialogOpen}
         title="아이 유무 선택"
         options={[...HAS_CHILDREN_OPTIONS]}
-        selectedValues={hasChildren ? [hasChildren] : []}
-        onConfirm={values => {
-          setValueUser("hasChildren", values[0] || "");
-          setHasChildrenDialogOpen(false);
+        selectedValue={hasChildren || ""}
+        onConfirm={value => {
+          setValueUser("hasChildren", value);
         }}
-        multiSelect={false}
       />
 
       {/* ===== Step 2 다이얼로그들 ===== */}
@@ -794,17 +785,15 @@ export function ProfileCreateForm() {
         multiSelect={true}
       />
 
-      <ProfileSelectDialog
+      <ProfilePickerDialog
         open={preferredEducationTierDialogOpen}
         onOpenChange={setPreferredEducationTierDialogOpen}
         title="희망 학력 (이상) 선택"
         options={[...EDUCATION_TIERS]}
-        selectedValues={preferredEducationTier ? [preferredEducationTier] : []}
-        onConfirm={values => {
-          handlePreferredEducationTierChange(values[0] || "");
-          setPreferredEducationTierDialogOpen(false);
+        selectedValue={preferredEducationTier || ""}
+        onConfirm={value => {
+          handlePreferredEducationTierChange(value);
         }}
-        multiSelect={false}
       />
 
       <ProfileSelectDialog

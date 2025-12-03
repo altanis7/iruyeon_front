@@ -6,7 +6,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/shared/components/ui/button";
 import { Label } from "@/shared/components/ui/label";
-import { ProfileSelectDialog } from "./ProfileSelectDialog";
+import { ProfilePickerDialog } from "./ProfilePickerDialog";
 import { EDUCATION_TIERS, EDUCATION_SCHOOLS } from "../constants/profileOptions";
 
 interface EducationSelectProps {
@@ -37,19 +37,13 @@ export function EducationSelect({
     }
   }, [educationTier, school, onSchoolChange]);
 
-  const handleTierConfirm = (values: string[]) => {
-    if (values.length > 0) {
-      onEducationTierChange(values[0]);
-      onSchoolChange(""); // 학력 티어 변경 시 학교 선택 초기화
-    }
-    setIsTierDialogOpen(false);
+  const handleTierConfirm = (value: string) => {
+    onEducationTierChange(value);
+    onSchoolChange(""); // 학력 티어 변경 시 학교 선택 초기화
   };
 
-  const handleSchoolConfirm = (values: string[]) => {
-    if (values.length > 0) {
-      onSchoolChange(values[0]);
-    }
-    setIsSchoolDialogOpen(false);
+  const handleSchoolConfirm = (value: string) => {
+    onSchoolChange(value);
   };
 
   const availableSchools = educationTier
@@ -89,25 +83,23 @@ export function EducationSelect({
       )}
 
       {/* 학력 티어 선택 다이얼로그 */}
-      <ProfileSelectDialog
+      <ProfilePickerDialog
         open={isTierDialogOpen}
         onOpenChange={setIsTierDialogOpen}
         title="학력 선택"
         options={[...EDUCATION_TIERS]}
-        selectedValues={educationTier ? [educationTier] : []}
+        selectedValue={educationTier || ""}
         onConfirm={handleTierConfirm}
-        multiSelect={false}
       />
 
       {/* 학교 선택 다이얼로그 */}
-      <ProfileSelectDialog
+      <ProfilePickerDialog
         open={isSchoolDialogOpen}
         onOpenChange={setIsSchoolDialogOpen}
         title="학교 선택"
         options={[...availableSchools]}
-        selectedValues={school ? [school] : []}
+        selectedValue={school || ""}
         onConfirm={handleSchoolConfirm}
-        multiSelect={false}
       />
     </div>
   );
