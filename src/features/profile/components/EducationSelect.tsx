@@ -1,105 +1,50 @@
 /**
- * 학력 선택 컴포넌트 (2단계 선택)
- * 1단계: 학력 티어 선택
- * 2단계: 해당 티어의 구체적 학교 선택
+ * 학력 선택 컴포넌트 (기획서 기준)
+ * - 학력 수준 선택 (고졸/학사/석사/박사/전문대)
  */
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/shared/components/ui/button";
-import { Label } from "@/shared/components/ui/label";
 import { ProfilePickerDialog } from "./ProfilePickerDialog";
-import { EDUCATION_TIERS, EDUCATION_SCHOOLS } from "../constants/profileOptions";
+import { EDUCATION_LEVELS } from "../constants/profileOptions";
+import { cn } from "@/lib/utils";
 
 interface EducationSelectProps {
-  educationTier: string;
-  school: string;
-  onEducationTierChange: (tier: string) => void;
-  onSchoolChange: (school: string) => void;
+  value: string; // eduLevel
+  onChange: (level: string) => void;
   required?: boolean;
+  className?: string;
 }
 
 export function EducationSelect({
-  educationTier,
-  school,
-  onEducationTierChange,
-  onSchoolChange,
+  value,
+  onChange,
   required = false,
+  className,
 }: EducationSelectProps) {
-  const [isTierDialogOpen, setIsTierDialogOpen] = useState(false);
-  const [isSchoolDialogOpen, setIsSchoolDialogOpen] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  // 학력 티어가 변경되면 학교 선택 초기화
-  useEffect(() => {
-    if (educationTier && school) {
-      const availableSchools = EDUCATION_SCHOOLS[educationTier] || [];
-      if (!availableSchools.includes(school)) {
-        onSchoolChange("");
-      }
-    }
-  }, [educationTier, school, onSchoolChange]);
-
-  const handleTierConfirm = (value: string) => {
-    onEducationTierChange(value);
-    onSchoolChange(""); // 학력 티어 변경 시 학교 선택 초기화
+  const handleConfirm = (level: string) => {
+    onChange(level);
   };
-
-  const handleSchoolConfirm = (value: string) => {
-    onSchoolChange(value);
-  };
-
-  const availableSchools = educationTier
-    ? EDUCATION_SCHOOLS[educationTier] || []
-    : [];
 
   return (
-    <div className="space-y-4">
-      {/* 학력 티어 선택 */}
-      <div>
-        <Label>
-          학력{required && <span className="text-red-500"> *</span>}
-        </Label>
-        <Button
-          type="button"
-          variant="outline"
-          className="w-full justify-start mt-2"
-          onClick={() => setIsTierDialogOpen(true)}
-        >
-          {educationTier || "학력을 선택하세요"}
-        </Button>
-      </div>
+    <div className={className}>
+      <Button
+        type="button"
+        variant="outline"
+        className={cn("w-full justify-start", !value && "text-muted-foreground")}
+        onClick={() => setIsDialogOpen(true)}
+      >
+        {value || "학력을 선택하세요"}
+      </Button>
 
-      {/* 학교 선택 (학력 티어 선택 후 활성화) */}
-      {educationTier && (
-        <div>
-          <Label>학교 선택</Label>
-          <Button
-            type="button"
-            variant="outline"
-            className="w-full justify-start mt-2"
-            onClick={() => setIsSchoolDialogOpen(true)}
-          >
-            {school || "학교를 선택하세요"}
-          </Button>
-        </div>
-      )}
-
-      {/* 학력 티어 선택 다이얼로그 */}
       <ProfilePickerDialog
-        open={isTierDialogOpen}
-        onOpenChange={setIsTierDialogOpen}
+        open={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
         title="학력 선택"
-        options={[...EDUCATION_TIERS]}
-        selectedValue={educationTier || ""}
-        onConfirm={handleTierConfirm}
-      />
-
-      {/* 학교 선택 다이얼로그 */}
-      <ProfilePickerDialog
-        open={isSchoolDialogOpen}
-        onOpenChange={setIsSchoolDialogOpen}
-        title="학교 선택"
-        options={[...availableSchools]}
-        selectedValue={school || ""}
-        onConfirm={handleSchoolConfirm}
+        options={[...EDUCATION_LEVELS]}
+        selectedValue={value || ""}
+        onConfirm={handleConfirm}
       />
     </div>
   );

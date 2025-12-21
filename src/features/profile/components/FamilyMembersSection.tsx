@@ -1,18 +1,18 @@
 /**
- * 가족 구성원 관리 섹션 컴포넌트
- * 최대 5명까지 추가 가능
+ * 가족 구성원 관리 섹션 컴포넌트 (기획서 기준)
+ * 최대 10명까지 추가 가능
  */
 import { Button } from "@/shared/components/ui/button";
 import { Label } from "@/shared/components/ui/label";
 import { FamilyMemberForm } from "./FamilyMemberForm";
-import type { FamilyMember } from "../types/profileForm";
+import type { FamilyMember } from "../api/profileApi";
 
 interface FamilyMembersSectionProps {
   familyMembers: FamilyMember[];
   onFamilyMembersChange: (members: FamilyMember[]) => void;
 }
 
-const MAX_FAMILY_MEMBERS = 5;
+const MAX_FAMILY_MEMBERS = 10;
 
 export function FamilyMembersSection({
   familyMembers,
@@ -24,16 +24,11 @@ export function FamilyMembersSection({
     }
 
     const newMember: FamilyMember = {
-      relation: "",
-      customRelation: undefined,
-      birthYear: undefined,
+      name: "",
+      relationShip: "",
       job: undefined,
-      jobDetail: undefined,
-      education: undefined,
-      school: undefined,
-      major: undefined,
+      birthYear: undefined,
       religion: undefined,
-      notes: undefined,
     };
 
     onFamilyMembersChange([...familyMembers, newMember]);
