@@ -13,7 +13,7 @@ interface ProfilePickerDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   title: string;
-  options: string[];
+  options: readonly string[];
   selectedValue: string;
   onConfirm: (value: string) => void;
 }
@@ -31,13 +31,14 @@ export function ProfilePickerDialog({
   });
 
   // 다이얼로그가 열릴 때 현재 선택된 값으로 초기화
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (open) {
       setPickerValue({
         option: selectedValue || options[0] || "",
       });
     }
-  }, [open, selectedValue, options]);
+  }, [open, selectedValue]);
 
   // 확인
   const handleConfirm = () => {
