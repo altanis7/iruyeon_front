@@ -1,10 +1,12 @@
 import { cn } from "@/lib/utils";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
 import { Checkbox } from "@/shared/components/ui/checkbox";
 import { useAuth } from "@/features/auth/hooks/useAuth";
+import { loginAPI } from "@/features/auth/api/authApi";
 
 export function LoginForm({
   className,
@@ -12,12 +14,24 @@ export function LoginForm({
 }: React.ComponentPropsWithoutRef<"div">) {
   const navigate = useNavigate();
   const { login } = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("서브밋");
-    // Mock 로그인: 어떤 값이든 입력하면 로그인 처리
-    login();
+    setError(null);
+    setIsLoading(true);
+
+    try {
+      await loginAPI({ email, password });
+      login();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "로그인에 실패했습니다.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -37,13 +51,31 @@ export function LoginForm({
           className="flex flex-col gap-6"
           onSubmit={handleSubmit}
         >
+          {error && (
+            <div className="text-sm text-red-500 text-center">{error}</div>
+          )}
           <div className="grid gap-2">
-            <Label htmlFor="id">아이디</Label>
-            <Input id="id" placeholder="휴대폰 번호를 입력하세요." required />
+            <Label htmlFor="email">이메일</Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="이메일을 입력하세요."
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              disabled={isLoading}
+              required
+            />
           </div>
           <div className="grid gap-2">
             <Label htmlFor="password">비밀번호</Label>
-            <Input id="password" type="password" required />
+            <Input
+              id="password"
+              type="password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              disabled={isLoading}
+              required
+            />
           </div>
           <div className="flex items-center gap-2">
             <Checkbox id="auto-login" />
@@ -60,14 +92,20 @@ export function LoginForm({
       {/* 하단 고정 버튼 영역 */}
       <div className="px-6 pb-safe pb-6">
         <div className="flex flex-col gap-3">
-          <Button type="submit" form="login-form" className="w-full">
-            로그인
+          <Button
+            type="submit"
+            form="login-form"
+            className="w-full"
+            disabled={isLoading}
+          >
+            {isLoading ? "로그인 중..." : "로그인"}
           </Button>
           <Button
             type="button"
             variant="outline"
             className="w-full"
             onClick={() => navigate("/signup")}
+            disabled={isLoading}
           >
             회원가입
           </Button>

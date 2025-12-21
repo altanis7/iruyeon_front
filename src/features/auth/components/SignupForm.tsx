@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -15,7 +15,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/shared/components/ui/dialog";
+import { ProfilePickerDialog } from "@/features/profile/components/ProfilePickerDialog";
 import { useSignup } from "@/features/auth/hooks/useSignup";
+import { useCheckEmail } from "@/features/auth/hooks/useCheckEmail";
+import { transformSignupData } from "@/features/auth/api/authApi";
 
 // Zod 유효성 검사 스키마
 const signupSchema = z
@@ -24,9 +27,18 @@ const signupSchema = z
       .string()
       .min(2, { message: "이름은 최소 2자 이상이어야 합니다." })
       .max(50, { message: "이름은 최대 50자까지 입력 가능합니다." }),
+    email: z
+      .string()
+      .min(1, { message: "이메일을 입력하세요." })
+      .email({ message: "올바른 이메일 형식을 입력하세요." }),
     phoneNumber: z.string().regex(/^010-\d{4}-\d{4}$/, {
       message: "휴대폰 번호 형식이 올바르지 않습니다. (예: 010-1234-5678)",
     }),
+    company: z
+      .string()
+      .min(2, { message: "회사명은 최소 2자 이상이어야 합니다." })
+      .max(100, { message: "회사명은 최대 100자까지 입력 가능합니다." }),
+    gender: z.string().min(1, { message: "성별을 선택하세요." }),
     password: z
       .string()
       .min(8, { message: "비밀번호는 최소 8자 이상이어야 합니다." })
@@ -45,19 +57,45 @@ type SignupFormData = z.infer<typeof signupSchema>;
 export function SignupForm() {
   const navigate = useNavigate();
   const { mutate: signup, isPending } = useSignup();
+  const { mutate: checkEmail, isPending: isCheckingEmail } = useCheckEmail();
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const [isGenderDialogOpen, setIsGenderDialogOpen] = useState(false);
+  const [emailCheckStatus, setEmailCheckStatus] = useState<
+    "unchecked" | "available" | "duplicate" | "error"
+  >("unchecked");
+  const [emailCheckMessage, setEmailCheckMessage] = useState<string>("");
+
+  const genderOptions = ["남성", "여성"];
 
   const {
     register,
     handleSubmit,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
     mode: "onTouched",
+    defaultValues: {
+      gender: "",
+    },
   });
 
+  const gender = watch("gender");
+  const email = watch("email");
+
+  // 이메일 변경 시 확인 상태 초기화
+  useEffect(() => {
+    if (emailCheckStatus !== "unchecked") {
+      setEmailCheckStatus("unchecked");
+      setEmailCheckMessage("");
+    }
+  }, [email, emailCheckStatus]);
+
   const onSubmit = (data: SignupFormData) => {
-    signup(data, {
+    const apiData = transformSignupData(data);
+
+    signup(apiData, {
       onSuccess: () => {
         setShowSuccessDialog(true);
       },
@@ -65,6 +103,34 @@ export function SignupForm() {
         alert(`회원가입 실패: ${error.message}`);
       },
     });
+  };
+
+  const handleEmailCheck = () => {
+    if (!email) {
+      setEmailCheckStatus("error");
+      setEmailCheckMessage("이메일을 입력하세요.");
+      return;
+    }
+
+    checkEmail(
+      { email },
+      {
+        onSuccess: data => {
+          console.log("API 응답:", data);
+          setEmailCheckStatus("available");
+          setEmailCheckMessage("응답 받음: " + JSON.stringify(data));
+        },
+        onError: error => {
+          console.error("API 에러:", error);
+          setEmailCheckStatus("error");
+          setEmailCheckMessage(error.message);
+        },
+      },
+    );
+  };
+
+  const handleGenderConfirm = (value: string) => {
+    setValue("gender", value, { shouldValidate: true });
   };
 
   const handleDialogClose = () => {
@@ -106,6 +172,35 @@ export function SignupForm() {
               )}
             </div>
 
+            {/* 이메일 */}
+            <div className="space-y-2">
+              <Label htmlFor="email">이메일</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="example@email.com"
+                  {...register("email")}
+                  disabled={isPending || isCheckingEmail}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleEmailCheck}
+                  disabled={isPending || isCheckingEmail || !email}
+                  className="shrink-0"
+                >
+                  {isCheckingEmail ? "확인 중..." : "중복 확인"}
+                </Button>
+              </div>
+              {errors.email && (
+                <p className="text-sm text-red-500">{errors.email.message}</p>
+              )}
+              {emailCheckMessage && (
+                <p className="text-sm text-gray-600">{emailCheckMessage}</p>
+              )}
+            </div>
+
             {/* 아이디 (휴대폰번호) */}
             <div className="space-y-2">
               <Label htmlFor="phoneNumber">아이디 (휴대폰번호)</Label>
@@ -120,6 +215,38 @@ export function SignupForm() {
                 <p className="text-sm text-red-500">
                   {errors.phoneNumber.message}
                 </p>
+              )}
+            </div>
+
+            {/* 회사명 */}
+            <div className="space-y-2">
+              <Label htmlFor="company">회사명</Label>
+              <Input
+                id="company"
+                type="text"
+                placeholder="회사명을 입력하세요"
+                {...register("company")}
+                disabled={isPending}
+              />
+              {errors.company && (
+                <p className="text-sm text-red-500">{errors.company.message}</p>
+              )}
+            </div>
+
+            {/* 성별 */}
+            <div className="space-y-2">
+              <Label htmlFor="gender">성별</Label>
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full justify-start"
+                onClick={() => setIsGenderDialogOpen(true)}
+                disabled={isPending}
+              >
+                {gender || "성별을 선택하세요"}
+              </Button>
+              {errors.gender && (
+                <p className="text-sm text-red-500">{errors.gender.message}</p>
               )}
             </div>
 
@@ -190,6 +317,16 @@ export function SignupForm() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* 성별 선택 다이얼로그 */}
+      <ProfilePickerDialog
+        open={isGenderDialogOpen}
+        onOpenChange={setIsGenderDialogOpen}
+        title="성별 선택"
+        options={genderOptions}
+        selectedValue={gender}
+        onConfirm={handleGenderConfirm}
+      />
     </>
   );
 }
