@@ -3,63 +3,64 @@
  */
 
 /**
- * 가족 구성원 정보
+ * 가족 구성원 정보 (기획서 기준 - 간소화)
  */
 export interface FamilyMember {
-  relation: string; // 관계 ("부", "모", "형제", "자매", "남매", "기타")
-  customRelation?: string; // "기타" 선택 시 커스텀 관계명
-  birthYear?: number; // 출생년도
-  job?: string; // 직업
-  jobDetail?: string; // 직업 세부 (현/전)
-  education?: string; // 학력 티어
-  school?: string; // 학교명
-  major?: string; // 전공
-  religion?: string; // 종교
-  notes?: string; // 기타 특이사항
+  name: string; // 이름 (필수)
+  relationShip: string; // 관계 (필수) - API 필드명
+  job?: string; // 직업 (선택)
+  birthYear?: number; // 출생년도 (선택)
+  religion?: string; // 종교 (선택)
 }
 
-// 프로필 타입 정의 (확장 가능한 구조)
+// 프로필 타입 정의 (API 필드명과 일치)
+// 필수 필드: 10개 (name, phoneNumber, gender, birthYear, address, eduLevel, job, height, religion, maritalStatus)
 export interface Profile {
-  id: string;
-  // 사진 관련
-  photos: string[];
-  mainPhotoIndex: number;
-  // 회원 기본 정보
+  id?: string; // 생성 시 선택
+
+  // ===== 필수 필드 (10개) =====
+  name: string; // 이름
+  phoneNumber: string; // 전화번호
+  gender: string; // 성별
   birthYear: number; // 출생년도
-  marriageType: string; // 성혼유형 ("초혼", "재혼")
+  address: string; // 거주지
+  eduLevel: string; // 학력
   job: string; // 직업
-  jobDetail?: string; // 직업 세부 (현/전)
-  education: string; // 학력 티어
-  school?: string; // 학교명
-  major?: string; // 전공
-  height?: string; // 키 (cm)
-  assets: string; // 재산
+  height: number; // 키
   religion: string; // 종교
-  region?: string; // 지역
-  hobbies?: string; // 취미
-  characteristics?: string; // 특징
-  hometown?: string; // 본가
-  hasChildren: string; // 아이 유무 ("유", "무")
-  notes?: string; // 기타 특이사항
-  familyMembers: FamilyMember[]; // 가족 정보 (최대 5명)
+  maritalStatus: string; // 혼인 여부
+
+  // ===== 선택 필드 =====
+  // 사진
+  imageIdList?: number[]; // photos(string[]) → imageIdList(number[])
+
+  // 학력 상세
+  university?: string; // 대학교명 - school → university
+  highSchool?: string; // 고등학교
+  major?: string; // 전공
+
+  // 직업 상세
+  jobDetail?: string; // 직업 상세
+  previousJob?: string; // 이전 직업
+
+  // 재산/취미
+  property?: string; // 재산 - assets → property ("5억", "10억")
+  hobby?: string; // 취미 - hobbies → hobby
+
+  // 성격/이상형
+  personality?: string; // 성격 - 키워드 쉼표 연결
+  idealType?: string; // 이상형 - 키워드 쉼표 연결
+
+  // 본가/기타
+  homeTown?: string; // 본가 - hometown → homeTown
+  info?: string; // 기타 특이사항 (최대 100자) - notes → info
+
   // 희망 상대 조건
-  preferredAgeMin?: number; // 희망 나이 최소 (출생년도)
-  preferredAgeMax?: number; // 희망 나이 최대 (출생년도)
-  preferredMarriageTypes?: string[]; // 희망 성혼유형
-  preferredJobs?: string[]; // 희망 직업 (다중)
-  preferredEducationTier?: string; // 희망 학력 (~이상)
-  preferredSchools?: string[]; // 희망 학교 (다중)
-  preferredReligions?: string[]; // 희망 종교 (다중)
-  preferredRegion?: string; // 희망 지역
-  preferredMinHeight?: string; // 희망 키 이상
-  preferredAssets?: string[]; // 희망 재산 (다중)
-  preferredNotes?: string; // 희망 상대 기타 특이사항
-  // 레거시 필드 (호환성)
-  name?: string;
-  weight?: number;
-  preferredJob?: string[];
-  preferredEducation?: string[];
-  preferredReligion?: string[];
+  minPreferredAge?: number; // 희망 나이 최소
+  maxPreferredAge?: number; // 희망 나이 최대
+
+  // 가족 정보
+  family?: FamilyMember[]; // familyMembers → family
 }
 
 // 나이 계산 유틸리티
@@ -73,188 +74,92 @@ export interface SearchProfileParams {
   keyword: string;
 }
 
-// 목업 데이터 (새로운 타입 구조에 맞게 수정)
-const mockProfiles: Profile[] = [
-  {
-    id: "1",
-    photos: ["https://api.dicebear.com/7.x/avataaars/svg?seed=1"],
-    mainPhotoIndex: 0,
-    birthYear: 1993,
-    marriageType: "초혼",
-    job: "의사",
-    education: "서울대/연세대/고려대",
-    school: "서울대",
-    assets: "10억이상 100억미만",
-    religion: "기독교",
-    hasChildren: "무",
-    familyMembers: [],
-    name: "김철수",
-    region: "서울",
-  },
-  {
-    id: "2",
-    photos: ["https://api.dicebear.com/7.x/avataaars/svg?seed=2"],
-    mainPhotoIndex: 0,
-    birthYear: 1996,
-    marriageType: "초혼",
-    job: "변호사",
-    education: "서울대/연세대/고려대",
-    school: "연세대",
-    assets: "10억이상 100억미만",
-    religion: "가톨릭",
-    hasChildren: "무",
-    familyMembers: [],
-    name: "이영희",
-    region: "경기",
-  },
-  {
-    id: "3",
-    photos: ["https://api.dicebear.com/7.x/avataaars/svg?seed=3"],
-    mainPhotoIndex: 0,
-    birthYear: 1997,
-    marriageType: "초혼",
-    job: "교육",
-    education: "중앙대/경희대/외대/시립대",
-    school: "경희대",
-    assets: "1억이상 10억미만",
-    religion: "불교",
-    hasChildren: "무",
-    familyMembers: [],
-    name: "박민수",
-    region: "부산",
-  },
-  {
-    id: "4",
-    photos: ["https://api.dicebear.com/7.x/avataaars/svg?seed=4"],
-    mainPhotoIndex: 0,
-    birthYear: 1995,
-    marriageType: "초혼",
-    job: "문화/예술",
-    education: "건국대/동국대/홍익대",
-    school: "홍익대",
-    assets: "1억이상 10억미만",
-    religion: "그 외",
-    hasChildren: "무",
-    familyMembers: [],
-    name: "최지은",
-    region: "서울",
-  },
-  {
-    id: "5",
-    photos: ["https://api.dicebear.com/7.x/avataaars/svg?seed=5"],
-    mainPhotoIndex: 0,
-    birthYear: 1994,
-    marriageType: "재혼",
-    job: "개발원",
-    education: "서강대/성균관대/한양대/GIST",
-    school: "한양대",
-    assets: "10억이상 100억미만",
-    religion: "그 외",
-    hasChildren: "유",
-    familyMembers: [],
-    name: "정현우",
-    region: "대전",
-  },
-  {
-    id: "6",
-    photos: ["https://api.dicebear.com/7.x/avataaars/svg?seed=6"],
-    mainPhotoIndex: 0,
-    birthYear: 1998,
-    marriageType: "초혼",
-    job: "회계사",
-    education: "서울대/연세대/고려대",
-    school: "고려대",
-    assets: "10억이상 100억미만",
-    religion: "기독교",
-    hasChildren: "무",
-    familyMembers: [],
-    name: "강수진",
-    region: "서울",
-  },
-  {
-    id: "7",
-    photos: ["https://api.dicebear.com/7.x/avataaars/svg?seed=7"],
-    mainPhotoIndex: 0,
-    birthYear: 1992,
-    marriageType: "초혼",
-    job: "간호사",
-    education: "국립대",
-    school: "국립대",
-    assets: "1억이상 10억미만",
-    religion: "가톨릭",
-    hasChildren: "무",
-    familyMembers: [],
-    name: "윤서연",
-    region: "인천",
-  },
-  {
-    id: "8",
-    photos: ["https://api.dicebear.com/7.x/avataaars/svg?seed=8"],
-    mainPhotoIndex: 0,
-    birthYear: 1996,
-    marriageType: "초혼",
-    job: "공기업/기관",
-    education: "국립대",
-    school: "국립대",
-    assets: "1억이상 10억미만",
-    religion: "그 외",
-    hasChildren: "무",
-    familyMembers: [],
-    name: "장동건",
-    region: "서울",
-  },
-  {
-    id: "9",
-    photos: ["https://api.dicebear.com/7.x/avataaars/svg?seed=9"],
-    mainPhotoIndex: 0,
-    birthYear: 1999,
-    marriageType: "초혼",
-    job: "간호사",
-    education: "그 외",
-    school: "그 외",
-    assets: "1억미만",
-    religion: "기독교",
-    hasChildren: "무",
-    familyMembers: [],
-    name: "오하나",
-    region: "경기",
-  },
-  {
-    id: "10",
-    photos: ["https://api.dicebear.com/7.x/avataaars/svg?seed=10"],
-    mainPhotoIndex: 0,
-    birthYear: 1991,
-    marriageType: "초혼",
-    job: "연구원",
-    education: "카이스트/포항공대/유니스트",
-    school: "포항공대",
-    assets: "1억이상 10억미만",
-    religion: "불교",
-    hasChildren: "무",
-    familyMembers: [],
-    name: "한재석",
-    region: "포항",
-  },
-];
+import { apiClient } from "@/lib/api/client";
 
-// API 함수들 (현재는 목업, 추후 실제 API로 교체)
+/**
+ * ========================================
+ * Client API Types (새로운 페이지네이션 API)
+ * ========================================
+ */
+
+// API 응답 wrapper
+export interface ApiResponse<T> {
+  data: T;
+  status: number;
+  message: string;
+  responseTime: string;
+}
+
+// 클라이언트 리스트 아이템 (GET /client 응답)
+export interface ClientListItem {
+  memberId: number;
+  memberName: string;
+  memberImage: string;
+  clientId: number;
+  clientName: string;
+  clientImage: string;
+  address: string;
+  university: string;
+  job: string;
+  gender: string;
+  height: number;
+  birthYear: number;
+}
+
+// 페이지네이션 응답 데이터
+export interface ClientListData {
+  totalPages: number;
+  currentPage: number;
+  list: ClientListItem[];
+}
+
+// 페이지네이션 파라미터
+export interface PaginationParams {
+  page: number;
+  size: number;
+}
+
+// UI 표시용 데이터 (ClientListItem을 컴포넌트에서 사용하기 쉬운 형태로 변환)
+export interface ClientDisplayData {
+  id: string;
+  name: string;
+  image: string;
+  job: string;
+  birthYear: number;
+  university: string;
+  address: string;
+  gender: string;
+  height: number;
+  memberName: string;
+  memberImage: string;
+}
+
+/**
+ * ========================================
+ * Profile API (기존)
+ * ========================================
+ */
+
+// API 함수들
 export const profileApi = {
   /**
    * 프로필 목록 조회
    */
   getProfiles: async (): Promise<Profile[]> => {
-    // 실제 API 호출 시뮬레이션 (지연 추가)
-    await new Promise(resolve => setTimeout(resolve, 300));
-    return mockProfiles;
+    const response = await apiClient.get<Profile[]>("/profiles");
+    return response.data;
   },
 
   /**
    * 프로필 상세 조회
    */
   getProfileById: async (id: string): Promise<Profile | null> => {
-    await new Promise(resolve => setTimeout(resolve, 200));
-    const profile = mockProfiles.find(p => p.id === id);
-    return profile || null;
+    try {
+      const response = await apiClient.get<Profile>(`/profiles/${id}`);
+      return response.data;
+    } catch (error) {
+      return null;
+    }
   },
 
   /**
@@ -262,68 +167,79 @@ export const profileApi = {
    * 검색 기준: 나이, 직업, 학벌, 종교, 지역
    */
   searchProfiles: async (params: SearchProfileParams): Promise<Profile[]> => {
-    await new Promise(resolve => setTimeout(resolve, 300));
-    const { keyword } = params;
-
-    if (!keyword.trim()) {
-      return mockProfiles;
-    }
-
-    const lowerKeyword = keyword.toLowerCase();
-
-    return mockProfiles.filter(profile => {
-      const age = calculateAge(profile.birthYear);
-      return (
-        profile.job.toLowerCase().includes(lowerKeyword) ||
-        profile.education.toLowerCase().includes(lowerKeyword) ||
-        (profile.region &&
-          profile.region.toLowerCase().includes(lowerKeyword)) ||
-        (profile.religion &&
-          profile.religion.toLowerCase().includes(lowerKeyword)) ||
-        age.toString().includes(lowerKeyword) ||
-        profile.birthYear.toString().includes(lowerKeyword)
-      );
-    });
+    const response = await apiClient.post<Profile[]>(
+      "/profiles/search",
+      params,
+    );
+    return response.data;
   },
 
   /**
    * 프로필 삭제
    */
   deleteProfile: async (id: string): Promise<void> => {
-    await new Promise(resolve => setTimeout(resolve, 200));
-    // 실제 구현 시 서버에 삭제 요청
-    const index = mockProfiles.findIndex(p => p.id === id);
-    if (index > -1) {
-      mockProfiles.splice(index, 1);
-    }
+    await apiClient.delete(`/profiles/${id}`);
   },
 
   /**
-   * 프로필 생성 (추후 구현)
+   * 프로필 생성
    */
   createProfile: async (profile: Omit<Profile, "id">): Promise<Profile> => {
-    await new Promise(resolve => setTimeout(resolve, 500));
-    const newProfile: Profile = {
-      ...profile,
-      id: String(Date.now()),
-    };
-    mockProfiles.push(newProfile);
-    return newProfile;
+    const response = await apiClient.post<Profile>("/profiles", profile);
+    return response.data;
   },
 
   /**
-   * 프로필 수정 (추후 구현)
+   * 프로필 수정
    */
   updateProfile: async (
     id: string,
     updates: Partial<Profile>,
   ): Promise<Profile> => {
-    await new Promise(resolve => setTimeout(resolve, 500));
-    const index = mockProfiles.findIndex(p => p.id === id);
-    if (index === -1) {
-      throw new Error("프로필을 찾을 수 없습니다.");
-    }
-    mockProfiles[index] = { ...mockProfiles[index], ...updates };
-    return mockProfiles[index];
+    const response = await apiClient.put<Profile>(`/profiles/${id}`, updates);
+    return response.data;
   },
 };
+
+/**
+ * ========================================
+ * Client API (새로운 페이지네이션 API)
+ * ========================================
+ */
+export const clientApi = {
+  /**
+   * 클라이언트 목록 조회 (페이지네이션)
+   */
+  getClients: async (
+    params: PaginationParams,
+  ): Promise<ApiResponse<ClientListData>> => {
+    const response = await apiClient.get<ApiResponse<ClientListData>>(
+      "/client",
+      {
+        params,
+      },
+    );
+    return response.data;
+  },
+};
+
+/**
+ * ClientListItem을 UI 표시용 ClientDisplayData로 변환
+ */
+export function mapClientToDisplay(
+  client: ClientListItem,
+): ClientDisplayData {
+  return {
+    id: String(client.clientId),
+    name: client.clientName,
+    image: client.clientImage,
+    job: client.job,
+    birthYear: client.birthYear,
+    university: client.university,
+    address: client.address,
+    gender: client.gender,
+    height: client.height,
+    memberName: client.memberName,
+    memberImage: client.memberImage,
+  };
+}
