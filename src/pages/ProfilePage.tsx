@@ -3,26 +3,39 @@ import { useNavigate } from "react-router";
 import { Menu, Plus } from "lucide-react";
 import { MainLayout } from "@/shared/components/layouts/MainLayout";
 import { Button } from "@/shared/components/ui/button";
-import { useProfiles } from "@/features/profile/hooks/useProfiles";
+import { useClients } from "@/features/profile/hooks/useClients";
 import { useSearchProfiles } from "@/features/profile/hooks/useSearchProfiles";
 import { ProfileGrid } from "@/features/profile/components/ProfileGrid";
 import { ProfileSearchBar } from "@/features/profile/components/ProfileSearchBar";
 import { ProfileDrawer } from "@/features/profile/components/ProfileDrawer";
+import { ClientPagination } from "@/features/profile/components/ClientPagination";
+import { mapClientToDisplay } from "@/features/profile/api/profileApi";
 
 export function ProfilePage() {
   const navigate = useNavigate();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
 
-  // 검색어가 있으면 검색 쿼리 사용, 없으면 전체 목록 쿼리 사용
-  const { data: allProfiles, isLoading: isLoadingAll } = useProfiles();
-  const { data: searchResults, isLoading: isSearching } = useSearchProfiles({
-    keyword: searchKeyword,
+  // 검색 중인지 확인
+  const isSearching = searchKeyword.trim().length > 0;
+
+  // 검색 쿼리
+  const { data: searchResults, isLoading: isSearchLoading } =
+    useSearchProfiles({ keyword: searchKeyword });
+
+  // 클라이언트 목록 쿼리
+  const { data: clientResponse, isLoading: isClientLoading } = useClients({
+    page: currentPage,
+    size: pageSize,
   });
 
-  // 검색어 여부에 따라 적절한 데이터와 로딩 상태 선택
-  const profiles = searchKeyword ? searchResults : allProfiles;
-  const isLoading = searchKeyword ? isSearching : isLoadingAll;
+  // 검색 중이면 검색 결과, 아니면 클라이언트 목록
+  const clients = clientResponse?.data.list.map(mapClientToDisplay) || [];
+  const totalPages = clientResponse?.data.totalPages || 1;
+  const profiles = isSearching ? searchResults : clients;
+  const isLoading = isSearching ? isSearchLoading : isClientLoading;
 
   return (
     <MainLayout>
@@ -61,6 +74,16 @@ export function ProfilePage() {
       {/* 프로필 그리드 */}
       <div className="p-4 pb-6">
         <ProfileGrid profiles={profiles || []} isLoading={isLoading} />
+
+        {/* 페이지네이션 (검색 중이 아닐 때만 표시) */}
+        {!isSearching && !isLoading && clients.length > 0 && (
+          <ClientPagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+            isLoading={isLoading}
+          />
+        )}
       </div>
 
       {/* 햄버거 메뉴 드로어 */}
