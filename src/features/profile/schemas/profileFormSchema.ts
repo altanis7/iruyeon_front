@@ -4,82 +4,71 @@
 import { z } from "zod";
 
 /**
- * 가족 구성원 스키마
+ * 가족 구성원 스키마 (기획서 기준 - 간소화)
  */
 export const familyMemberSchema = z.object({
-  relation: z.string().min(1, "관계를 선택해주세요"),
-  customRelation: z.string().optional(),
-  birthYear: z.number().optional(),
+  name: z.string().min(1, "이름을 입력해주세요"),
+  relationShip: z.string().min(1, "관계를 선택해주세요"),
   job: z.string().optional(),
-  jobDetail: z.string().optional(),
-  education: z.string().optional(),
-  school: z.string().optional(),
-  major: z.string().optional(),
+  birthYear: z.number().optional(),
   religion: z.string().optional(),
-  notes: z.string().optional(),
 });
 
 /**
- * 회원 프로필 스키마 (Step 1)
+ * 프로필 스키마 (단일 Step)
+ * 필수 필드: 10개 (name, phoneNumber, gender, birthYear, address, eduLevel, job, height, religion, maritalStatus)
  */
-export const userProfileSchema = z.object({
-  // 사진 (필수: 최소 1장, 최대 5장)
-  photos: z
-    .array(z.string())
-    .min(1, "최소 1장의 사진을 등록해주세요")
-    .max(5, "사진은 최대 5장까지 등록 가능합니다"),
-  mainPhotoIndex: z.number().min(0),
-  // 기본 정보 (필수)
+export const profileSchema = z.object({
+  // ===== 필수 필드 (10개) =====
+  name: z.string().min(1, "이름을 입력해주세요"),
+  phoneNumber: z.string().min(1, "전화번호를 입력해주세요"),
+  gender: z.string().min(1, "성별을 선택해주세요"),
   birthYear: z.number().min(1950, "출생년도를 확인해주세요"),
-  marriageType: z.string().min(1, "성혼유형을 선택해주세요"),
+  address: z.string().min(1, "거주지를 입력해주세요"),
+  eduLevel: z.string().min(1, "학력을 선택해주세요"),
   job: z.string().min(1, "직업을 선택해주세요"),
-  jobDetail: z.string().optional(),
-  education: z.string().min(1, "학력을 선택해주세요"),
-  school: z.string().optional(),
-  major: z.string().optional(),
-  height: z.string().optional(),
-  assets: z.string().min(1, "재산을 선택해주세요"),
+  height: z.number().min(1, "키를 입력해주세요"),
   religion: z.string().min(1, "종교를 선택해주세요"),
-  region: z.string().optional(),
-  hobbies: z.string().optional(),
-  characteristics: z.string().optional(),
-  hometown: z.string().optional(),
-  hasChildren: z.string().min(1, "아이 유무를 선택해주세요"),
-  notes: z.string().optional(),
-  // 가족 정보 (최대 5명)
-  familyMembers: z
-    .array(familyMemberSchema)
-    .max(5, "가족은 최대 5명까지 등록 가능합니다"),
-});
+  maritalStatus: z.string().min(1, "혼인 여부를 선택해주세요"),
 
-/**
- * 희망 상대 조건 스키마 (Step 2)
- */
-export const preferredConditionsSchema = z.object({
-  ageMin: z.number().optional(),
-  ageMax: z.number().optional(),
-  marriageTypes: z.array(z.string()).optional(),
-  jobs: z.array(z.string()).optional(),
-  educationTier: z.string().optional(),
-  schools: z.array(z.string()).optional(),
-  religions: z.array(z.string()).optional(),
-  region: z.string().optional(),
-  minHeight: z.string().optional(),
-  assets: z.array(z.string()).optional(),
-  notes: z.string().optional(),
-});
+  // ===== 선택 필드 =====
+  // 사진
+  imageIdList: z
+    .array(z.number())
+    .max(3, "사진은 최대 3장까지 등록 가능합니다")
+    .optional(),
 
-/**
- * 전체 프로필 폼 스키마
- */
-export const profileFormSchema = z.object({
-  userProfile: userProfileSchema,
-  preferredConditions: preferredConditionsSchema,
+  // 학력 상세
+  university: z.string().optional(),
+  highSchool: z.string().optional(),
+  major: z.string().optional(),
+
+  // 직업 상세
+  jobDetail: z.string().optional(),
+  previousJob: z.string().optional(),
+
+  // 재산/취미
+  property: z.string().optional(),
+  hobby: z.string().optional(),
+
+  // 성격/이상형 (키워드 선택 → 쉼표 연결 문자열)
+  personality: z.string().optional(),
+  idealType: z.string().optional(),
+
+  // 본가/기타
+  homeTown: z.string().optional(),
+  info: z
+    .string()
+    .max(100, "기타 특이사항은 최대 100자까지 입력 가능합니다")
+    .optional(),
+
+  // 희망 상대
+  minPreferredAge: z.number().optional(),
+  maxPreferredAge: z.number().optional(),
+
+  // 가족
+  family: z.array(familyMemberSchema).optional(),
 });
 
 export type FamilyMemberFormData = z.infer<typeof familyMemberSchema>;
-export type UserProfileFormData = z.infer<typeof userProfileSchema>;
-export type PreferredConditionsFormData = z.infer<
-  typeof preferredConditionsSchema
->;
-export type ProfileFormData = z.infer<typeof profileFormSchema>;
+export type ProfileFormData = z.infer<typeof profileSchema>;

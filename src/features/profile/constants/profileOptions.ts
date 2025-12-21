@@ -2,88 +2,73 @@
  * 프로필 생성 폼에서 사용하는 모든 선택 옵션 상수
  */
 
-// 직업 목록
+// 성별
+export const GENDER_OPTIONS = ["여자", "남자"] as const;
+
+// 직업 목록 (기획서 기준)
 export const JOB_OPTIONS = [
-  "간호사",
-  "건설",
-  "경영",
-  "공기업/기관",
-  "교육",
-  "군인",
-  "농업",
+  "전문직",
   "대기업",
   "중견기업",
   "중소기업",
-  "문화/예술",
-  "방송",
+  "공기업/기관",
   "부동산/임대",
-  "서비스직",
-  "엔터테인먼트",
   "연구원",
-  "개발원",
-  "운동",
-  "의사",
-  "판사",
-  "검사",
-  "변호사",
-  "회계사",
-  "세무사",
   "프리랜서",
+  "자영업자",
   "기타",
 ] as const;
 
-// 학력 등급 (티어)
-export const EDUCATION_TIERS = [
-  "카이스트/포항공대/유니스트",
-  "서울대/연세대/고려대",
-  "서강대/성균관대/한양대/GIST",
-  "중앙대/경희대/외대/시립대",
-  "건국대/동국대/홍익대",
-  "국민대/숭실대/세종대/단국대",
-  "국립대",
-  "그 외",
+// 학력 수준 (기존 EDUCATION_TIERS 대체)
+export const EDUCATION_LEVELS = [
+  "고졸",
+  "학사",
+  "석사",
+  "박사",
+  "전문대",
 ] as const;
 
-// 학력 등급별 구체적인 학교 매핑
-export const EDUCATION_SCHOOLS: Record<string, readonly string[]> = {
-  "카이스트/포항공대/유니스트": ["카이스트", "포항공대", "유니스트"],
-  "서울대/연세대/고려대": ["서울대", "연세대", "고려대"],
-  "서강대/성균관대/한양대/GIST": ["서강대", "성균관대", "한양대", "GIST"],
-  "중앙대/경희대/외대/시립대": ["중앙대", "경희대", "외대", "시립대"],
-  "건국대/동국대/홍익대": ["건국대", "동국대", "홍익대"],
-  "국민대/숭실대/세종대/단국대": ["국민대", "숭실대", "세종대", "단국대"],
-  "국립대": ["국립대"],
-  "그 외": ["그 외"],
-} as const;
-
-// 종교 목록
+// 종교 목록 (기획서 기준)
 export const RELIGION_OPTIONS = [
+  "무교",
   "기독교",
-  "가톨릭",
   "불교",
-  "그 외",
-] as const;
-
-// 재산 범위
-export const ASSET_OPTIONS = [
-  "1억미만",
-  "1억이상 10억미만",
-  "10억이상 100억미만",
-  "100억이상",
-] as const;
-
-// 성혼유형
-export const MARRIAGE_TYPE_OPTIONS = ["초혼", "재혼"] as const;
-
-// 아이 유무
-export const HAS_CHILDREN_OPTIONS = ["유", "무"] as const;
-
-// 가족 관계 타입
-export const FAMILY_RELATION_OPTIONS = [
-  "부",
-  "모",
-  "형제",
-  "자매",
-  "남매",
+  "천주교",
   "기타",
+] as const;
+
+// 재산 단위
+export const PROPERTY_UNITS = ["천만원", "억"] as const;
+
+// 성격/이상형 키워드
+export const PERSONALITY_KEYWORDS = [
+  "외향적인",
+  "시원시원한",
+  "유머있는",
+  "감성적인",
+  "상냥한",
+  "자유로운",
+  "귀여운",
+  "차분한",
+  "듬직한",
+  "낙천적인",
+  "지적인",
+  "4차원적인",
+  "열정적인",
+  "섹시한",
+] as const;
+
+// 혼인 여부 (maritalStatus)
+export const MARITAL_STATUS_OPTIONS = ["초혼", "재혼"] as const;
+
+// 가족 관계 타입 (기획서 기준)
+export const FAMILY_RELATION_OPTIONS = [
+  "아버지",
+  "어머니",
+  "오빠",
+  "형",
+  "누나",
+  "언니",
+  "여동생",
+  "남동생",
 ] as const;
