@@ -1,15 +1,19 @@
-import { useQuery } from "@tanstack/react-query";
-import { clientApi, type PaginationParams } from "../api/profileApi";
-
-export interface UseClientsParams extends PaginationParams {}
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { clientApi } from "../api/profileApi";
 
 /**
- * 페이지네이션된 클라이언트 목록을 가져오는 Hook
+ * 인피니티 스크롤로 클라이언트 목록을 가져오는 Hook
  */
-export function useClients(params: UseClientsParams) {
-  return useQuery({
-    queryKey: ["clients", params.page, params.size],
-    queryFn: () => clientApi.getClients(params),
-    placeholderData: previousData => previousData,
+export function useClients() {
+  return useInfiniteQuery({
+    queryKey: ["clients"],
+    queryFn: ({ pageParam = 1 }) =>
+      clientApi.getClients({ page: pageParam, size: 10 }),
+    getNextPageParam: (lastPage, allPages) => {
+      const currentPage = lastPage.data.currentPage;
+      const totalPages = lastPage.data.totalPages;
+      return currentPage < totalPages ? currentPage + 1 : undefined;
+    },
+    initialPageParam: 1,
   });
 }
