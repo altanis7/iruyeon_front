@@ -21,7 +21,7 @@ export function ProfileGrid({ profiles, isLoading }: ProfileGridProps) {
         {Array.from({ length: 6 }).map((_, i) => (
           <div
             key={i}
-            className="h-40 bg-gray-100 rounded-lg animate-pulse"
+            className="h-[320px] bg-gray-100 rounded-lg animate-pulse"
           />
         ))}
       </div>
@@ -45,7 +45,7 @@ export function ProfileGrid({ profiles, isLoading }: ProfileGridProps) {
         <ProfileCard
           key={profile.id}
           profile={profile}
-          onClick={() => navigate(`/profile/${profile.id}`)}
+          onClick={() => navigate(`/client/${profile.id}`)}
         />
       ))}
     </div>
