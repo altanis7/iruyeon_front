@@ -9,6 +9,7 @@ import { ProfileNewPage } from "@/pages/ProfileNewPage";
 import { ProfileEditPage } from "@/pages/ProfileEditPage";
 import { SentProfilesPage } from "@/pages/SentProfilesPage";
 import { ReceivedProfilesPage } from "@/pages/ReceivedProfilesPage";
+import { ClientDetailPage } from "@/pages/ClientDetailPage";
 import { Routes, Route, Navigate } from "react-router-dom";
 import RootLayout from "@/shared/components/layouts/RootLayout";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -121,6 +122,14 @@ const App = () => {
             element={
               <ProtectedRoute>
                 <ProfileEditPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/client/:clientId"
+            element={
+              <ProtectedRoute>
+                <ClientDetailPage />
               </ProtectedRoute>
             }
           />
