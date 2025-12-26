@@ -19,14 +19,13 @@ import {
 } from "../utils/response";
 
 const BASE_URL = import.meta.env.VITE_API_URL;
-const API_VERSION = "v0";
 
 export const profileHandlers = [
   /**
    * GET /api/v0/profiles
    * 프로필 목록 조회
    */
-  http.get(`${BASE_URL}/api/${API_VERSION}/profiles`, async () => {
+  http.get(`${BASE_URL}/api/v0/profiles`, async () => {
     await simulateDelay(300);
     const profiles = profilesStorage.get();
     return createSuccessResponse(profiles);
@@ -36,7 +35,7 @@ export const profileHandlers = [
    * GET /api/v0/profiles/:id
    * 프로필 상세 조회
    */
-  http.get(`${BASE_URL}/api/${API_VERSION}/profiles/:id`, async ({ params }) => {
+  http.get(`${BASE_URL}/api/v0/profiles/:id`, async ({ params }) => {
     await simulateDelay(200);
     const { id } = params;
 
@@ -54,7 +53,7 @@ export const profileHandlers = [
    * 프로필 검색
    */
   http.post<never, SearchProfileParams>(
-    `${BASE_URL}/api/${API_VERSION}/profiles/search`,
+    `${BASE_URL}/api/v0/profiles/search`,
     async ({ request }) => {
       await simulateDelay(300);
 
@@ -90,7 +89,7 @@ export const profileHandlers = [
    * 프로필 생성
    */
   http.post<never, Omit<Profile, "id">>(
-    `${BASE_URL}/api/${API_VERSION}/profiles`,
+    `${BASE_URL}/api/v0/profiles`,
     async ({ request }) => {
       await simulateDelay(500);
 
@@ -119,7 +118,7 @@ export const profileHandlers = [
    * 프로필 수정
    */
   http.put<{ id: string }, Partial<Profile>>(
-    `${BASE_URL}/api/${API_VERSION}/profiles/:id`,
+    `${BASE_URL}/api/v0/profiles/:id`,
     async ({ params, request }) => {
       await simulateDelay(500);
 
@@ -140,7 +139,7 @@ export const profileHandlers = [
    * DELETE /api/v0/profiles/:id
    * 프로필 삭제
    */
-  http.delete(`${BASE_URL}/api/${API_VERSION}/profiles/:id`, async ({ params }) => {
+  http.delete(`${BASE_URL}/api/v0/profiles/:id`, async ({ params }) => {
     await simulateDelay(200);
 
     const { id } = params;

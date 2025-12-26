@@ -19,7 +19,6 @@ import {
 } from "../utils/response";
 
 const BASE_URL = import.meta.env.VITE_API_URL;
-const API_VERSION = "v0";
 
 export const authHandlers = [
   /**
@@ -27,7 +26,7 @@ export const authHandlers = [
    * 회원가입
    */
   http.post<never, SignupRequest>(
-    `${BASE_URL}/api/${API_VERSION}/signup`,
+    `${BASE_URL}/api/v0/signup`,
     async ({ request }) => {
       await simulateDelay(500);
 
@@ -72,7 +71,7 @@ export const authHandlers = [
    * 이메일 중복 확인
    */
   http.post<never, CheckEmailRequest>(
-    `${BASE_URL}/api/${API_VERSION}/email/check`,
+    `${BASE_URL}/api/v0/email/check`,
     async ({ request }) => {
       await simulateDelay(200);
 
@@ -99,7 +98,7 @@ export const authHandlers = [
    * 로그인
    */
   http.post<never, LoginRequest>(
-    `${BASE_URL}/api/${API_VERSION}/login`,
+    `${BASE_URL}/api/v0/login`,
     async ({ request }) => {
       await simulateDelay(300);
 
