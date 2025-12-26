@@ -1,68 +1,63 @@
-import { useState } from "react";
+import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router";
-import { Menu, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { MainLayout } from "@/shared/components/layouts/MainLayout";
 import { Button } from "@/shared/components/ui/button";
-import { useClients } from "@/features/profile/hooks/useClients";
-import { useSearchProfiles } from "@/features/profile/hooks/useSearchProfiles";
-import { ProfileGrid } from "@/features/profile/components/ProfileGrid";
-import { ProfileSearchBar } from "@/features/profile/components/ProfileSearchBar";
-import { ProfileDrawer } from "@/features/profile/components/ProfileDrawer";
-import { ClientPagination } from "@/features/profile/components/ClientPagination";
-import { mapClientToDisplay } from "@/features/profile/api/profileApi";
+import { useMyClients } from "@/features/profile/hooks/useMyClients";
+import { MyClientCard } from "@/features/profile/components/MyClientCard";
+import { mapMyClientToDisplay } from "@/features/profile/api/profileApi";
 
 export function ProfilePage() {
   const navigate = useNavigate();
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [searchKeyword, setSearchKeyword] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 10;
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
-  // 검색 중인지 확인
-  const isSearching = searchKeyword.trim().length > 0;
+  const {
+    data,
+    isLoading,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  } = useMyClients();
 
-  // 검색 쿼리
-  const { data: searchResults, isLoading: isSearchLoading } =
-    useSearchProfiles({ keyword: searchKeyword });
+  // 모든 페이지의 클라이언트 데이터를 평탄화
+  const clients =
+    data?.pages.flatMap(page =>
+      page.data.list.map(mapMyClientToDisplay),
+    ) || [];
 
-  // 클라이언트 목록 쿼리
-  const { data: clientResponse, isLoading: isClientLoading } = useClients({
-    page: currentPage,
-    size: pageSize,
-  });
+  // Intersection Observer 설정
+  useEffect(() => {
+    if (observerRef.current) observerRef.current.disconnect();
 
-  // 검색 중이면 검색 결과, 아니면 클라이언트 목록
-  const clients = clientResponse?.data.list.map(mapClientToDisplay) || [];
-  const totalPages = clientResponse?.data.totalPages || 1;
-  const profiles = isSearching ? searchResults : clients;
-  const isLoading = isSearching ? isSearchLoading : isClientLoading;
+    observerRef.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+        fetchNextPage();
+      }
+    });
+
+    if (loadMoreRef.current) {
+      observerRef.current.observe(loadMoreRef.current);
+    }
+
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+    };
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   return (
     <MainLayout>
       {/* 헤더 */}
       <div className="sticky top-0 bg-white z-10 px-4 pt-safe-top pt-3 pb-3 border-b">
-        <div className="flex items-center gap-3">
-          {/* 햄버거 메뉴 */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-9 w-9 shrink-0"
-            onClick={() => setIsDrawerOpen(true)}
-          >
-            <Menu className="h-5 w-5" />
-          </Button>
-
-          {/* 검색바 */}
-          <ProfileSearchBar
-            value={searchKeyword}
-            onChange={setSearchKeyword}
-          />
+        <div className="flex items-center justify-between">
+          <h1 className="text-xl font-bold">프로필 관리</h1>
 
           {/* 프로필등록 버튼 */}
           <Button
             variant="default"
             size="sm"
-            className="shrink-0 h-9"
             onClick={() => navigate("/profile/new")}
           >
             <Plus className="h-4 w-4 mr-1" />
@@ -73,21 +68,41 @@ export function ProfilePage() {
 
       {/* 프로필 그리드 */}
       <div className="p-4 pb-6">
-        <ProfileGrid profiles={profiles || []} isLoading={isLoading} />
+        <div className="grid grid-cols-2 gap-3">
+          {isLoading ? (
+            Array.from({ length: 6 }).map((_, i) => (
+              <div
+                key={i}
+                className="h-[320px] bg-gray-100 rounded-lg animate-pulse"
+              />
+            ))
+          ) : clients.length === 0 ? (
+            <div className="col-span-2 flex flex-col items-center justify-center py-12 text-center">
+              <p className="text-gray-500 mb-2">등록된 회원이 없습니다</p>
+              <p className="text-sm text-gray-400">
+                프로필등록 버튼을 눌러 새 회원을 등록해보세요
+              </p>
+            </div>
+          ) : (
+            clients.map(client => (
+              <MyClientCard
+                key={client.id}
+                client={client}
+                onClick={() => navigate(`/client/${client.id}`)}
+              />
+            ))
+          )}
+        </div>
 
-        {/* 페이지네이션 (검색 중이 아닐 때만 표시) */}
-        {!isSearching && !isLoading && clients.length > 0 && (
-          <ClientPagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setCurrentPage}
-            isLoading={isLoading}
-          />
+        {/* 인피니티 스크롤 트리거 */}
+        {hasNextPage && (
+          <div ref={loadMoreRef} className="h-10 flex items-center justify-center">
+            {isFetchingNextPage && (
+              <div className="text-sm text-gray-500">로딩 중...</div>
+            )}
+          </div>
         )}
       </div>
-
-      {/* 햄버거 메뉴 드로어 */}
-      <ProfileDrawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen} />
     </MainLayout>
   );
 }
