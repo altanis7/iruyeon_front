@@ -18,7 +18,7 @@ interface EducationSelectProps {
 export function EducationSelect({
   value,
   onChange,
-  required = false,
+  required: _required = false,
   className,
 }: EducationSelectProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);

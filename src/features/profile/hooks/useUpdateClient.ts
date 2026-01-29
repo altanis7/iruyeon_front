@@ -12,7 +12,7 @@ export function useUpdateClient() {
   return useMutation({
     mutationFn: (data: UpdateClientRequest) =>
       clientManagementApi.updateClient(data),
-    onSuccess: (response, variables) => {
+    onSuccess: (_response, variables) => {
       // Invalidate specific client detail
       queryClient.invalidateQueries({
         queryKey: ["client", String(variables.clientId)],

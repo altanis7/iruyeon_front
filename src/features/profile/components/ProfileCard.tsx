@@ -2,7 +2,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avat
 import { Card, CardContent } from "@/shared/components/ui/card";
 import { cn } from "@/lib/utils";
 import type { Profile, ClientDisplayData } from "../api/profileApi";
-import { calculateAge } from "../api/profileApi";
 import {
   formatValue,
   formatHeight,
@@ -34,7 +33,7 @@ export function ProfileCard({ profile, onClick, className }: ProfileCardProps) {
   // 타입에 따라 다른 필드 사용
   const mainPhoto = isClientDisplayData(profile)
     ? profile.image
-    : profile.photos?.[profile.mainPhotoIndex] || profile.photos?.[0];
+    : undefined;
 
   const name = isClientDisplayData(profile)
     ? profile.name

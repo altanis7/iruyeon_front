@@ -8,6 +8,7 @@ import {
 } from "@/shared/components/ui/avatar";
 import { useProfile } from "@/features/profile/hooks/useProfile";
 import { useDeleteProfile } from "@/features/profile/hooks/useDeleteProfile";
+import { calculateAge } from "@/features/profile/api/profileApi";
 import RootLayout from "@/shared/components/layouts/RootLayout";
 
 export function ProfileDetailPage() {
@@ -17,7 +18,7 @@ export function ProfileDetailPage() {
   const { mutate: deleteProfile } = useDeleteProfile();
 
   const handleDelete = () => {
-    if (!profile) return;
+    if (!profile || !profile.id) return;
 
     if (window.confirm("정말로 이 프로필을 삭제하시겠습니까?")) {
       deleteProfile(profile.id);
@@ -79,7 +80,7 @@ export function ProfileDetailPage() {
         <div className="flex justify-center">
           <Avatar className="h-32 w-32">
             <AvatarImage
-              src={profile.photoUrl}
+              src={undefined}
               alt={profile.name || "프로필"}
             />
             <AvatarFallback className="text-3xl">
@@ -104,33 +105,25 @@ export function ProfileDetailPage() {
 
           <div>
             <dt className="text-sm font-medium text-gray-500 mb-1">나이</dt>
-            <dd className="text-base">{profile.age}세</dd>
+            <dd className="text-base">{calculateAge(profile.birthYear)}세</dd>
           </div>
 
           <div>
             <dt className="text-sm font-medium text-gray-500 mb-1">학력</dt>
-            <dd className="text-base">{profile.education}</dd>
+            <dd className="text-base">{profile.eduLevel}</dd>
           </div>
 
-          {profile.region && (
+          {profile.address && (
             <div>
               <dt className="text-sm font-medium text-gray-500 mb-1">지역</dt>
-              <dd className="text-base">{profile.region}</dd>
+              <dd className="text-base">{profile.address}</dd>
             </div>
           )}
 
-          {/* 추가 필드들 (있을 경우에만 표시) */}
           {profile.height && (
             <div>
               <dt className="text-sm font-medium text-gray-500 mb-1">키</dt>
               <dd className="text-base">{profile.height}cm</dd>
-            </div>
-          )}
-
-          {profile.weight && (
-            <div>
-              <dt className="text-sm font-medium text-gray-500 mb-1">몸무게</dt>
-              <dd className="text-base">{profile.weight}kg</dd>
             </div>
           )}
 
@@ -141,12 +134,12 @@ export function ProfileDetailPage() {
             </div>
           )}
 
-          {profile.marriageType && (
+          {profile.maritalStatus && (
             <div>
               <dt className="text-sm font-medium text-gray-500 mb-1">
-                성혼유형
+                혼인상태
               </dt>
-              <dd className="text-base">{profile.marriageType}</dd>
+              <dd className="text-base">{profile.maritalStatus}</dd>
             </div>
           )}
         </div>

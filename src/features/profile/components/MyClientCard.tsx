@@ -6,11 +6,7 @@ import {
 import { Card, CardContent } from "@/shared/components/ui/card";
 import { cn } from "@/lib/utils";
 import type { MyClientDisplayData } from "../api/profileApi";
-import {
-  formatValue,
-  formatHeight,
-  formatNameWithBirthYear,
-} from "../utils/clientFormat";
+import { formatValue } from "../utils/clientFormat";
 
 interface MyClientCardProps {
   client: MyClientDisplayData;
@@ -36,8 +32,6 @@ const statusConfig = {
  * - 활동/비활동 상태 배지 (맨 하단)
  */
 export function MyClientCard({ client, onClick, className }: MyClientCardProps) {
-  const displayName = formatNameWithBirthYear(client.name, client.birthYear);
-  const displayHeight = formatHeight(client.height);
   const displayUniversity = formatValue(client.university);
   const displayJob = formatValue(client.job);
   const displayAddress = formatValue(client.address);
