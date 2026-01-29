@@ -28,6 +28,12 @@ export const matchStatusConfig = {
     bgColor: "bg-gray-100",
     textColor: "text-gray-700",
   },
+  MATCHED: {
+    label: "매칭됨",
+    color: "blue",
+    bgColor: "bg-blue-100",
+    textColor: "text-blue-700",
+  },
 } as const;
 
 /**

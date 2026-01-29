@@ -9,7 +9,7 @@ export function useReceivedMatches() {
     queryKey: ["matches", "received"],
     queryFn: ({ pageParam = 1 }) =>
       matchApi.getReceivedMatches({ page: pageParam, size: 10 }),
-    getNextPageParam: (lastPage, allPages) => {
+    getNextPageParam: (lastPage, _allPages) => {
       const currentPage = lastPage.data.currentPage;
       const totalPages = lastPage.data.totalPages;
       return currentPage < totalPages ? currentPage + 1 : undefined;
