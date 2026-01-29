@@ -4,13 +4,12 @@ import { HomePage } from "@/pages/HomePage";
 import { MatchPage } from "@/pages/MatchPage";
 import { SettingPage } from "@/pages/SettingPage";
 import { ProfilePage } from "@/pages/ProfilePage";
-import { ProfileDetailPage } from "@/pages/ProfileDetailPage";
 import { ProfileNewPage } from "@/pages/ProfileNewPage";
 import { ProfileEditPage } from "@/pages/ProfileEditPage";
 import { SentProfilesPage } from "@/pages/SentProfilesPage";
 import { ReceivedProfilesPage } from "@/pages/ReceivedProfilesPage";
 import { ClientDetailPage } from "@/pages/ClientDetailPage";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useParams } from "react-router-dom";
 import RootLayout from "@/shared/components/layouts/RootLayout";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useAuth } from "@/features/auth/hooks/useAuth";
@@ -25,6 +24,11 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 function AuthRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth();
   return !isAuthenticated ? <>{children}</> : <Navigate to="/" replace />;
+}
+
+function ProfileRedirect() {
+  const { id } = useParams<{ id: string }>();
+  return <Navigate to={`/client/${id}`} replace />;
 }
 
 const App = () => {
@@ -113,7 +117,7 @@ const App = () => {
             path="/profile/:id"
             element={
               <ProtectedRoute>
-                <ProfileDetailPage />
+                <ProfileRedirect />
               </ProtectedRoute>
             }
           />

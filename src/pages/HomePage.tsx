@@ -4,7 +4,7 @@ import { Menu, Plus } from "lucide-react";
 import { MainLayout } from "@/shared/components/layouts/MainLayout";
 import { Button } from "@/shared/components/ui/button";
 import { useClients } from "@/features/profile/hooks/useClients";
-import { useSearchProfiles } from "@/features/profile/hooks/useSearchProfiles";
+import { useSearchClients } from "@/features/profile/hooks/useSearchClients";
 import { ProfileGrid } from "@/features/profile/components/ProfileGrid";
 import { ProfileSearchBar } from "@/features/profile/components/ProfileSearchBar";
 import { ProfileDrawer } from "@/features/profile/components/ProfileDrawer";
@@ -21,8 +21,8 @@ export function HomePage() {
   const isSearching = searchKeyword.trim().length > 0;
 
   // 검색 쿼리
-  const { data: searchResults, isLoading: isSearchLoading } =
-    useSearchProfiles({ keyword: searchKeyword });
+  const { data: searchResponse, isLoading: isSearchLoading } =
+    useSearchClients({ keyword: searchKeyword });
 
   // 클라이언트 목록 쿼리 (인피니티)
   const {
@@ -39,7 +39,7 @@ export function HomePage() {
       page.data.list.map(mapClientToDisplay),
     ) || [];
 
-  const profiles = isSearching ? searchResults : clients;
+  const profiles = isSearching ? (searchResponse?.data.list.map(mapClientToDisplay) || []) : clients;
   const isLoading = isSearching ? isSearchLoading : isClientLoading;
 
   // Intersection Observer 설정 (검색 중이 아닐 때만)

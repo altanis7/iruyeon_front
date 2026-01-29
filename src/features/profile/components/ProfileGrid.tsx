@@ -1,9 +1,9 @@
 import { useNavigate } from "react-router";
 import { ProfileCard } from "./ProfileCard";
-import type { Profile, ClientDisplayData } from "../api/profileApi";
+import type { ClientDisplayData } from "../api/profileApi";
 
 interface ProfileGridProps {
-  profiles: (Profile | ClientDisplayData)[];
+  profiles: ClientDisplayData[];
   isLoading?: boolean;
 }
 

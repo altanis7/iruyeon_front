@@ -17,7 +17,7 @@ import { KeywordSelector } from "./KeywordSelector";
 import { PropertyInput } from "./PropertyInput";
 import { HeightInputDialog } from "./HeightInputDialog";
 import { AgeRangeInput } from "./AgeRangeInput";
-import { useCreateProfile } from "../hooks/useCreateProfile";
+import { useCreateClient } from "../hooks/useCreateClient";
 import { profileSchema } from "../schemas/profileFormSchema";
 import type { ProfileFormData } from "../schemas/profileFormSchema";
 import {
@@ -30,7 +30,7 @@ import {
 import { cn } from "@/lib/utils";
 
 export function ProfileCreateForm() {
-  const createProfileMutation = useCreateProfile();
+  const createProfileMutation = useCreateClient();
 
   const {
     watch,
