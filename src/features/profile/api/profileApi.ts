@@ -220,73 +220,6 @@ export interface ClientDetail {
 
 /**
  * ========================================
- * Profile API (기존)
- * ========================================
- */
-
-// API 함수들
-export const profileApi = {
-  /**
-   * 프로필 목록 조회
-   */
-  getProfiles: async (): Promise<Profile[]> => {
-    const response = await apiClient.get<Profile[]>("/profiles");
-    return response.data;
-  },
-
-  /**
-   * 프로필 상세 조회
-   */
-  getProfileById: async (id: string): Promise<Profile | null> => {
-    try {
-      const response = await apiClient.get<Profile>(`/profiles/${id}`);
-      return response.data;
-    } catch (error) {
-      return null;
-    }
-  },
-
-  /**
-   * 프로필 검색
-   * 검색 기준: 나이, 직업, 학벌, 종교, 지역
-   */
-  searchProfiles: async (params: SearchProfileParams): Promise<Profile[]> => {
-    const response = await apiClient.post<Profile[]>(
-      "/profiles/search",
-      params,
-    );
-    return response.data;
-  },
-
-  /**
-   * 프로필 삭제
-   */
-  deleteProfile: async (id: string): Promise<void> => {
-    await apiClient.delete(`/profiles/${id}`);
-  },
-
-  /**
-   * 프로필 생성
-   */
-  createProfile: async (profile: Omit<Profile, "id">): Promise<Profile> => {
-    const response = await apiClient.post<Profile>("/profiles", profile);
-    return response.data;
-  },
-
-  /**
-   * 프로필 수정
-   */
-  updateProfile: async (
-    id: string,
-    updates: Partial<Profile>,
-  ): Promise<Profile> => {
-    const response = await apiClient.put<Profile>(`/profiles/${id}`, updates);
-    return response.data;
-  },
-};
-
-/**
- * ========================================
  * Client API (새로운 페이지네이션 API)
  * ========================================
  */
@@ -329,6 +262,32 @@ export const clientApi = {
       {
         params,
       },
+    );
+    return response.data;
+  },
+
+  /**
+   * 클라이언트 생성
+   */
+  createClient: async (
+    profile: Omit<Profile, "id">,
+  ): Promise<ApiResponse<ClientDetail>> => {
+    const response = await apiClient.post<ApiResponse<ClientDetail>>(
+      "/client",
+      profile,
+    );
+    return response.data;
+  },
+
+  /**
+   * 클라이언트 검색
+   */
+  searchClients: async (
+    params: SearchProfileParams,
+  ): Promise<ApiResponse<ClientListData>> => {
+    const response = await apiClient.post<ApiResponse<ClientListData>>(
+      "/client/search",
+      params,
     );
     return response.data;
   },
