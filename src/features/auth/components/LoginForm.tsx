@@ -26,13 +26,13 @@ export function LoginForm({
 
     try {
       const response = await loginAPI({ email, password });
-      // 로그인 성공 시 사용자 정보를 login 함수에 전달
-      if (response.success && response.data) {
-        login({
+      if (response.data && response.data.token) {
+        login(response.data.token, {
           id: String(response.data.id),
-          email: response.data.email,
-          name: response.data.name,
+          role: response.data.role,
         });
+      } else {
+        setError("로그인 응답이 올바르지 않습니다.");
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "로그인에 실패했습니다.");

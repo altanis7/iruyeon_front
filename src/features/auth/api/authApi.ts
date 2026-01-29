@@ -42,14 +42,15 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
-  success: boolean;
-  message: string;
-  data?: {
-    id: string;
-    email: string;
-    name: string;
-    token?: string;
+  data: {
+    id: number;
+    token: string;
+    role: string;
+    status: string;
   };
+  status: number;
+  message: string;
+  responseTime: string;
 }
 
 export interface CheckEmailRequest {

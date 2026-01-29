@@ -8,12 +8,25 @@ export const apiClient = axios.create({
   timeout: 10000,
 });
 
-// 쿠키에서 값 읽기
-function getCookie(name: string): string | null {
+// 쿠키 유틸리티
+export function getCookie(name: string): string | null {
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
   if (parts.length === 2) return parts.pop()?.split(";").shift() || null;
   return null;
+}
+
+export function setCookie(
+  name: string,
+  value: string,
+  maxAgeDays: number = 7,
+): void {
+  const isSecure = window.location.protocol === "https:";
+  document.cookie = `${name}=${value}; path=/; max-age=${maxAgeDays * 86400}; SameSite=Strict${isSecure ? "; Secure" : ""}`;
+}
+
+export function removeCookie(name: string): void {
+  document.cookie = `${name}=; path=/; max-age=0`;
 }
 
 apiClient.interceptors.request.use(
