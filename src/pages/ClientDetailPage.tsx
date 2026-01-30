@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, useParams } from "react-router";
+import { useNavigate, useParams, useSearchParams } from "react-router";
 import { ArrowLeft, Edit, Trash2, ToggleLeft, ToggleRight } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
 import {
@@ -9,6 +9,8 @@ import {
 } from "@/shared/components/ui/avatar";
 import { Card, CardContent } from "@/shared/components/ui/card";
 import { useClient } from "@/features/profile/hooks/useClient";
+import { useClientInfo } from "@/features/profile/hooks/useClientInfo";
+import type { ClientInfoFamilyMember } from "@/features/profile/api/profileApi";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useToggleClientStatus } from "@/features/profile/hooks/useToggleClientStatus";
 import { useDeleteClient } from "@/features/profile/hooks/useDeleteClient";
@@ -26,7 +28,18 @@ import {
 export function ClientDetailPage() {
   const navigate = useNavigate();
   const { clientId } = useParams<{ clientId: string }>();
-  const { data: response, isLoading } = useClient(clientId!);
+  const [searchParams] = useSearchParams();
+  const isFromProfile = searchParams.get("source") === "profile";
+
+  // 상호 배타적 API 호출: source=profile이면 /info API, 아니면 기존 API
+  const { data: clientResponse, isLoading: clientLoading } = useClient(
+    isFromProfile ? "" : clientId!,
+  );
+  const { data: clientInfoResponse, isLoading: clientInfoLoading } =
+    useClientInfo(isFromProfile ? clientId! : "");
+
+  const response = isFromProfile ? clientInfoResponse : clientResponse;
+  const isLoading = isFromProfile ? clientInfoLoading : clientLoading;
   const { currentUser } = useAuth();
 
   // Mutations
@@ -170,10 +183,7 @@ export function ClientDetailPage() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => {
-                /* TODO: 수정 기능 구현 */
-                alert("수정 기능은 추후 구현 예정입니다.");
-              }}
+              onClick={() => navigate(`/profile/${clientId}/edit?source=profile`)}
               className="flex-1 gap-2"
             >
               <Edit className="h-4 w-4" />
@@ -281,8 +291,14 @@ export function ClientDetailPage() {
                       small
                     />
                     <InfoRow
-                      label="출생년도"
-                      value={formatBirthYear(family.birthYear)}
+                      label="나이"
+                      value={
+                        "age" in family
+                          ? (family as ClientInfoFamilyMember).age
+                          : formatBirthYear(
+                              (family as { birthYear: number }).birthYear,
+                            )
+                      }
                       small
                     />
                     <InfoRow
@@ -310,6 +326,22 @@ export function ClientDetailPage() {
                       value={formatValue(family.property)}
                       small
                     />
+                    {"major" in family && family.major && (
+                      <InfoRow
+                        label="전공"
+                        value={formatValue(family.major)}
+                        small
+                      />
+                    )}
+                    {"maritalStatus" in family && family.maritalStatus && (
+                      <InfoRow
+                        label="혼인상태"
+                        value={formatValue(
+                          family.maritalStatus as string,
+                        )}
+                        small
+                      />
+                    )}
                     {family.info && (
                       <InfoRow
                         label="기타"

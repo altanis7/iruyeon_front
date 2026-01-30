@@ -34,6 +34,7 @@ function convertFormDataToProfile(
     info: formData.info || undefined,
     minPreferredAge: formData.minPreferredAge ?? undefined,
     maxPreferredAge: formData.maxPreferredAge ?? undefined,
+    totalMeetingCnt: formData.totalMeetingCnt ?? undefined,
     family: formData.family?.length ? formData.family : undefined,
   };
 }

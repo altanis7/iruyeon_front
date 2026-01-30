@@ -18,6 +18,8 @@ import { PropertyInput } from "./PropertyInput";
 import { HeightInputDialog } from "./HeightInputDialog";
 import { AgeRangeInput } from "./AgeRangeInput";
 import { useCreateClient } from "../hooks/useCreateClient";
+import { useUpdateClient } from "../hooks/useUpdateClient";
+import { convertFormDataToUpdateRequest } from "../utils/formDataToUpdateRequest";
 import { profileSchema } from "../schemas/profileFormSchema";
 import type { ProfileFormData } from "../schemas/profileFormSchema";
 import {
@@ -29,8 +31,21 @@ import {
 } from "../constants/profileOptions";
 import { cn } from "@/lib/utils";
 
-export function ProfileCreateForm() {
+interface ProfileCreateFormProps {
+  mode?: 'create' | 'edit';
+  defaultValues?: ProfileFormData;
+  clientId?: number;
+  onSuccess?: () => void;
+}
+
+export function ProfileCreateForm({
+  mode = 'create',
+  defaultValues: externalDefaults,
+  clientId,
+  onSuccess,
+}: ProfileCreateFormProps = {}) {
   const createProfileMutation = useCreateClient();
+  const updateMutation = useUpdateClient();
 
   const {
     watch,
@@ -40,7 +55,7 @@ export function ProfileCreateForm() {
   } = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
     mode: "onTouched",
-    defaultValues: {
+    defaultValues: externalDefaults ?? {
       imageIdList: [],
       name: "",
       phoneNumber: "",
@@ -104,13 +119,22 @@ export function ProfileCreateForm() {
 
   // 최종 제출
   const onSubmit = (data: ProfileFormData) => {
-    createProfileMutation.mutate(data);
+    if (mode === 'edit' && clientId) {
+      const updateRequest = convertFormDataToUpdateRequest(data, clientId);
+      updateMutation.mutate(updateRequest, {
+        onSuccess: () => onSuccess?.(),
+      });
+    } else {
+      createProfileMutation.mutate(data);
+    }
   };
+
+  const isPending = mode === 'create' ? createProfileMutation.isPending : updateMutation.isPending;
 
   return (
     <div className="p-6 max-w-2xl mx-auto">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        <h2 className="text-xl font-bold mb-4">프로필 등록</h2>
+        <h2 className="text-xl font-bold mb-4">{mode === 'create' ? '프로필 등록' : '프로필 수정'}</h2>
 
         {/* 1. 프로필 사진 (PhotoUpload는 나중에 추가) */}
         <div className="space-y-2">
@@ -385,9 +409,11 @@ export function ProfileCreateForm() {
             type="submit"
             size="lg"
             className="w-full"
-            disabled={createProfileMutation.isPending}
+            disabled={isPending}
           >
-            {createProfileMutation.isPending ? "등록 중..." : "등록 완료"}
+            {isPending
+              ? (mode === 'create' ? "등록 중..." : "수정 중...")
+              : (mode === 'create' ? "등록 완료" : "수정 완료")}
           </Button>
         </div>
       </form>

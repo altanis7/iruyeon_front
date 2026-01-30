@@ -88,7 +88,7 @@ export function ProfilePage() {
               <MyClientCard
                 key={client.id}
                 client={client}
-                onClick={() => navigate(`/client/${client.id}`)}
+                onClick={() => navigate(`/client/${client.id}?source=profile`)}
               />
             ))
           )}
