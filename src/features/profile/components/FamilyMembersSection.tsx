@@ -25,7 +25,7 @@ export function FamilyMembersSection({
 
     const newMember: FamilyMember = {
       name: "",
-      relationShip: "",
+      relationship: "",
       job: undefined,
       birthYear: undefined,
       religion: undefined,

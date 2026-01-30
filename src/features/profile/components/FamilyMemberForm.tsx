@@ -1,6 +1,6 @@
 /**
  * 단일 가족 구성원 입력 폼 컴포넌트 (기획서 기준 - 간소화)
- * 5개 필드: 이름, 관계, 직업, 출생년도, 종교
+ * 10개 필드: 이름, 관계, 직업, 출생년도, 종교, 직업 상세, 거주지, 대학교, 재산, 기타 정보
  */
 import { useState } from "react";
 import { Button } from "@/shared/components/ui/button";
@@ -37,7 +37,7 @@ export function FamilyMemberForm({
   };
 
   const handleRelationConfirm = (value: string) => {
-    handleUpdate({ relationShip: value });
+    handleUpdate({ relationship: value });
   };
 
   const handleYearConfirm = (year: number) => {
@@ -86,7 +86,7 @@ export function FamilyMemberForm({
             className="w-full justify-start mt-2"
             onClick={() => setIsRelationDialogOpen(true)}
           >
-            {member.relationShip || "관계를 선택하세요"}
+            {member.relationship || "관계를 선택하세요"}
           </Button>
         </div>
 
@@ -130,13 +130,76 @@ export function FamilyMemberForm({
           </Button>
         </div>
 
+        {/* --- 상세 정보 --- */}
+        <div className="border-t pt-4 mt-4 space-y-4">
+          {/* 6. 직업 상세 */}
+          <div>
+            <Label>직업 상세</Label>
+            <Input
+              type="text"
+              placeholder="직업 상세를 입력하세요"
+              value={member.jobDetail || ""}
+              onChange={e => handleUpdate({ jobDetail: e.target.value })}
+              className="mt-2"
+            />
+          </div>
+
+          {/* 7. 거주지 */}
+          <div>
+            <Label>거주지</Label>
+            <Input
+              type="text"
+              placeholder="거주지를 입력하세요"
+              value={member.address || ""}
+              onChange={e => handleUpdate({ address: e.target.value })}
+              className="mt-2"
+            />
+          </div>
+
+          {/* 8. 대학교 */}
+          <div>
+            <Label>대학교</Label>
+            <Input
+              type="text"
+              placeholder="대학교를 입력하세요"
+              value={member.university || ""}
+              onChange={e => handleUpdate({ university: e.target.value })}
+              className="mt-2"
+            />
+          </div>
+
+          {/* 9. 재산 */}
+          <div>
+            <Label>재산</Label>
+            <Input
+              type="text"
+              placeholder="재산 정보를 입력하세요"
+              value={member.property || ""}
+              onChange={e => handleUpdate({ property: e.target.value })}
+              className="mt-2"
+            />
+          </div>
+
+          {/* 10. 기타 정보 */}
+          <div>
+            <Label>기타 정보</Label>
+            <Input
+              type="text"
+              placeholder="기타 정보를 입력하세요"
+              value={member.info || ""}
+              onChange={e => handleUpdate({ info: e.target.value })}
+              className="mt-2"
+            />
+          </div>
+        </div>
+
         {/* 다이얼로그들 */}
         <ProfilePickerDialog
           open={isRelationDialogOpen}
           onOpenChange={setIsRelationDialogOpen}
           title="관계 선택"
           options={FAMILY_RELATION_OPTIONS}
-          selectedValue={member.relationShip || ""}
+          selectedValue={member.relationship || ""}
           onConfirm={handleRelationConfirm}
         />
 
