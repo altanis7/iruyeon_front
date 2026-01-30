@@ -7,10 +7,15 @@
  */
 export interface FamilyMember {
   name: string; // 이름 (필수)
-  relationShip: string; // 관계 (필수) - API 필드명
+  relationship: string; // 관계 (필수) - PATCH API 기준 소문자 통일
   job?: string; // 직업 (선택)
   birthYear?: number; // 출생년도 (선택)
   religion?: string; // 종교 (선택)
+  jobDetail?: string; // 직업 상세 (선택)
+  address?: string; // 주소 (선택)
+  university?: string; // 대학교 (선택)
+  property?: string; // 재산 (선택)
+  info?: string; // 기타 정보 (선택)
 }
 
 // 프로필 타입 정의 (API 필드명과 일치)
@@ -58,6 +63,9 @@ export interface Profile {
   // 희망 상대 조건
   minPreferredAge?: number; // 희망 나이 최소
   maxPreferredAge?: number; // 희망 나이 최대
+
+  // 만남 횟수
+  totalMeetingCnt?: number; // 전체 만남 횟수
 
   // 가족 정보
   family?: FamilyMember[]; // familyMembers → family
@@ -148,6 +156,8 @@ export interface MyClientListItem {
   gender: string;
   height: number;
   birthYear: number;
+  totalMeetingCnt?: number; // 전체 만남 횟수
+  currentMeetingCnt?: number; // 현재 만남 횟수
   status: "ACTIVE" | "INACTIVE"; // 활동 상태
 }
 
@@ -169,6 +179,8 @@ export interface MyClientDisplayData {
   address: string;
   gender: string;
   height: number;
+  totalMeetingCnt?: number;
+  currentMeetingCnt?: number;
   status: "ACTIVE" | "INACTIVE";
 }
 
@@ -184,6 +196,22 @@ export interface ClientFamilyMember {
   jobDetail: string; // 직업 상세
   religion: string; // 종교
   info: string | null; // 기타 정보
+}
+
+// 클라이언트 가족 구성원 정보 (GET /client/:id/info 응답)
+export interface ClientInfoFamilyMember {
+  relationship: string;
+  name: string;
+  age: string; // "68세 (1958년생)" 형식
+  address: string;
+  property: string;
+  university: string;
+  major: string | null; // 전공 (새 필드)
+  job: string | null;
+  jobDetail: string;
+  religion: string;
+  info: string | null;
+  maritalStatus: string | null; // 혼인상태 (새 필드)
 }
 
 // 클라이언트 상세 정보 (GET /client/:id 응답)
@@ -218,6 +246,13 @@ export interface ClientDetail {
   families: ClientFamilyMember[]; // 가족 구성원 배열
 }
 
+// 클라이언트 상세 정보 (GET /client/:id/info 응답)
+export interface ClientInfoDetail extends Omit<ClientDetail, "families"> {
+  interest: string; // 관심사 (새 필드)
+  childCnt: number; // 자녀 수 (새 필드)
+  families: ClientInfoFamilyMember[]; // 새 가족 타입
+}
+
 /**
  * ========================================
  * Client API (새로운 페이지네이션 API)
@@ -247,6 +282,18 @@ export const clientApi = {
   ): Promise<ApiResponse<ClientDetail>> => {
     const response = await apiClient.get<ApiResponse<ClientDetail>>(
       `/client/${clientId}`,
+    );
+    return response.data;
+  },
+
+  /**
+   * 클라이언트 상세 정보 조회 (프로필 관리용)
+   */
+  getClientInfoById: async (
+    clientId: string,
+  ): Promise<ApiResponse<ClientInfoDetail>> => {
+    const response = await apiClient.get<ApiResponse<ClientInfoDetail>>(
+      `/client/${clientId}/info`,
     );
     return response.data;
   },
@@ -330,6 +377,8 @@ export function mapMyClientToDisplay(
     address: client.address,
     gender: client.gender,
     height: client.height,
+    totalMeetingCnt: client.totalMeetingCnt,
+    currentMeetingCnt: client.currentMeetingCnt,
     status: client.status,
   };
 }
@@ -383,6 +432,9 @@ export interface UpdateClientRequest {
   minPreferredAge?: number;
   maxPreferredAge?: number;
 
+  // 만남 횟수
+  totalMeetingCnt?: number; // 전체 만남 횟수
+
   // 가족 정보
   family?: Array<{
     relationship: string;
@@ -422,7 +474,7 @@ export const clientManagementApi = {
   toggleClientStatus: async (
     memberId: number,
   ): Promise<ApiResponse<ToggleStatusResponse>> => {
-    const response = await apiClient.patch<ApiResponse<ToggleStatusResponse>>(
+    const response = await apiClient.post<ApiResponse<ToggleStatusResponse>>(
       `/client/status/${memberId}`,
     );
     return response.data;
@@ -451,7 +503,7 @@ export const clientManagementApi = {
     const response = await apiClient.delete<
       ApiResponse<DeleteClientResponse>
     >(`/client`, {
-      data: { clientId },
+      params: { id: clientId },
     });
     return response.data;
   },
