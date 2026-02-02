@@ -13,35 +13,32 @@ export type MatchStatus =
   | "REJECTED"
   | "PENDING"
   | "ACCEPTED"
-  | "MATCHED";
+  | "MATCHED"
+  | "DEACTIVATED_USER";
 
 /**
- * 매칭 상대방 클라이언트 정보
+ * 멤버+클라이언트 정보 DTO (API 응답 구조)
  */
-export interface MemberClientInfo {
+export interface MemberClientDTO {
   memberId: number;
   memberName: string;
-  memberImage: string;
+  memberImage: string | null;
   clientId: number;
   clientName: string;
-  clientImage: string;
-  age: string; // "32세 (1993년생)" 형식
-  address: string;
-  university: string;
-  job: string;
-  gender: string;
+  clientImage: string | null;
+  clientJob: string;
+  clientSchool: string;
 }
 
 /**
- * 받은 매칭 아이템
+ * 매칭 아이템 (API 응답 구조 - received/sent/matched 공통)
  */
 export interface ReceivedMatch {
   matchId: number;
   matchStatus: MatchStatus;
-  message: string;
-  memberClientResponseDTO: MemberClientInfo;
-  openAt: string; // ISO datetime
-  reply: string | null;
+  newChatCnt: number;
+  oppositeMemberClientDTO: MemberClientDTO;
+  memberClientResponseDTO: MemberClientDTO;
 }
 
 /**

@@ -34,6 +34,12 @@ export const matchStatusConfig = {
     bgColor: "bg-blue-100",
     textColor: "text-blue-700",
   },
+  DEACTIVATED_USER: {
+    label: "비활성 회원",
+    color: "gray",
+    bgColor: "bg-gray-100",
+    textColor: "text-gray-500",
+  },
 } as const;
 
 /**
