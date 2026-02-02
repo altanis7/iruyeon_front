@@ -38,6 +38,17 @@ export function MatchPage() {
   const sentMatches = sentData?.pages.flatMap(page => page.data.list) || [];
   const matchedMatches = matchedData?.pages.flatMap(page => page.data.list) || [];
 
+  // 뱃지 카운트 계산
+  const receivedNewChatCount = receivedMatches.reduce(
+    (sum, match) => sum + match.newChatCnt, 0
+  );
+  const sentNewChatCount = sentMatches.reduce(
+    (sum, match) => sum + match.newChatCnt, 0
+  );
+  const matchedNewChatCount = matchedMatches.reduce(
+    (sum, match) => sum + match.newChatCnt, 0
+  );
+
   return (
     <MainLayout>
       {/* 헤더 */}
@@ -49,20 +60,27 @@ export function MatchPage() {
           <TabsList className="w-full grid grid-cols-3">
             <TabsTrigger value="received" className="relative">
               받은 매칭
-              {/* 임시 하드코딩 뱃지 */}
-              <span className="ml-1 inline-flex items-center justify-center w-5 h-5 text-xs bg-red-500 text-white rounded-full">
-                2
-              </span>
+              {receivedNewChatCount > 0 && (
+                <span className="ml-1 inline-flex items-center justify-center w-5 h-5 text-xs bg-red-500 text-white rounded-full">
+                  {receivedNewChatCount}
+                </span>
+              )}
             </TabsTrigger>
             <TabsTrigger value="sent">
               보낸 매칭
+              {sentNewChatCount > 0 && (
+                <span className="ml-1 inline-flex items-center justify-center w-5 h-5 text-xs bg-red-500 text-white rounded-full">
+                  {sentNewChatCount}
+                </span>
+              )}
             </TabsTrigger>
             <TabsTrigger value="completed" className="relative">
               매칭 완료
-              {/* 임시 하드코딩 뱃지 */}
-              <span className="ml-1 inline-flex items-center justify-center w-5 h-5 text-xs bg-red-500 text-white rounded-full">
-                1
-              </span>
+              {matchedNewChatCount > 0 && (
+                <span className="ml-1 inline-flex items-center justify-center w-5 h-5 text-xs bg-red-500 text-white rounded-full">
+                  {matchedNewChatCount}
+                </span>
+              )}
             </TabsTrigger>
           </TabsList>
 
