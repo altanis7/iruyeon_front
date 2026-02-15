@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Card, CardContent } from "@/shared/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/shared/components/ui/avatar";
 import { Button } from "@/shared/components/ui/button";
@@ -5,6 +6,7 @@ import { ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { ReceivedMatch, MemberClientDTO } from "../api/matchApi";
 import { matchStatusConfig } from "../utils/matchFormat";
+import { ChatModal } from "./ChatModal";
 
 interface MatchCardProps {
   match: ReceivedMatch;
@@ -59,7 +61,8 @@ function ClientProfile({
  * - newChatCnt 기반 채팅 뱃지
  */
 export function MatchCard({ match, className }: MatchCardProps) {
-  const { memberClientResponseDTO, oppositeMemberClientDTO, matchStatus, newChatCnt } = match;
+  const [chatOpen, setChatOpen] = useState(false);
+  const { memberClientResponseDTO, oppositeMemberClientDTO, matchStatus, newChatCnt, matchId } = match;
   const statusConfig = matchStatusConfig[matchStatus];
 
   return (
@@ -115,7 +118,12 @@ export function MatchCard({ match, className }: MatchCardProps) {
               비활성 회원
             </div>
           ) : matchStatus !== "REJECTED" && matchStatus !== "CANCELED" ? (
-            <Button variant="default" className="flex-1 relative" size="sm">
+            <Button
+              variant="default"
+              className="flex-1 relative"
+              size="sm"
+              onClick={() => setChatOpen(true)}
+            >
               채팅 보기
               {newChatCnt > 0 && (
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
@@ -126,6 +134,13 @@ export function MatchCard({ match, className }: MatchCardProps) {
           ) : null}
         </div>
       </CardContent>
+
+      {/* 채팅 모달 */}
+      <ChatModal
+        matchId={matchId}
+        open={chatOpen}
+        onOpenChange={setChatOpen}
+      />
     </Card>
   );
 }

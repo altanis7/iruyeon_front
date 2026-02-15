@@ -1,3 +1,5 @@
+import { format, parseISO } from "date-fns";
+import { ko } from "date-fns/locale";
 import type { MatchStatus } from "../api/matchApi";
 
 /**
@@ -58,4 +60,12 @@ export function formatMatchDate(dateString: string): string {
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const day = String(date.getDate()).padStart(2, "0");
   return `${year}.${month}.${day}`;
+}
+
+/**
+ * 채팅 시간 포맷팅 ("2025-12-19T13:25:12.46069" → "오후 01:25")
+ */
+export function formatChatTime(isoString: string): string {
+  const date = parseISO(isoString);
+  return format(date, "a hh:mm", { locale: ko });
 }

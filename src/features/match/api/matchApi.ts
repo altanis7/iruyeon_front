@@ -59,6 +59,34 @@ export interface ReceivedMatchesParams {
 }
 
 /**
+ * 채팅 메시지
+ */
+export interface ChatMessage {
+  id: number;
+  senderId: number;
+  message: string;
+  createdAt: string;
+}
+
+/**
+ * 채팅 데이터 (API 응답)
+ */
+export interface ChatData {
+  chatRoomId: number;
+  oppositeMemberImage: string | null;
+  oppositeMemberName: string;
+  message: ChatMessage[];
+}
+
+/**
+ * 채팅 전송 요청
+ */
+export interface SendChatRequest {
+  matchId: number;
+  message: string;
+}
+
+/**
  * 매칭 API 함수
  */
 export const matchApi = {
@@ -103,6 +131,27 @@ export const matchApi = {
       {
         params,
       },
+    );
+    return response.data;
+  },
+
+  /**
+   * 채팅 내역 조회
+   */
+  getChat: async (matchId: number): Promise<ApiResponse<ChatData>> => {
+    const response = await apiClient.get<ApiResponse<ChatData>>(
+      `/match/chat/${matchId}`,
+    );
+    return response.data;
+  },
+
+  /**
+   * 채팅 메시지 전송
+   */
+  sendChat: async (request: SendChatRequest): Promise<ApiResponse<null>> => {
+    const response = await apiClient.post<ApiResponse<null>>(
+      "/match/chat",
+      request,
     );
     return response.data;
   },
