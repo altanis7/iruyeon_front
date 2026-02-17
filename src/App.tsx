@@ -9,7 +9,10 @@ import { ProfileEditPage } from "@/pages/ProfileEditPage";
 import { SentProfilesPage } from "@/pages/SentProfilesPage";
 import { ReceivedProfilesPage } from "@/pages/ReceivedProfilesPage";
 import { ClientDetailPage } from "@/pages/ClientDetailPage";
-import { Routes, Route, Navigate, useParams } from "react-router-dom";
+import { AllManagersPage } from "@/pages/admin/AllManagersPage";
+import { PendingManagersPage } from "@/pages/admin/PendingManagersPage";
+import { AdminLayout } from "@/features/admin/components/AdminLayout";
+import { Routes, Route, Navigate, useParams, Outlet } from "react-router-dom";
 import RootLayout from "@/shared/components/layouts/RootLayout";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useAuth } from "@/features/auth/hooks/useAuth";
@@ -26,6 +29,22 @@ function AuthRoute({ children }: { children: React.ReactNode }) {
   return !isAuthenticated ? <>{children}</> : <Navigate to="/" replace />;
 }
 
+// 관리자 전용 라우트 컴포넌트
+function AdminRoute({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated } = useAuth();
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+
+  /**
+   * TODO: [API 개발 필요] 관리자 권한 체크
+   * - 백엔드: 로그인 응답에 role: "ADMIN" 포함 필요
+   * - 프론트: 아래 주석 해제하여 권한 체크 활성화
+   */
+  // const { currentUser } = useAuth();
+  // if (currentUser?.role !== "ADMIN") return <Navigate to="/" replace />;
+
+  return <>{children}</>;
+}
+
 function ProfileRedirect() {
   const { id } = useParams<{ id: string }>();
   return <Navigate to={`/client/${id}`} replace />;
@@ -36,8 +55,28 @@ const App = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <RootLayout>
-        <Routes>
+      <Routes>
+        {/* 관리자 페이지 - RootLayout 외부 (전체 너비) */}
+        <Route
+          path="/admin"
+          element={
+            <AdminRoute>
+              <AdminLayout />
+            </AdminRoute>
+          }
+        >
+          <Route index element={<AllManagersPage />} />
+          <Route path="pending" element={<PendingManagersPage />} />
+        </Route>
+
+        {/* 일반 사용자 페이지 - RootLayout 내부 (모바일 너비) */}
+        <Route
+          element={
+            <RootLayout>
+              <Outlet />
+            </RootLayout>
+          }
+        >
           {/* 인증 전 페이지 */}
           <Route
             path="/login"
@@ -137,8 +176,8 @@ const App = () => {
               </ProtectedRoute>
             }
           />
-        </Routes>
-      </RootLayout>
+        </Route>
+      </Routes>
     </QueryClientProvider>
   );
 };
