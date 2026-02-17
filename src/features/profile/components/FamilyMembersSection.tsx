@@ -2,8 +2,6 @@
  * 가족 구성원 관리 섹션 컴포넌트 (기획서 기준)
  * 최대 10명까지 추가 가능
  */
-import { Button } from "@/shared/components/ui/button";
-import { Label } from "@/shared/components/ui/label";
 import { FamilyMemberForm } from "./FamilyMemberForm";
 import type { FamilyMember } from "../api/profileApi";
 
@@ -13,6 +11,38 @@ interface FamilyMembersSectionProps {
 }
 
 const MAX_FAMILY_MEMBERS = 10;
+
+// 가족 아이콘 (3인 실루엣)
+function FamilyIcon() {
+  return (
+    <svg
+      width="48"
+      height="48"
+      viewBox="0 0 48 48"
+      fill="none"
+      className="text-gray-300"
+    >
+      {/* 왼쪽 사람 (작은 아이) */}
+      <circle cx="12" cy="20" r="4" fill="currentColor" />
+      <path
+        d="M12 25c-3 0-5 2-5 4v7h10v-7c0-2-2-4-5-4z"
+        fill="currentColor"
+      />
+      {/* 가운데 사람 (부모) */}
+      <circle cx="24" cy="16" r="5" fill="currentColor" />
+      <path
+        d="M24 22c-4 0-6 2.5-6 5v9h12v-9c0-2.5-2-5-6-5z"
+        fill="currentColor"
+      />
+      {/* 오른쪽 사람 (작은 아이) */}
+      <circle cx="36" cy="20" r="4" fill="currentColor" />
+      <path
+        d="M36 25c-3 0-5 2-5 4v7h10v-7c0-2-2-4-5-4z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
 
 export function FamilyMembersSection({
   familyMembers,
@@ -46,32 +76,35 @@ export function FamilyMembersSection({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
+      {/* 헤더 */}
       <div className="flex items-center justify-between">
-        <Label>
+        <span className="text-base font-medium text-gray-900">
           가족 정보{" "}
-          <span className="text-sm text-gray-500">
+          <span className="text-gray-400 font-normal">
             (최대 {MAX_FAMILY_MEMBERS}명)
           </span>
-        </Label>
-        <Button
+        </span>
+        <button
           type="button"
-          variant="outline"
-          size="sm"
           onClick={handleAddMember}
           disabled={familyMembers.length >= MAX_FAMILY_MEMBERS}
+          className="text-primary font-medium text-sm hover:text-primary/80 transition-colors disabled:text-gray-300 disabled:cursor-not-allowed"
         >
-          + 가족 추가
-        </Button>
+          + 추가하기
+        </button>
       </div>
 
+      {/* 빈 상태 */}
       {familyMembers.length === 0 && (
-        <div className="text-center py-8 text-gray-500 border-2 border-dashed rounded-lg">
-          <p>가족 정보가 없습니다.</p>
-          <p className="text-sm mt-1">위 버튼을 눌러 가족을 추가해주세요.</p>
+        <div className="flex flex-col items-center justify-center py-10 bg-[#fcfdfe] border-2 border-dashed border-[#f7f8fa] rounded-xl">
+          <FamilyIcon />
+          <p className="mt-4 text-gray-400 text-sm">아직 등록된 정보가 없습니다.</p>
+          <p className="text-gray-400 text-sm">버튼을 눌러 가족을 추가해주세요.</p>
         </div>
       )}
 
+      {/* 가족 목록 */}
       <div className="space-y-4">
         {familyMembers.map((member, index) => (
           <FamilyMemberForm

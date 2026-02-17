@@ -8,6 +8,7 @@
 export interface FamilyMember {
   name: string; // 이름 (필수)
   relationship: string; // 관계 (필수) - PATCH API 기준 소문자 통일
+  phoneNumber?: string; // 전화번호 (선택)
   job?: string; // 직업 (선택)
   birthYear?: number; // 출생년도 (선택)
   religion?: string; // 종교 (선택)

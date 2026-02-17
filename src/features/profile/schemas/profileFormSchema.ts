@@ -9,6 +9,7 @@ import { z } from "zod";
 export const familyMemberSchema = z.object({
   name: z.string().min(1, "이름을 입력해주세요"),
   relationship: z.string().min(1, "관계를 선택해주세요"),
+  phoneNumber: z.string().optional(),
   job: z.string().optional(),
   birthYear: z.number().optional(),
   religion: z.string().optional(),
