@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useNavigate } from "react-router-dom";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Check } from "lucide-react";
 
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
@@ -15,42 +15,51 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/shared/components/ui/dialog";
-import { ProfilePickerDialog } from "@/features/profile/components/ProfilePickerDialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/shared/components/ui/select";
 import { useSignup } from "@/features/auth/hooks/useSignup";
 import { useCheckEmail } from "@/features/auth/hooks/useCheckEmail";
 import { transformSignupData } from "@/features/auth/api/authApi";
+import { ProfileImageUpload } from "@/features/upload/components/ProfileImageUpload";
+import { cn } from "@/lib/utils";
 
 // Zod 유효성 검사 스키마
-const signupSchema = z
-  .object({
-    name: z
-      .string()
-      .min(2, { message: "이름은 최소 2자 이상이어야 합니다." })
-      .max(50, { message: "이름은 최대 50자까지 입력 가능합니다." }),
-    email: z
-      .string()
-      .min(1, { message: "이메일을 입력하세요." })
-      .email({ message: "올바른 이메일 형식을 입력하세요." }),
-    phoneNumber: z.string().regex(/^010-\d{4}-\d{4}$/, {
-      message: "휴대폰 번호 형식이 올바르지 않습니다. (예: 010-1234-5678)",
+const signupSchema = z.object({
+  name: z
+    .string()
+    .min(2, { message: "이름은 최소 2자 이상이어야 합니다." })
+    .max(50, { message: "이름은 최대 50자까지 입력 가능합니다." }),
+  email: z
+    .string()
+    .min(1, { message: "이메일을 입력하세요." })
+    .email({ message: "올바른 이메일 형식을 입력하세요." }),
+  phoneNumber: z.string().regex(/^010-\d{4}-\d{4}$/, {
+    message: "휴대폰 번호 형식이 올바르지 않습니다. (예: 010-1234-5678)",
+  }),
+  company: z
+    .string()
+    .min(2, { message: "회사명은 최소 2자 이상이어야 합니다." })
+    .max(100, { message: "회사명은 최대 100자까지 입력 가능합니다." }),
+  gender: z.string().min(1, { message: "성별을 선택하세요." }),
+  password: z
+    .string()
+    .min(8, { message: "비밀번호는 최소 8자 이상이어야 합니다." })
+    .regex(/^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])/, {
+      message: "비밀번호는 영문, 숫자, 특수문자를 포함해야 합니다.",
     }),
-    company: z
-      .string()
-      .min(2, { message: "회사명은 최소 2자 이상이어야 합니다." })
-      .max(100, { message: "회사명은 최대 100자까지 입력 가능합니다." }),
-    gender: z.string().min(1, { message: "성별을 선택하세요." }),
-    password: z
-      .string()
-      .min(8, { message: "비밀번호는 최소 8자 이상이어야 합니다." })
-      .regex(/^(?=.*[A-Za-z])(?=.*\d)/, {
-        message: "비밀번호는 영문과 숫자를 포함해야 합니다.",
-      }),
-    passwordConfirm: z.string(),
-  })
-  .refine(data => data.password === data.passwordConfirm, {
-    message: "비밀번호가 일치하지 않습니다.",
-    path: ["passwordConfirm"],
-  });
+});
+
+// 비밀번호 유효성 검사 헬퍼
+const checkPasswordLength = (password: string) => password.length >= 8;
+const checkPasswordComplexity = (password: string) =>
+  /[A-Za-z]/.test(password) &&
+  /\d/.test(password) &&
+  /[!@#$%^&*(),.?":{}|<>]/.test(password);
 
 type SignupFormData = z.infer<typeof signupSchema>;
 
@@ -59,13 +68,19 @@ export function SignupForm() {
   const { mutate: signup, isPending } = useSignup();
   const { mutate: checkEmail, isPending: isCheckingEmail } = useCheckEmail();
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
-  const [isGenderDialogOpen, setIsGenderDialogOpen] = useState(false);
   const [emailCheckStatus, setEmailCheckStatus] = useState<
     "unchecked" | "available" | "duplicate" | "error"
   >("unchecked");
-  const [emailCheckMessage, setEmailCheckMessage] = useState<string>("");
+  const [profileImageId, setProfileImageId] = useState<number | null>(null);
+  const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null);
 
-  const genderOptions = ["남성", "여성"];
+  const handleImageChange = (
+    imageId: number | null,
+    imageUrl: string | null,
+  ) => {
+    setProfileImageId(imageId);
+    setProfileImageUrl(imageUrl);
+  };
 
   const {
     register,
@@ -78,22 +93,32 @@ export function SignupForm() {
     mode: "onTouched",
     defaultValues: {
       gender: "",
+      password: "",
     },
   });
 
   const gender = watch("gender");
   const email = watch("email");
+  const password = watch("password");
+
+  // 비밀번호 유효성 상태
+  const isPasswordLengthValid = checkPasswordLength(password || "");
+  const isPasswordComplexityValid = checkPasswordComplexity(password || "");
 
   // 이메일 변경 시 확인 상태 초기화
   useEffect(() => {
-    if (emailCheckStatus !== "unchecked") {
-      setEmailCheckStatus("unchecked");
-      setEmailCheckMessage("");
-    }
-  }, [email, emailCheckStatus]);
+    setEmailCheckStatus("unchecked");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [email]);
 
   const onSubmit = (data: SignupFormData) => {
-    const apiData = transformSignupData(data);
+    // 이메일 중복확인 필수
+    if (emailCheckStatus !== "available") {
+      alert("이메일 중복확인을 해주세요.");
+      return;
+    }
+
+    const apiData = transformSignupData(data, profileImageId);
 
     signup(apiData, {
       onSuccess: () => {
@@ -108,28 +133,28 @@ export function SignupForm() {
   const handleEmailCheck = () => {
     if (!email) {
       setEmailCheckStatus("error");
-      setEmailCheckMessage("이메일을 입력하세요.");
       return;
     }
 
     checkEmail(
       { email },
       {
-        onSuccess: data => {
-          console.log("API 응답:", data);
-          setEmailCheckStatus("available");
-          setEmailCheckMessage("응답 받음: " + JSON.stringify(data));
+        onSuccess: response => {
+          // data: false = 중복 아님(사용 가능), data: true = 중복(사용 불가)
+          if (response.data === false) {
+            setEmailCheckStatus("available");
+          } else {
+            setEmailCheckStatus("duplicate");
+          }
         },
-        onError: error => {
-          console.error("API 에러:", error);
+        onError: () => {
           setEmailCheckStatus("error");
-          setEmailCheckMessage(error.message);
         },
       },
     );
   };
 
-  const handleGenderConfirm = (value: string) => {
+  const handleGenderChange = (value: string) => {
     setValue("gender", value, { shouldValidate: true });
   };
 
@@ -151,15 +176,125 @@ export function SignupForm() {
           >
             <ChevronLeft className="h-6 w-6" />
           </Button>
-          <h1 className="text-center text-2xl font-bold">회원가입</h1>
+          <h1 className="text-center text-2xl font-bold text-pink-500">
+            회원가입
+          </h1>
+          <p className="text-center text-gray-600 mt-1">
+            모든 항목을 입력해주세요
+          </p>
         </div>
 
         {/* 스크롤 가능한 폼 영역 */}
         <div className="flex-1 overflow-y-auto px-6">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 pb-4">
+            {/* 프로필 이미지 */}
+            <div className="py-4">
+              <ProfileImageUpload
+                imageUrl={profileImageUrl}
+                onImageChange={handleImageChange}
+                disabled={isPending}
+              />
+            </div>
+
+            {/* 이메일 */}
+            <div className="space-y-2">
+              <Label htmlFor="email">
+                이메일 <span className="text-pink-500">*</span>
+              </Label>
+              <div className="flex gap-2">
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="example@email.com"
+                  {...register("email")}
+                  disabled={isPending || isCheckingEmail}
+                  className="flex-1"
+                />
+                <Button
+                  type="button"
+                  onClick={handleEmailCheck}
+                  disabled={isPending || isCheckingEmail || !email}
+                  className="shrink-0 bg-pink-500 hover:bg-pink-600 text-white"
+                >
+                  {isCheckingEmail ? "확인 중..." : "중복확인"}
+                </Button>
+              </div>
+              {errors.email && (
+                <p className="text-sm text-red-500">{errors.email.message}</p>
+              )}
+              {emailCheckStatus === "available" && (
+                <p className="text-sm text-teal-500">
+                  사용 가능한 이메일입니다.
+                </p>
+              )}
+              {emailCheckStatus === "duplicate" && (
+                <p className="text-sm text-red-500">
+                  이미 사용 중인 이메일입니다.
+                </p>
+              )}
+            </div>
+
+            {/* 비밀번호 */}
+            <div className="space-y-2">
+              <Label htmlFor="password">
+                비밀번호 <span className="text-pink-500">*</span>
+              </Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="8~20자, 영문+숫자+특수문자 포함"
+                {...register("password")}
+                disabled={isPending}
+              />
+              <div className="space-y-1">
+                <div className="flex items-center gap-1">
+                  <Check
+                    className={cn(
+                      "h-4 w-4",
+                      isPasswordLengthValid
+                        ? "text-teal-500"
+                        : "text-gray-400",
+                    )}
+                  />
+                  <span
+                    className={cn(
+                      "text-sm",
+                      isPasswordLengthValid
+                        ? "text-teal-500"
+                        : "text-gray-400",
+                    )}
+                  >
+                    8자 이상
+                  </span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Check
+                    className={cn(
+                      "h-4 w-4",
+                      isPasswordComplexityValid
+                        ? "text-teal-500"
+                        : "text-gray-400",
+                    )}
+                  />
+                  <span
+                    className={cn(
+                      "text-sm",
+                      isPasswordComplexityValid
+                        ? "text-teal-500"
+                        : "text-gray-400",
+                    )}
+                  >
+                    영문, 숫자, 특수문자 포함
+                  </span>
+                </div>
+              </div>
+            </div>
+
             {/* 이름 */}
             <div className="space-y-2">
-              <Label htmlFor="name">이름</Label>
+              <Label htmlFor="name">
+                이름 <span className="text-pink-500">*</span>
+              </Label>
               <Input
                 id="name"
                 type="text"
@@ -172,42 +307,15 @@ export function SignupForm() {
               )}
             </div>
 
-            {/* 이메일 */}
+            {/* 전화번호 */}
             <div className="space-y-2">
-              <Label htmlFor="email">이메일</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="example@email.com"
-                  {...register("email")}
-                  disabled={isPending || isCheckingEmail}
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleEmailCheck}
-                  disabled={isPending || isCheckingEmail || !email}
-                  className="shrink-0"
-                >
-                  {isCheckingEmail ? "확인 중..." : "중복 확인"}
-                </Button>
-              </div>
-              {errors.email && (
-                <p className="text-sm text-red-500">{errors.email.message}</p>
-              )}
-              {emailCheckMessage && (
-                <p className="text-sm text-gray-600">{emailCheckMessage}</p>
-              )}
-            </div>
-
-            {/* 아이디 (휴대폰번호) */}
-            <div className="space-y-2">
-              <Label htmlFor="phoneNumber">아이디 (휴대폰번호)</Label>
+              <Label htmlFor="phoneNumber">
+                전화번호 <span className="text-pink-500">*</span>
+              </Label>
               <Input
                 id="phoneNumber"
                 type="tel"
-                placeholder="010-1234-5678"
+                placeholder="전화번호를 입력하세요"
                 {...register("phoneNumber")}
                 disabled={isPending}
               />
@@ -218,9 +326,34 @@ export function SignupForm() {
               )}
             </div>
 
+            {/* 성별 */}
+            <div className="space-y-2">
+              <Label htmlFor="gender">
+                성별 <span className="text-pink-500">*</span>
+              </Label>
+              <Select
+                value={gender}
+                onValueChange={handleGenderChange}
+                disabled={isPending}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="성별을 선택하세요" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="남자">남자</SelectItem>
+                  <SelectItem value="여자">여자</SelectItem>
+                </SelectContent>
+              </Select>
+              {errors.gender && (
+                <p className="text-sm text-red-500">{errors.gender.message}</p>
+              )}
+            </div>
+
             {/* 회사명 */}
             <div className="space-y-2">
-              <Label htmlFor="company">회사명</Label>
+              <Label htmlFor="company">
+                회사명 <span className="text-pink-500">*</span>
+              </Label>
               <Input
                 id="company"
                 type="text"
@@ -232,69 +365,18 @@ export function SignupForm() {
                 <p className="text-sm text-red-500">{errors.company.message}</p>
               )}
             </div>
-
-            {/* 성별 */}
-            <div className="space-y-2">
-              <Label htmlFor="gender">성별</Label>
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full justify-start"
-                onClick={() => setIsGenderDialogOpen(true)}
-                disabled={isPending}
-              >
-                {gender || "성별을 선택하세요"}
-              </Button>
-              {errors.gender && (
-                <p className="text-sm text-red-500">{errors.gender.message}</p>
-              )}
-            </div>
-
-            {/* 비밀번호 */}
-            <div className="space-y-2">
-              <Label htmlFor="password">비밀번호</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="비밀번호를 입력하세요"
-                {...register("password")}
-                disabled={isPending}
-              />
-              {errors.password && (
-                <p className="text-sm text-red-500">
-                  {errors.password.message}
-                </p>
-              )}
-            </div>
-
-            {/* 비밀번호 확인 */}
-            <div className="space-y-2">
-              <Label htmlFor="passwordConfirm">비밀번호 확인</Label>
-              <Input
-                id="passwordConfirm"
-                type="password"
-                placeholder="비밀번호를 다시 입력하세요"
-                {...register("passwordConfirm")}
-                disabled={isPending}
-              />
-              {errors.passwordConfirm && (
-                <p className="text-sm text-red-500">
-                  {errors.passwordConfirm.message}
-                </p>
-              )}
-            </div>
           </form>
         </div>
 
         {/* 하단 고정 버튼 영역 */}
-        <div>
+        <div className="p-4">
           <Button
             type="submit"
-            className="w-full rounded-none py-8"
+            className="w-full py-6 rounded-full bg-gradient-to-r from-pink-400 to-purple-400 hover:from-pink-500 hover:to-purple-500 text-white font-semibold"
             disabled={isPending}
             onClick={handleSubmit(onSubmit)}
           >
-            {isPending ? "처리 중..." : "가입신청"}
+            {isPending ? "처리 중..." : "회원가입"}
           </Button>
         </div>
       </div>
@@ -317,16 +399,6 @@ export function SignupForm() {
           </div>
         </DialogContent>
       </Dialog>
-
-      {/* 성별 선택 다이얼로그 */}
-      <ProfilePickerDialog
-        open={isGenderDialogOpen}
-        onOpenChange={setIsGenderDialogOpen}
-        title="성별 선택"
-        options={genderOptions}
-        selectedValue={gender}
-        onConfirm={handleGenderConfirm}
-      />
     </>
   );
 }
