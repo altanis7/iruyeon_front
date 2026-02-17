@@ -87,6 +87,15 @@ export interface SendChatRequest {
 }
 
 /**
+ * 매칭 알림 카운트 데이터
+ */
+export interface MatchAlarmData {
+  receivedMatchAlarmCnt: number; // 받은 매칭탭 알림 개수
+  sentMatchAlarmCnt: number; // 보낸 매칭탭 알림 개수
+  matchedMatchAlarmCnt: number; // 매칭 완료탭 알림 개수
+}
+
+/**
  * 매칭 API 함수
  */
 export const matchApi = {
@@ -152,6 +161,16 @@ export const matchApi = {
     const response = await apiClient.post<ApiResponse<null>>(
       "/match/chat",
       request,
+    );
+    return response.data;
+  },
+
+  /**
+   * 매칭 알림 개수 조회
+   */
+  getMatchAlarm: async (): Promise<ApiResponse<MatchAlarmData>> => {
+    const response = await apiClient.get<ApiResponse<MatchAlarmData>>(
+      "/match/alarm",
     );
     return response.data;
   },

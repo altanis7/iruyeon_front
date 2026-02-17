@@ -3,6 +3,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/shared/components/ui
 import { useReceivedMatches } from "@/features/match/hooks/useReceivedMatches";
 import { useSentMatches } from "@/features/match/hooks/useSentMatches";
 import { useMatchedMatches } from "@/features/match/hooks/useMatchedMatches";
+import { useMatchAlarm } from "@/features/match/hooks/useMatchAlarm";
 import { MatchCard } from "@/features/match/components/MatchCard";
 
 export function MatchPage() {
@@ -33,21 +34,24 @@ export function MatchPage() {
     fetchNextPage: fetchMatchedNextPage,
   } = useMatchedMatches();
 
+  // 알림 개수
+  const { data: alarmData } = useMatchAlarm();
+
   // 모든 페이지의 매칭 데이터를 평탄화
   const receivedMatches = receivedData?.pages.flatMap(page => page.data.list) || [];
   const sentMatches = sentData?.pages.flatMap(page => page.data.list) || [];
   const matchedMatches = matchedData?.pages.flatMap(page => page.data.list) || [];
 
-  // 뱃지 카운트 계산
-  const receivedNewChatCount = receivedMatches.reduce(
-    (sum, match) => sum + match.newChatCnt, 0
-  );
-  const sentNewChatCount = sentMatches.reduce(
-    (sum, match) => sum + match.newChatCnt, 0
-  );
-  const matchedNewChatCount = matchedMatches.reduce(
-    (sum, match) => sum + match.newChatCnt, 0
-  );
+  // 알림 개수 (API 우선, fallback으로 newChatCnt 합산)
+  const receivedAlarmCount =
+    alarmData?.data?.receivedMatchAlarmCnt ??
+    receivedMatches.reduce((sum, match) => sum + match.newChatCnt, 0);
+  const sentAlarmCount =
+    alarmData?.data?.sentMatchAlarmCnt ??
+    sentMatches.reduce((sum, match) => sum + match.newChatCnt, 0);
+  const matchedAlarmCount =
+    alarmData?.data?.matchedMatchAlarmCnt ??
+    matchedMatches.reduce((sum, match) => sum + match.newChatCnt, 0);
 
   return (
     <MainLayout>
@@ -60,25 +64,25 @@ export function MatchPage() {
           <TabsList className="w-full grid grid-cols-3">
             <TabsTrigger value="received" className="relative">
               받은 매칭
-              {receivedNewChatCount > 0 && (
+              {receivedAlarmCount > 0 && (
                 <span className="ml-1 inline-flex items-center justify-center w-5 h-5 text-xs bg-red-500 text-white rounded-full">
-                  {receivedNewChatCount}
+                  {receivedAlarmCount}
                 </span>
               )}
             </TabsTrigger>
             <TabsTrigger value="sent">
               보낸 매칭
-              {sentNewChatCount > 0 && (
+              {sentAlarmCount > 0 && (
                 <span className="ml-1 inline-flex items-center justify-center w-5 h-5 text-xs bg-red-500 text-white rounded-full">
-                  {sentNewChatCount}
+                  {sentAlarmCount}
                 </span>
               )}
             </TabsTrigger>
             <TabsTrigger value="completed" className="relative">
               매칭 완료
-              {matchedNewChatCount > 0 && (
+              {matchedAlarmCount > 0 && (
                 <span className="ml-1 inline-flex items-center justify-center w-5 h-5 text-xs bg-red-500 text-white rounded-full">
-                  {matchedNewChatCount}
+                  {matchedAlarmCount}
                 </span>
               )}
             </TabsTrigger>
