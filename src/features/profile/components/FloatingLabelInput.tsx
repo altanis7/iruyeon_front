@@ -13,9 +13,10 @@ interface FloatingLabelInputProps {
   required?: boolean;
   hasError?: boolean;
   errorMessage?: string;
-  type?: "text" | "tel" | "email" | "number";
+  type?: "text" | "tel" | "email" | "number" | "password";
   maxLength?: number;
   className?: string;
+  disabled?: boolean;
 }
 
 export function FloatingLabelInput({
@@ -29,6 +30,7 @@ export function FloatingLabelInput({
   type = "text",
   maxLength,
   className,
+  disabled = false,
 }: FloatingLabelInputProps) {
   const [isFocused, setIsFocused] = useState(false);
   const hasValue = value && value.length > 0;
@@ -45,10 +47,12 @@ export function FloatingLabelInput({
           onBlur={() => setIsFocused(false)}
           placeholder={isFloating ? placeholder : ""}
           maxLength={maxLength}
+          disabled={disabled}
           className={cn(
             "w-full px-4 pt-6 pb-2 bg-[#fcfdfe] border border-[#f7f8fa] rounded-xl text-base transition-all duration-200 outline-none",
             "focus:bg-white focus:ring-2 focus:ring-primary/20",
-            hasError && "ring-2 ring-red-500/50 bg-red-50/30"
+            hasError && "ring-2 ring-red-500/50 bg-red-50/30",
+            disabled && "opacity-50 cursor-not-allowed"
           )}
         />
         <label
