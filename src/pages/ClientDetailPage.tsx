@@ -17,6 +17,7 @@ import {
   FamilySection,
   ManagerOpinionSection,
 } from "@/features/profile/components/client-detail";
+import { MatchRequestDialog } from "@/features/match/components/MatchRequestDialog";
 
 export function ClientDetailPage() {
   const navigate = useNavigate();
@@ -42,6 +43,7 @@ export function ClientDetailPage() {
   // UI State
   const [showStatusDialog, setShowStatusDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showMatchDialog, setShowMatchDialog] = useState(false);
 
   // Sticky bar visibility state
   const [showStickyBar, setShowStickyBar] = useState(false);
@@ -161,7 +163,7 @@ export function ClientDetailPage() {
         <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-white via-white to-transparent max-w-md mx-auto">
           <Button
             className="w-full h-14 text-lg font-semibold rounded-2xl bg-rose-500 hover:bg-rose-600 text-white shadow-lg"
-            onClick={() => navigate(`/match/request?clientId=${clientId}`)}
+            onClick={() => setShowMatchDialog(true)}
           >
             매칭 신청하기
           </Button>
@@ -189,6 +191,17 @@ export function ClientDetailPage() {
         isLoading={deleteClientMutation.isPending}
         variant="destructive"
       />
+
+      {/* 매칭 신청 다이얼로그 */}
+      {client && (
+        <MatchRequestDialog
+          open={showMatchDialog}
+          onOpenChange={setShowMatchDialog}
+          toClientId={client.id}
+          toClientName={client.name}
+          onSuccess={() => setShowMatchDialog(false)}
+        />
+      )}
     </div>
   );
 }

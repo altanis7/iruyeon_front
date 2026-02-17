@@ -9,13 +9,20 @@ import { useAuth } from "@/features/auth/hooks/useAuth";
 import { ProfileGrid } from "@/features/profile/components/ProfileGrid";
 import { ProfileSearchBar } from "@/features/profile/components/ProfileSearchBar";
 import { ProfileDrawer } from "@/features/profile/components/ProfileDrawer";
-import { mapClientToDisplay } from "@/features/profile/api/profileApi";
+import {
+  mapClientToDisplay,
+  type ClientDisplayData,
+} from "@/features/profile/api/profileApi";
+import { MatchRequestDialog } from "@/features/match/components/MatchRequestDialog";
 
 export function HomePage() {
   const navigate = useNavigate();
   const { currentUser } = useAuth();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState("");
+  const [matchDialogOpen, setMatchDialogOpen] = useState(false);
+  const [selectedProfile, setSelectedProfile] =
+    useState<ClientDisplayData | null>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
@@ -43,6 +50,11 @@ export function HomePage() {
 
   const profiles = isSearching ? (searchResponse?.data.list.map(mapClientToDisplay) || []) : clients;
   const isLoading = isSearching ? isSearchLoading : isClientLoading;
+
+  const handleMatchRequest = (profile: ClientDisplayData) => {
+    setSelectedProfile(profile);
+    setMatchDialogOpen(true);
+  };
 
   // Intersection Observer 설정 (검색 중이 아닐 때만)
   useEffect(() => {
@@ -107,6 +119,7 @@ export function HomePage() {
           profiles={profiles || []}
           isLoading={isLoading}
           currentUserId={currentUser?.id ? Number(currentUser.id) : undefined}
+          onMatchRequest={handleMatchRequest}
         />
 
         {/* 인피니티 스크롤 트리거 (검색 중이 아닐 때만) */}
@@ -121,6 +134,20 @@ export function HomePage() {
 
       {/* 햄버거 메뉴 드로어 */}
       <ProfileDrawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen} />
+
+      {/* 매칭 신청 다이얼로그 */}
+      {selectedProfile && (
+        <MatchRequestDialog
+          open={matchDialogOpen}
+          onOpenChange={setMatchDialogOpen}
+          toClientId={Number(selectedProfile.id)}
+          toClientName={selectedProfile.name}
+          onSuccess={() => {
+            setMatchDialogOpen(false);
+            setSelectedProfile(null);
+          }}
+        />
+      )}
     </MainLayout>
   );
 }
