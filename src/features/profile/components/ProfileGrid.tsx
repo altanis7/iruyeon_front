@@ -6,6 +6,7 @@ interface ProfileGridProps {
   profiles: ClientDisplayData[];
   isLoading?: boolean;
   currentUserId?: number;
+  onMatchRequest?: (profile: ClientDisplayData) => void;
 }
 
 /**
@@ -13,7 +14,7 @@ interface ProfileGridProps {
  * - 2열 그리드 레이아웃 (모바일 최적화)
  * - 6개씩 보이고 스크롤 가능
  */
-export function ProfileGrid({ profiles, isLoading, currentUserId }: ProfileGridProps) {
+export function ProfileGrid({ profiles, isLoading, currentUserId, onMatchRequest }: ProfileGridProps) {
   const navigate = useNavigate();
 
   if (isLoading) {
@@ -48,6 +49,7 @@ export function ProfileGrid({ profiles, isLoading, currentUserId }: ProfileGridP
           profile={profile}
           onClick={() => navigate(`/client/${profile.id}`)}
           isMyClient={currentUserId !== undefined && profile.memberId === currentUserId}
+          onMatchRequest={() => onMatchRequest?.(profile)}
         />
       ))}
     </div>
