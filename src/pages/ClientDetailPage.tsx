@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router";
 import { Button } from "@/shared/components/ui/button";
+import { cn } from "@/lib/utils";
 import { useClient } from "@/features/profile/hooks/useClient";
 import { useClientInfo } from "@/features/profile/hooks/useClientInfo";
 import { useAuth } from "@/features/auth/hooks/useAuth";
@@ -145,7 +146,7 @@ export function ClientDetailPage() {
       </div>
 
       {/* 콘텐츠 섹션들 */}
-      <div className="px-4 py-6 space-y-4 -mt-4">
+      <div className={cn("px-4 py-6 space-y-4 -mt-4", !isOwner && "pb-24")}>
         <InfoSection client={client} />
         <EducationCareerSection client={client} />
         <PreferenceSection client={client} />
@@ -154,6 +155,18 @@ export function ClientDetailPage() {
         )}
         {client.info && <ManagerOpinionSection info={client.info} />}
       </div>
+
+      {/* 플로팅 매칭 신청 버튼 (소유자가 아닐 때만 표시) */}
+      {!isOwner && (
+        <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-white via-white to-transparent max-w-md mx-auto">
+          <Button
+            className="w-full h-14 text-lg font-semibold rounded-2xl bg-rose-500 hover:bg-rose-600 text-white shadow-lg"
+            onClick={() => navigate(`/match/request?clientId=${clientId}`)}
+          >
+            매칭 신청하기
+          </Button>
+        </div>
+      )}
 
       {/* 확인 다이얼로그 */}
       <ConfirmDialog
