@@ -141,6 +141,7 @@ export interface ClientDisplayData {
   address: string;
   gender: string;
   height: number;
+  memberId: number;
   memberName: string;
   memberImage: string | null;
   status: "ACTIVE" | "INACTIVE";
@@ -360,6 +361,7 @@ export function mapClientToDisplay(
     address: client.address,
     gender: client.gender,
     height: client.height,
+    memberId: client.memberId,
     memberName: client.memberName,
     memberImage: client.memberImage,
     status: client.status,

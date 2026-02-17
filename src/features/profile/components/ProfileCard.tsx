@@ -10,6 +10,7 @@ interface ProfileCardProps {
   profile: ClientDisplayData;
   onClick?: () => void;
   onMatchRequest?: () => void;
+  isMyClient?: boolean;
   className?: string;
 }
 
@@ -23,6 +24,7 @@ export function ProfileCard({
   profile,
   onClick,
   onMatchRequest,
+  isMyClient = false,
   className,
 }: ProfileCardProps) {
   const displayHeight = formatHeight(profile.height);
@@ -161,16 +163,27 @@ export function ProfileCard({
           </div>
         </div>
 
-        {/* 매칭 신청 버튼 */}
-        <Button
-          variant="default"
-          size="sm"
-          className="w-full bg-gradient-to-r from-pink-400 to-pink-500 hover:from-pink-500 hover:to-pink-600 text-white rounded-full text-xs h-9"
-          onClick={handleMatchClick}
-        >
-          <Heart className="h-3.5 w-3.5 mr-1.5 fill-current" />
-          매칭 신청하기
-        </Button>
+        {/* 버튼: 내 회원이면 프로필 보기, 아니면 매칭 신청하기 */}
+        {isMyClient ? (
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full rounded-full text-xs h-9"
+            onClick={onClick}
+          >
+            프로필 보기
+          </Button>
+        ) : (
+          <Button
+            variant="default"
+            size="sm"
+            className="w-full bg-gradient-to-r from-pink-400 to-pink-500 hover:from-pink-500 hover:to-pink-600 text-white rounded-full text-xs h-9"
+            onClick={handleMatchClick}
+          >
+            <Heart className="h-3.5 w-3.5 mr-1.5 fill-current" />
+            매칭 신청하기
+          </Button>
+        )}
       </CardContent>
     </Card>
   );

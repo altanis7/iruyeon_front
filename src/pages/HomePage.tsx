@@ -5,6 +5,7 @@ import { MainLayout } from "@/shared/components/layouts/MainLayout";
 import { Button } from "@/shared/components/ui/button";
 import { useClients } from "@/features/profile/hooks/useClients";
 import { useSearchClients } from "@/features/profile/hooks/useSearchClients";
+import { useAuth } from "@/features/auth/hooks/useAuth";
 import { ProfileGrid } from "@/features/profile/components/ProfileGrid";
 import { ProfileSearchBar } from "@/features/profile/components/ProfileSearchBar";
 import { ProfileDrawer } from "@/features/profile/components/ProfileDrawer";
@@ -12,6 +13,7 @@ import { mapClientToDisplay } from "@/features/profile/api/profileApi";
 
 export function HomePage() {
   const navigate = useNavigate();
+  const { currentUser } = useAuth();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState("");
   const observerRef = useRef<IntersectionObserver | null>(null);
@@ -101,7 +103,11 @@ export function HomePage() {
 
       {/* 프로필 그리드 */}
       <div className="p-4 pb-6">
-        <ProfileGrid profiles={profiles || []} isLoading={isLoading} />
+        <ProfileGrid
+          profiles={profiles || []}
+          isLoading={isLoading}
+          currentUserId={currentUser?.id ? Number(currentUser.id) : undefined}
+        />
 
         {/* 인피니티 스크롤 트리거 (검색 중이 아닐 때만) */}
         {!isSearching && hasNextPage && (
