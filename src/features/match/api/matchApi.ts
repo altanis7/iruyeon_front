@@ -9,6 +9,7 @@ import type { ApiResponse } from "@/features/profile/api/profileApi";
  * 매칭 상태
  */
 export type MatchStatus =
+  | "UNREAD"
   | "CANCELED"
   | "REJECTED"
   | "PENDING"
@@ -93,6 +94,13 @@ export interface SendMatchRequest {
   fromClientId: number;
   toClientId: number;
   message: string;
+}
+
+/**
+ * 매칭 취소 요청
+ */
+export interface CancelMatchRequest {
+  matchId: number;
 }
 
 /**
@@ -192,6 +200,20 @@ export const matchApi = {
   ): Promise<ApiResponse<null>> => {
     const response = await apiClient.post<ApiResponse<null>>(
       "/match/send",
+      request,
+    );
+    return response.data;
+  },
+
+  /**
+   * 보낸 매칭 취소
+   * PENDING 또는 UNREAD 상태에서만 취소 가능
+   */
+  cancelSentMatch: async (
+    request: CancelMatchRequest,
+  ): Promise<ApiResponse<null>> => {
+    const response = await apiClient.post<ApiResponse<null>>(
+      "/match/sent/cancel",
       request,
     );
     return response.data;

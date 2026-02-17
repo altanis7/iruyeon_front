@@ -6,9 +6,19 @@ import type { MatchStatus } from "../api/matchApi";
  * 매칭 상태별 설정
  */
 export const matchStatusConfig = {
+  UNREAD: {
+    label: "읽지 않음",
+    description: "아직 확인하지 않은 매칭입니다",
+    color: "purple",
+    bgColor: "bg-purple-100",
+    textColor: "text-purple-700",
+    headerBg: "bg-gradient-to-r from-purple-100 to-violet-100",
+    headerText: "text-purple-800",
+    headerDescText: "text-purple-600",
+  },
   PENDING: {
-    label: "수락 대기중",
-    description: "상대방의 답변을 기다리는 중입니다",
+    label: "담당 매니저 확인중",
+    description: "담당 매니저가 확인하고 있습니다",
     color: "gray",
     bgColor: "bg-gray-100",
     textColor: "text-gray-700",

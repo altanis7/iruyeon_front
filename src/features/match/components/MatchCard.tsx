@@ -6,15 +6,18 @@ import {
   AvatarFallback,
 } from "@/shared/components/ui/avatar";
 import { Button } from "@/shared/components/ui/button";
-import { Heart, MessageCircle } from "lucide-react";
+import { Heart, MessageCircle, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { ReceivedMatch, MemberClientDTO } from "../api/matchApi";
 import { matchStatusConfig } from "../utils/matchFormat";
 import { ChatModal } from "./ChatModal";
+import { useCancelMatch } from "../hooks/useCancelMatch";
 
 interface MatchCardProps {
   match: ReceivedMatch;
   className?: string;
+  /** 카드 타입: sent일 때 취소 버튼 노출 */
+  variant?: "received" | "sent" | "matched";
 }
 
 /** 클라이언트 프로필 카드 (이미지 배경 + 텍스트 오버레이) */
@@ -60,8 +63,13 @@ function ClientProfileCard({ data }: { data: MemberClientDTO }) {
  * - 중앙 하트 아이콘
  * - 매칭 상태에 따라 하단 버튼 분기
  */
-export function MatchCard({ match, className }: MatchCardProps) {
+export function MatchCard({
+  match,
+  className,
+  variant = "received",
+}: MatchCardProps) {
   const [chatOpen, setChatOpen] = useState(false);
+  const cancelMatch = useCancelMatch();
   const {
     memberClientResponseDTO,
     oppositeMemberClientDTO,
@@ -69,17 +77,27 @@ export function MatchCard({ match, className }: MatchCardProps) {
     newChatCnt,
     matchId,
   } = match;
-  const statusConfig = matchStatusConfig[matchStatus];
+
+  // 취소 가능 여부: 보낸 매칭이고 PENDING 또는 UNREAD 상태
+  const canCancel =
+    variant === "sent" &&
+    (matchStatus === "PENDING" || matchStatus === "UNREAD");
+
+  const handleCancel = () => {
+    if (confirm("매칭 신청을 취소하시겠습니까?")) {
+      cancelMatch.mutate(matchId);
+    }
+  };
+  const statusConfig = matchStatusConfig[matchStatus] ?? {
+    label: matchStatus ?? "알 수 없음",
+    headerBg: "bg-gray-100",
+    headerText: "text-gray-700",
+  };
 
   return (
     <Card className={cn("overflow-hidden", className)}>
       {/* 상단: 상태 헤더 (카드 전체 너비) */}
-      <div
-        className={cn(
-          "px-4 py-2.5",
-          statusConfig.headerBg,
-        )}
-      >
+      <div className={cn("px-4 py-2.5", statusConfig.headerBg)}>
         <span className={cn("font-semibold text-sm", statusConfig.headerText)}>
           {statusConfig.label}
         </span>
@@ -104,7 +122,7 @@ export function MatchCard({ match, className }: MatchCardProps) {
 
         {/* 하단 버튼 */}
         <div className="flex gap-2 mt-4">
-          {matchStatus === "PENDING" ? (
+          {matchStatus === "PENDING" && variant === "received" ? (
             <>
               {/* 매칭 수락 */}
               <Button
@@ -132,20 +150,33 @@ export function MatchCard({ match, className }: MatchCardProps) {
               </Button>
             </>
           ) : (
-            /* 채팅 보기 버튼 (전체 너비) */
-            <Button
-              variant="outline"
-              className="flex-1 h-11 relative"
-              onClick={() => setChatOpen(true)}
-            >
-              <MessageCircle className="h-5 w-5 mr-2" />
-              채팅 보기
-              {newChatCnt > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                  {newChatCnt}
-                </span>
+            /* 채팅 보기 버튼 + 취소 버튼 (보낸 매칭에서 PENDING/UNREAD일 때) */
+            <>
+              <Button
+                variant="outline"
+                className="flex-1 h-11 relative"
+                onClick={() => setChatOpen(true)}
+              >
+                <MessageCircle className="h-5 w-5 mr-2" />
+                채팅 보기
+                {newChatCnt > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    {newChatCnt}
+                  </span>
+                )}
+              </Button>
+              {canCancel && (
+                <Button
+                  variant="outline"
+                  className="h-11 px-4 text-red-500 border-red-300 hover:bg-red-50 hover:border-red-400 hover:text-red-600"
+                  onClick={handleCancel}
+                  disabled={cancelMatch.isPending}
+                >
+                  <X className="h-5 w-5 mr-1" />
+                  {cancelMatch.isPending ? "취소 중..." : "매칭 취소"}
+                </Button>
               )}
-            </Button>
+            </>
           )}
         </div>
       </CardContent>

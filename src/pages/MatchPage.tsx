@@ -145,7 +145,7 @@ export function MatchPage() {
                 // 매칭 목록
                 <>
                   {sentMatches.map(match => (
-                    <MatchCard key={match.matchId} match={match} />
+                    <MatchCard key={match.matchId} match={match} variant="sent" />
                   ))}
 
                   {/* 무한 스크롤 트리거 */}
@@ -185,7 +185,7 @@ export function MatchPage() {
                 // 매칭 목록
                 <>
                   {matchedMatches.map(match => (
-                    <MatchCard key={match.matchId} match={match} />
+                    <MatchCard key={match.matchId} match={match} variant="matched" />
                   ))}
 
                   {/* 무한 스크롤 트리거 */}
