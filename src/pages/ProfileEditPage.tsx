@@ -100,6 +100,7 @@ export function ProfileEditPage() {
       <ProfileCreateForm
         mode="edit"
         defaultValues={formData}
+        initialImageUrls={client.profileImages}
         clientId={Number(id)}
         onSuccess={() => navigate(`/client/${id}?source=profile`)}
       />

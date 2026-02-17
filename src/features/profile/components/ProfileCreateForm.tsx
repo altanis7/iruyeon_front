@@ -2,7 +2,7 @@
  * 프로필 생성 폼 (전면 개편 - 단일 Step)
  * 기획서 기준: 24개 필드 단일 페이지 스크롤
  */
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/shared/components/ui/button";
@@ -34,6 +34,7 @@ import {
 interface ProfileCreateFormProps {
   mode?: "create" | "edit";
   defaultValues?: ProfileFormData;
+  initialImageUrls?: string[];
   clientId?: number;
   onSuccess?: () => void;
 }
@@ -41,6 +42,7 @@ interface ProfileCreateFormProps {
 export function ProfileCreateForm({
   mode = "create",
   defaultValues: externalDefaults,
+  initialImageUrls = [],
   clientId,
   onSuccess,
 }: ProfileCreateFormProps = {}) {
@@ -92,7 +94,14 @@ export function ProfileCreateForm({
   const [maritalStatusDialogOpen, setMaritalStatusDialogOpen] = useState(false);
 
   // 이미지 URL 상태 (미리보기용 - imageId는 form에, imageUrl은 로컬 상태로)
-  const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const [imageUrls, setImageUrls] = useState<string[]>(initialImageUrls);
+
+  // 비동기 데이터 동기화 (React Query에서 데이터 도착 시 상태 업데이트)
+  useEffect(() => {
+    if (initialImageUrls.length > 0) {
+      setImageUrls(initialImageUrls);
+    }
+  }, [initialImageUrls]);
 
   // Watch 필드
   const gender = watch("gender");
