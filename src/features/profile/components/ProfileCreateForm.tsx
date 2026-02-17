@@ -6,7 +6,6 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/shared/components/ui/button";
-import { Label } from "@/shared/components/ui/label";
 import { ProfilePickerDialog } from "./ProfilePickerDialog";
 import { FloatingLabelInput } from "./FloatingLabelInput";
 import { FloatingLabelTextarea } from "./FloatingLabelTextarea";
