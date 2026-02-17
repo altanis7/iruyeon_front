@@ -41,7 +41,7 @@ export function ProfileCard({
   return (
     <Card
       className={cn(
-        "cursor-pointer transition-all hover:shadow-md hover:scale-[1.02] overflow-hidden",
+        "cursor-pointer transition-all hover:shadow-md hover:scale-[1.02] overflow-hidden isolate",
         className,
       )}
       onClick={onClick}
