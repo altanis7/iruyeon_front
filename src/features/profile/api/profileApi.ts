@@ -102,7 +102,7 @@ export interface ApiResponse<T> {
 export interface ClientListItem {
   memberId: number;
   memberName: string;
-  memberImage: string;
+  memberImage: string | null;
   clientId: number;
   clientName: string;
   clientImage: string;
@@ -112,6 +112,9 @@ export interface ClientListItem {
   gender: string;
   height: number;
   birthYear: number;
+  status: "ACTIVE" | "INACTIVE";
+  totalMeetingCnt: number;
+  currentMeetingCnt: number;
 }
 
 // 페이지네이션 응답 데이터
@@ -139,7 +142,8 @@ export interface ClientDisplayData {
   gender: string;
   height: number;
   memberName: string;
-  memberImage: string;
+  memberImage: string | null;
+  status: "ACTIVE" | "INACTIVE";
 }
 
 // 내 회원 리스트 아이템 (GET /client/my 응답)
@@ -358,6 +362,7 @@ export function mapClientToDisplay(
     height: client.height,
     memberName: client.memberName,
     memberImage: client.memberImage,
+    status: client.status,
   };
 }
 
