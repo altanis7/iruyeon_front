@@ -95,7 +95,7 @@ export function MatchCard({
   };
 
   return (
-    <Card className={cn("overflow-hidden", className)}>
+    <Card className={cn("overflow-hidden isolate", className)}>
       {/* 상단: 상태 헤더 (카드 전체 너비) */}
       <div className={cn("px-4 py-2.5", statusConfig.headerBg)}>
         <span className={cn("font-semibold text-sm", statusConfig.headerText)}>

@@ -20,7 +20,7 @@ export function BottomNavigation() {
   const navigate = useNavigate();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-background border-t border-border pb-safe">
+    <nav className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-background border-t border-border pb-safe z-50">
       <div className="flex items-center justify-around h-16">
         {navItems.map(item => {
           const Icon = item.icon;
