@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
+import { toast } from "sonner";
 import { clientApi, type Profile } from "../api/profileApi";
 import type { ProfileFormData } from "../schemas/profileFormSchema";
 
@@ -50,10 +51,12 @@ export function useCreateClient() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["clients"] });
+      toast.success("프로필이 등록되었습니다.");
       navigate("/profile");
     },
     onError: (error: Error) => {
       console.error("클라이언트 생성 실패:", error);
+      toast.error(error.message || "프로필 등록에 실패했습니다.");
     },
   });
 }
