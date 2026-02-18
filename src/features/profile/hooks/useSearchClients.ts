@@ -1,13 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
-import { clientApi, type SearchProfileParams } from "../api/profileApi";
+import { clientApi, type FilterSearchParams } from "../api/profileApi";
+import { hasActiveFilters } from "../utils/filterOptions";
 
 /**
- * 클라이언트 검색 Hook
+ * 클라이언트 필터 검색 Hook
  */
-export function useSearchClients(params: SearchProfileParams) {
+export function useSearchClients(params: FilterSearchParams) {
   return useQuery({
-    queryKey: ["clients", "search", params.keyword],
+    queryKey: ["clients", "search", params],
     queryFn: () => clientApi.searchClients(params),
-    enabled: params.keyword.trim().length > 0,
+    enabled: hasActiveFilters(params),
+    staleTime: 1000 * 30,
   });
 }

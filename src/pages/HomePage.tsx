@@ -9,29 +9,37 @@ import { useAuth } from "@/features/auth/hooks/useAuth";
 import { ProfileGrid } from "@/features/profile/components/ProfileGrid";
 import { ProfileSearchBar } from "@/features/profile/components/ProfileSearchBar";
 import { ProfileDrawer } from "@/features/profile/components/ProfileDrawer";
+import { FilterPanel } from "@/features/profile/components/FilterPanel";
 import {
   mapClientToDisplay,
   type ClientDisplayData,
+  type FilterSearchParams,
 } from "@/features/profile/api/profileApi";
+import {
+  INITIAL_FILTER_STATE,
+  countActiveFilters,
+  hasActiveFilters,
+} from "@/features/profile/utils/filterOptions";
 import { MatchRequestDialog } from "@/features/match/components/MatchRequestDialog";
 
 export function HomePage() {
   const navigate = useNavigate();
   const { currentUser } = useAuth();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [searchKeyword, setSearchKeyword] = useState("");
+  const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false);
+  const [committedFilters, setCommittedFilters] = useState<FilterSearchParams>(INITIAL_FILTER_STATE);
   const [matchDialogOpen, setMatchDialogOpen] = useState(false);
   const [selectedProfile, setSelectedProfile] =
     useState<ClientDisplayData | null>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
-  // 검색 중인지 확인
-  const isSearching = searchKeyword.trim().length > 0;
+  const isSearching = hasActiveFilters(committedFilters);
+  const activeFilterCount = countActiveFilters(committedFilters);
 
-  // 검색 쿼리
+  // 필터 검색 쿼리
   const { data: searchResponse, isLoading: isSearchLoading } =
-    useSearchClients({ keyword: searchKeyword });
+    useSearchClients(committedFilters);
 
   // 클라이언트 목록 쿼리 (인피니티)
   const {
@@ -48,7 +56,9 @@ export function HomePage() {
       page.data.list.map(mapClientToDisplay),
     ) || [];
 
-  const profiles = isSearching ? (searchResponse?.data.list.map(mapClientToDisplay) || []) : clients;
+  const profiles = isSearching
+    ? (searchResponse?.data.list.map(mapClientToDisplay) || [])
+    : clients;
   const isLoading = isSearching ? isSearchLoading : isClientLoading;
 
   const handleMatchRequest = (profile: ClientDisplayData) => {
@@ -96,8 +106,13 @@ export function HomePage() {
 
           {/* 검색바 */}
           <ProfileSearchBar
-            value={searchKeyword}
-            onChange={setSearchKeyword}
+            value={
+              activeFilterCount > 0
+                ? `${activeFilterCount}개 필터 적용중`
+                : ""
+            }
+            onClick={() => setIsFilterPanelOpen(true)}
+            activeFilterCount={activeFilterCount}
           />
 
           {/* 프로필등록 버튼 */}
@@ -134,6 +149,17 @@ export function HomePage() {
 
       {/* 햄버거 메뉴 드로어 */}
       <ProfileDrawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen} />
+
+      {/* 필터 패널 */}
+      <FilterPanel
+        open={isFilterPanelOpen}
+        initialFilters={committedFilters}
+        onClose={() => setIsFilterPanelOpen(false)}
+        onSearch={(filters) => {
+          setCommittedFilters(filters);
+          setIsFilterPanelOpen(false);
+        }}
+      />
 
       {/* 매칭 신청 다이얼로그 */}
       {selectedProfile && (

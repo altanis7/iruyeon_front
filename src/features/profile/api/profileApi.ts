@@ -78,9 +78,24 @@ export const calculateAge = (birthYear: number): number => {
   return currentYear - birthYear + 1; // 한국 나이
 };
 
-// 검색 파라미터
+// 검색 파라미터 (기존 - 하위 호환)
 export interface SearchProfileParams {
   keyword: string;
+}
+
+// 필터 검색 파라미터 (API 필드명 기준)
+export interface FilterSearchParams {
+  job?: string[];           // 직업 다중선택
+  minBirthYear?: number;    // 최소 출생년도
+  maxBirthYear?: number;    // 최대 출생년도
+  eduLevel?: string[];      // 학력 다중선택
+  universities?: string[];  // 대학교 다중선택
+  gender?: string[];        // 성별 다중선택
+  maritalStatus?: string[]; // 결혼여부 다중선택
+  religion?: string[];      // 종교 다중선택
+  minHeight?: number;       // 최소 키
+  maxHeight?: number;       // 최대 키
+  keyword?: string;         // 키워드 검색
 }
 
 import { apiClient } from "@/lib/api/client";
@@ -333,14 +348,27 @@ export const clientApi = {
   },
 
   /**
-   * 클라이언트 검색
+   * 클라이언트 검색 (필터 검색)
+   * 전체 범위 값(1960/2005, 140/200)과 빈 배열/빈 문자열은 페이로드에서 제외
    */
   searchClients: async (
-    params: SearchProfileParams,
+    params: FilterSearchParams,
   ): Promise<ApiResponse<ClientListData>> => {
+    const body: Partial<FilterSearchParams> = {};
+    if ((params.job?.length ?? 0) > 0) body.job = params.job;
+    if ((params.religion?.length ?? 0) > 0) body.religion = params.religion;
+    if ((params.gender?.length ?? 0) > 0) body.gender = params.gender;
+    if ((params.eduLevel?.length ?? 0) > 0) body.eduLevel = params.eduLevel;
+    if ((params.universities?.length ?? 0) > 0) body.universities = params.universities;
+    if ((params.maritalStatus?.length ?? 0) > 0) body.maritalStatus = params.maritalStatus;
+    if (params.keyword?.trim()) body.keyword = params.keyword.trim();
+    if (params.minBirthYear !== undefined && params.minBirthYear !== 1960) body.minBirthYear = params.minBirthYear;
+    if (params.maxBirthYear !== undefined && params.maxBirthYear !== 2005) body.maxBirthYear = params.maxBirthYear;
+    if (params.minHeight !== undefined && params.minHeight !== 140) body.minHeight = params.minHeight;
+    if (params.maxHeight !== undefined && params.maxHeight !== 200) body.maxHeight = params.maxHeight;
     const response = await apiClient.post<ApiResponse<ClientListData>>(
       "/client/search",
-      params,
+      body,
     );
     return response.data;
   },
