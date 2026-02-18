@@ -1,11 +1,9 @@
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Clock, XCircle } from "lucide-react";
+import { Clock, Heart, XCircle } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
-import { Input } from "@/shared/components/ui/input";
-import { Label } from "@/shared/components/ui/label";
-import { Checkbox } from "@/shared/components/ui/checkbox";
+import { ToggleSwitch } from "@/shared/components/ui/toggle-switch";
 import {
   Dialog,
   DialogContent,
@@ -13,6 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/shared/components/ui/dialog";
+import { FloatingLabelInput } from "@/features/profile/components/FloatingLabelInput";
 import { useAuth, getAutoLoginSetting } from "@/features/auth/hooks/useAuth";
 import { loginAPI } from "@/features/auth/api/authApi";
 
@@ -79,58 +78,51 @@ export function LoginForm({
     <div className={cn("flex flex-col h-full w-full", className)} {...props}>
       {/* 상단 헤더 영역 */}
       <div className="px-6 pt-safe-top pt-12">
-        <h1 className="text-2xl font-bold text-center mb-2">이루연 로고</h1>
-        <p className="text-sm text-center text-muted-foreground">
-          이루연 모바일 애플리케이션
-        </p>
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center">
+            <Heart className="w-9 h-9 text-gray-500" fill="currentColor" />
+          </div>
+          <h1 className="text-3xl font-bold text-foreground">이루연</h1>
+          <p className="text-sm text-muted-foreground">
+            당신의 소중한 인연을 이어드립니다
+          </p>
+        </div>
       </div>
 
       {/* 스크롤 가능한 폼 영역 */}
       <div className="flex-1 overflow-y-auto px-6 pt-8">
         <form
           id="login-form"
-          className="flex flex-col gap-6"
+          className="flex flex-col gap-4"
           onSubmit={handleSubmit}
         >
           {error && (
             <div className="text-sm text-red-500 text-center">{error}</div>
           )}
-          <div className="grid gap-2">
-            <Label htmlFor="email">이메일</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="이메일을 입력하세요."
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              disabled={isLoading}
-              required
-            />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="password">비밀번호</Label>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              disabled={isLoading}
-              required
-            />
-          </div>
-          <div className="flex items-center gap-2">
-            <Checkbox
-              id="auto-login"
+
+          <FloatingLabelInput
+            label="이메일"
+            type="email"
+            value={email}
+            onChange={setEmail}
+            disabled={isLoading}
+          />
+
+          <FloatingLabelInput
+            label="비밀번호"
+            type="password"
+            value={password}
+            onChange={setPassword}
+            disabled={isLoading}
+          />
+
+          <div className="flex items-center gap-3 py-1">
+            <ToggleSwitch
               checked={autoLogin}
-              onCheckedChange={checked => setAutoLogin(checked === true)}
+              onCheckedChange={setAutoLogin}
               disabled={isLoading}
             />
-            <Label
-              htmlFor="auto-login"
-              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-            >
-              자동 로그인
-            </Label>
+            <span className="text-sm text-foreground">자동 로그인</span>
           </div>
         </form>
       </div>
@@ -141,7 +133,7 @@ export function LoginForm({
           <Button
             type="submit"
             form="login-form"
-            className="w-full"
+            className="w-full h-12 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90"
             disabled={isLoading}
           >
             {isLoading ? "로그인 중..." : "로그인"}
@@ -149,7 +141,7 @@ export function LoginForm({
           <Button
             type="button"
             variant="outline"
-            className="w-full"
+            className="w-full h-12 rounded-xl border-gray-200"
             onClick={() => navigate("/signup")}
             disabled={isLoading}
           >
@@ -157,7 +149,9 @@ export function LoginForm({
           </Button>
         </div>
         <div className="mt-4 text-center text-sm text-muted-foreground">
-          문의가 있으신 경우 02-514-3651로 연락 부탁드립니다.
+          문의사항이 있으신 경우 02-514-3651로
+          <br />
+          연락 부탁드립니다.
         </div>
       </div>
 
