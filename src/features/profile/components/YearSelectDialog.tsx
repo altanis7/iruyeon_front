@@ -1,14 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import Picker from "react-mobile-picker";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/shared/components/ui/dialog";
+  BottomSheet,
+  BottomSheetContent,
+  BottomSheetHeader,
+  BottomSheetTitle,
+  BottomSheetFooter,
+} from "@/shared/components/ui/bottom-sheet";
 import { Button } from "@/shared/components/ui/button";
 import { calculateAge } from "../api/profileApi";
-import { cn } from "@/lib/utils";
 
 interface YearSelectDialogProps {
   open: boolean;
@@ -16,8 +16,8 @@ interface YearSelectDialogProps {
   title: string;
   selectedYear?: number;
   onConfirm: (year: number) => void;
-  minAge?: number; // 최소 나이 (기본값: 20세)
-  maxAge?: number; // 최대 나이 (기본값: 50세)
+  minAge?: number;
+  maxAge?: number;
 }
 
 export function YearSelectDialog({
@@ -30,72 +30,93 @@ export function YearSelectDialog({
   maxAge = 50,
 }: YearSelectDialogProps) {
   const currentYear = new Date().getFullYear();
-  const minBirthYear = currentYear - maxAge; // 가장 오래된 년도
-  const maxBirthYear = currentYear - minAge; // 가장 최근 년도
+  const minBirthYear = currentYear - maxAge;
+  const maxBirthYear = currentYear - minAge;
 
-  // 년도 목록 생성 (최신 년도부터)
-  const years: number[] = [];
+  const years: string[] = [];
   for (let year = maxBirthYear; year >= minBirthYear; year--) {
-    years.push(year);
+    years.push(String(year));
   }
 
-  // 기본 시작 년도를 중간값으로 설정
-  const defaultYear =
-    selectedYear || Math.floor((maxBirthYear + minBirthYear) / 2);
+  const defaultYear = String(
+    selectedYear || Math.floor((maxBirthYear + minBirthYear) / 2)
+  );
 
-  const [tempSelectedYear, setTempSelectedYear] = useState<number>(defaultYear);
+  const [pickerValue, setPickerValue] = useState<{ year: string }>({
+    year: defaultYear,
+  });
 
-  // 확인 버튼 핸들러
+  useEffect(() => {
+    if (open) {
+      setPickerValue({
+        year: String(selectedYear || Math.floor((maxBirthYear + minBirthYear) / 2)),
+      });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, selectedYear]);
+
   const handleConfirm = () => {
-    onConfirm(tempSelectedYear);
+    onConfirm(Number(pickerValue.year));
+    onOpenChange(false);
+  };
+
+  const handleCancel = () => {
     onOpenChange(false);
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle className="text-center text-lg font-semibold text-red-500">
+    <BottomSheet open={open} onOpenChange={onOpenChange}>
+      <BottomSheetContent>
+        <BottomSheetHeader>
+          <BottomSheetTitle className="text-center text-lg font-semibold text-red-500">
             {title}
-          </DialogTitle>
+          </BottomSheetTitle>
           <p className="text-center text-sm text-gray-600 mt-2">
-            {tempSelectedYear}년생 ({calculateAge(tempSelectedYear)}세)
+            {pickerValue.year}년생 ({calculateAge(Number(pickerValue.year))}세)
           </p>
-        </DialogHeader>
+        </BottomSheetHeader>
 
-        {/* 년도 버튼 그리드 */}
-        <div className="grid grid-cols-4 gap-2 py-4 max-h-96 overflow-y-auto">
-          {years.map((year) => {
-            const isSelected = year === tempSelectedYear;
-            return (
-              <Button
-                key={year}
-                type="button"
-                variant={isSelected ? "default" : "outline"}
-                onClick={() => setTempSelectedYear(year)}
-                className={cn(
-                  "h-10 text-sm transition-all",
-                  isSelected
-                    ? "bg-gray-700 hover:bg-gray-800 text-white"
-                    : "bg-white hover:bg-gray-100 text-gray-700 border-gray-300",
-                )}
-              >
-                {year}
-              </Button>
-            );
-          })}
+        <div className="py-4">
+          <Picker
+            value={pickerValue}
+            onChange={setPickerValue}
+            wheelMode="natural"
+          >
+            <Picker.Column name="year">
+              {years.map(year => (
+                <Picker.Item key={year} value={year}>
+                  {({ selected }) => (
+                    <div
+                      className={
+                        selected ? "font-semibold text-black" : "text-neutral-400"
+                      }
+                    >
+                      {year}년
+                    </div>
+                  )}
+                </Picker.Item>
+              ))}
+            </Picker.Column>
+          </Picker>
         </div>
 
-        <DialogFooter>
+        <BottomSheetFooter className="flex flex-col gap-2 pt-2">
           <Button
             type="button"
             onClick={handleConfirm}
-            className="w-full bg-gray-700 hover:bg-gray-800 text-white"
+            className="w-full h-12 rounded-full text-base font-semibold bg-pink-500 hover:bg-pink-600 text-white"
           >
             확인
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          <button
+            type="button"
+            onClick={handleCancel}
+            className="w-full h-10 text-sm text-gray-500 hover:text-gray-700 transition-colors"
+          >
+            취소
+          </button>
+        </BottomSheetFooter>
+      </BottomSheetContent>
+    </BottomSheet>
   );
 }

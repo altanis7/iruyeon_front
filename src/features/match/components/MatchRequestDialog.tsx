@@ -1,10 +1,10 @@
 import { useState, useMemo } from "react";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/shared/components/ui/dialog";
+  BottomSheet,
+  BottomSheetContent,
+  BottomSheetHeader,
+  BottomSheetTitle,
+} from "@/shared/components/ui/bottom-sheet";
 import { Button } from "@/shared/components/ui/button";
 import { Textarea } from "@/shared/components/ui/textarea";
 import { useMyClients } from "@/features/profile/hooks/useMyClients";
@@ -81,16 +81,16 @@ export function MatchRequestDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="max-w-md p-0 gap-0 overflow-hidden">
-        <DialogHeader className="p-4 pb-2">
-          <DialogTitle className="text-center text-lg font-semibold">
+    <BottomSheet open={open} onOpenChange={handleOpenChange}>
+      <BottomSheetContent>
+        <BottomSheetHeader>
+          <BottomSheetTitle className="text-center text-lg font-semibold">
             <span className="text-gray-900">{toClientName}</span>
             <span className="text-gray-600 font-normal">님에게 매칭 제안</span>
-          </DialogTitle>
-        </DialogHeader>
+          </BottomSheetTitle>
+        </BottomSheetHeader>
 
-        <div className="px-4 pb-4 space-y-4">
+        <div className="pb-4 space-y-4">
           {/* 검색바 */}
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -209,7 +209,7 @@ export function MatchRequestDialog({
             )}
           </Button>
         </div>
-      </DialogContent>
-    </Dialog>
+      </BottomSheetContent>
+    </BottomSheet>
   );
 }

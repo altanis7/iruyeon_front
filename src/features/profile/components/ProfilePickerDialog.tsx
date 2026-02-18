@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import Picker from "react-mobile-picker";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/shared/components/ui/dialog";
+  BottomSheet,
+  BottomSheetContent,
+  BottomSheetHeader,
+  BottomSheetTitle,
+  BottomSheetFooter,
+} from "@/shared/components/ui/bottom-sheet";
 import { Button } from "@/shared/components/ui/button";
 
 interface ProfilePickerDialogProps {
@@ -30,7 +30,7 @@ export function ProfilePickerDialog({
     option: selectedValue || options[0] || "",
   });
 
-  // 다이얼로그가 열릴 때 현재 선택된 값으로 초기화
+  // 바텀시트가 열릴 때 현재 선택된 값으로 초기화
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (open) {
@@ -52,17 +52,17 @@ export function ProfilePickerDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle className="text-center text-lg font-semibold text-red-500">
+    <BottomSheet open={open} onOpenChange={onOpenChange}>
+      <BottomSheetContent>
+        <BottomSheetHeader>
+          <BottomSheetTitle className="text-center text-lg font-semibold text-red-500">
             {title}
-          </DialogTitle>
+          </BottomSheetTitle>
           <p className="text-center text-sm text-gray-600 mt-2">
             선택지에 결혼에 필요한 이성의 프로필이 등록되면 알림을 받으실 수
             있습니다!
           </p>
-        </DialogHeader>
+        </BottomSheetHeader>
 
         {/* Picker */}
         <div className="py-4">
@@ -91,24 +91,23 @@ export function ProfilePickerDialog({
           </Picker>
         </div>
 
-        <DialogFooter className="grid grid-cols-2 gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handleCancel}
-            className="bg-gray-200 hover:bg-gray-300 text-black"
-          >
-            취소
-          </Button>
+        <BottomSheetFooter className="flex flex-col gap-2 pt-2">
           <Button
             type="button"
             onClick={handleConfirm}
-            className="bg-gray-700 hover:bg-gray-800 text-white"
+            className="w-full h-12 rounded-full text-base font-semibold bg-pink-500 hover:bg-pink-600 text-white"
           >
             확인
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          <button
+            type="button"
+            onClick={handleCancel}
+            className="w-full h-10 text-sm text-gray-500 hover:text-gray-700 transition-colors"
+          >
+            취소
+          </button>
+        </BottomSheetFooter>
+      </BottomSheetContent>
+    </BottomSheet>
   );
 }

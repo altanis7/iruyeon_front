@@ -1,12 +1,13 @@
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/shared/components/ui/dialog";
+  BottomSheet,
+  BottomSheetContent,
+  BottomSheetHeader,
+  BottomSheetTitle,
+  BottomSheetDescription,
+  BottomSheetFooter,
+} from "@/shared/components/ui/bottom-sheet";
 import { Button } from "@/shared/components/ui/button";
+import { cn } from "@/lib/utils";
 
 interface ConfirmDialogProps {
   open: boolean;
@@ -21,8 +22,8 @@ interface ConfirmDialogProps {
 }
 
 /**
- * 확인 다이얼로그 컴포넌트
- * - 사용자 액션에 대한 확인을 받는 재사용 가능한 다이얼로그
+ * 확인 바텀시트 컴포넌트
+ * - 사용자 액션에 대한 확인을 받는 재사용 가능한 바텀시트
  */
 export function ConfirmDialog({
   open,
@@ -36,25 +37,39 @@ export function ConfirmDialog({
   variant = "default",
 }: ConfirmDialogProps) {
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>{description}</DialogDescription>
-        </DialogHeader>
-        <DialogFooter>
+    <BottomSheet open={open} onOpenChange={onOpenChange}>
+      <BottomSheetContent className="px-6">
+        <BottomSheetHeader className="pb-4">
+          <BottomSheetTitle className="text-center text-lg font-bold text-gray-900">
+            {title}
+          </BottomSheetTitle>
+          <BottomSheetDescription className="text-center text-sm text-gray-500 mt-1">
+            {description}
+          </BottomSheetDescription>
+        </BottomSheetHeader>
+        <BottomSheetFooter className="flex flex-col gap-2 pt-2">
           <Button
-            variant="outline"
-            onClick={() => onOpenChange(false)}
+            onClick={onConfirm}
             disabled={isLoading}
+            className={cn(
+              "w-full h-12 rounded-full text-base font-semibold",
+              variant === "destructive"
+                ? "bg-destructive hover:bg-destructive/90 text-white"
+                : "bg-pink-500 hover:bg-pink-600 text-white"
+            )}
           >
-            {cancelText}
-          </Button>
-          <Button variant={variant} onClick={onConfirm} disabled={isLoading}>
             {isLoading ? "처리 중..." : confirmText}
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          <button
+            type="button"
+            onClick={() => onOpenChange(false)}
+            disabled={isLoading}
+            className="w-full h-10 text-sm text-gray-500 hover:text-gray-700 transition-colors disabled:opacity-50"
+          >
+            {cancelText}
+          </button>
+        </BottomSheetFooter>
+      </BottomSheetContent>
+    </BottomSheet>
   );
 }

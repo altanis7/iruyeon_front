@@ -1,16 +1,16 @@
 /**
  * 키워드 선택 섹션 (성격/이상형)
- * 빈 상태 + 다이얼로그 선택 + 선택된 칩 표시
+ * 빈 상태 + 바텀시트 선택 + 선택된 칩 표시
  */
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { X } from "lucide-react";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/shared/components/ui/dialog";
+  BottomSheet,
+  BottomSheetContent,
+  BottomSheetHeader,
+  BottomSheetTitle,
+} from "@/shared/components/ui/bottom-sheet";
 import { Button } from "@/shared/components/ui/button";
 
 interface KeywordPickerSectionProps {
@@ -52,14 +52,14 @@ export function KeywordPickerSection({
   emptyText = "아직 선택된 항목이 없습니다.",
   emptySubText = "버튼을 눌러 선택해주세요.",
 }: KeywordPickerSectionProps) {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const [tempSelected, setTempSelected] = useState<string[]>([]);
 
   const hasSelection = selectedKeywords.length > 0;
 
-  const handleOpenDialog = () => {
+  const handleOpen = () => {
     setTempSelected([...selectedKeywords]);
-    setIsDialogOpen(true);
+    setIsOpen(true);
   };
 
   const handleToggleKeyword = (keyword: string) => {
@@ -73,7 +73,7 @@ export function KeywordPickerSection({
 
   const handleConfirm = () => {
     onSelectionChange(tempSelected);
-    setIsDialogOpen(false);
+    setIsOpen(false);
   };
 
   const handleRemoveKeyword = (keyword: string) => {
@@ -92,7 +92,7 @@ export function KeywordPickerSection({
         </span>
         <button
           type="button"
-          onClick={handleOpenDialog}
+          onClick={handleOpen}
           className="text-primary font-medium text-sm hover:text-primary/80 transition-colors"
         >
           + 선택하기
@@ -126,20 +126,20 @@ export function KeywordPickerSection({
         </div>
       )}
 
-      {/* 선택 다이얼로그 */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-md mx-auto">
-          <DialogHeader>
-            <DialogTitle className="text-lg font-semibold">
+      {/* 선택 바텀시트 */}
+      <BottomSheet open={isOpen} onOpenChange={setIsOpen}>
+        <BottomSheetContent>
+          <BottomSheetHeader>
+            <BottomSheetTitle className="text-lg font-semibold">
               {label} 선택
               <span className="ml-2 text-sm font-normal text-gray-500">
                 ({tempSelected.length}/{maxSelection})
               </span>
-            </DialogTitle>
-          </DialogHeader>
+            </BottomSheetTitle>
+          </BottomSheetHeader>
 
           <div className="py-4">
-            <div className="flex flex-wrap gap-2">
+            <div className="grid grid-cols-2 gap-2">
               {keywords.map(keyword => {
                 const isSelected = tempSelected.includes(keyword);
                 const isDisabled = !isSelected && tempSelected.length >= maxSelection;
@@ -151,10 +151,10 @@ export function KeywordPickerSection({
                     onClick={() => handleToggleKeyword(keyword)}
                     disabled={isDisabled}
                     className={cn(
-                      "px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 border-2",
+                      "px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 border-2",
                       isSelected
-                        ? "bg-primary text-white border-primary shadow-sm"
-                        : "bg-white text-gray-600 border-gray-200 hover:border-primary hover:text-primary",
+                        ? "bg-pink-500 text-white border-pink-500 shadow-sm"
+                        : "bg-white text-gray-600 border-gray-200 hover:border-pink-400 hover:text-pink-500",
                       isDisabled && "opacity-40 cursor-not-allowed hover:border-gray-200 hover:text-gray-600"
                     )}
                   >
@@ -171,25 +171,24 @@ export function KeywordPickerSection({
             )}
           </div>
 
-          <div className="flex gap-3 pt-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setIsDialogOpen(false)}
-              className="flex-1"
-            >
-              취소
-            </Button>
+          <div className="flex flex-col gap-2 pt-2">
             <Button
               type="button"
               onClick={handleConfirm}
-              className="flex-1"
+              className="w-full h-12 rounded-full text-base font-semibold bg-pink-500 hover:bg-pink-600 text-white"
             >
               선택 완료
             </Button>
+            <button
+              type="button"
+              onClick={() => setIsOpen(false)}
+              className="w-full h-10 text-sm text-gray-500 hover:text-gray-700 transition-colors"
+            >
+              취소
+            </button>
           </div>
-        </DialogContent>
-      </Dialog>
+        </BottomSheetContent>
+      </BottomSheet>
     </div>
   );
 }
