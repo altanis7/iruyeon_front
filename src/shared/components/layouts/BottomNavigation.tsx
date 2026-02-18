@@ -12,7 +12,7 @@ const navItems: NavItem[] = [
   { path: "/", label: "메인", icon: Home },
   { path: "/match", label: "매칭관리", icon: Heart },
   { path: "/profile", label: "프로필 관리", icon: UserCircle },
-  { path: "/setting", label: "설정", icon: Settings },
+  { path: "/setting", label: "내 정보", icon: Settings },
 ];
 
 export function BottomNavigation() {
