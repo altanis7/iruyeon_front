@@ -5,6 +5,7 @@
  */
 import { useRef, useState, useEffect } from "react";
 import { Plus, X, Loader2, Camera } from "lucide-react";
+import { toast } from "sonner";
 import { useUploadImage } from "@/features/upload/hooks/useUploadImage";
 import { cn } from "@/lib/utils";
 
@@ -76,13 +77,13 @@ export function ProfilePhotoUploader({
 
     // 이미지 파일 검증
     if (!file.type.startsWith("image/")) {
-      alert("이미지 파일만 업로드 가능합니다.");
+      toast.error("이미지 파일만 업로드 가능합니다.");
       return;
     }
 
     // 파일 크기 검증 (5MB)
     if (file.size > 5 * 1024 * 1024) {
-      alert("파일 크기는 5MB 이하만 가능합니다.");
+      toast.error("파일 크기는 5MB 이하만 가능합니다.");
       return;
     }
 
@@ -112,7 +113,7 @@ export function ProfilePhotoUploader({
         onImagesChange(newIds, newUrls);
       },
       onError: error => {
-        alert(`이미지 업로드 실패: ${error.message}`);
+        toast.error(`이미지 업로드 실패: ${error.message}`);
         setSlots(prev =>
           prev.map((slot, i) =>
             i === slotIndex ? { ...slot, isUploading: false } : slot
