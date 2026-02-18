@@ -3,6 +3,7 @@
  */
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { matchApi } from "../api/matchApi";
 
 /**
@@ -18,6 +19,10 @@ export function useCancelMatch() {
       queryClient.invalidateQueries({ queryKey: ["matches", "sent"] });
       // 알림 개수도 갱신
       queryClient.invalidateQueries({ queryKey: ["match", "alarm"] });
+      toast.success("매칭이 취소되었습니다.");
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || "매칭 취소에 실패했습니다.");
     },
   });
 }
