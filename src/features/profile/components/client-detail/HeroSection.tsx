@@ -44,6 +44,11 @@ export function HeroSection({
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
   const [count, setCount] = useState(0);
+  const [imageLoaded, setImageLoaded] = useState<boolean[]>([]);
+
+  useEffect(() => {
+    setImageLoaded(new Array(client.profileImages?.length ?? 0).fill(false));
+  }, [client.profileImages]);
 
   useEffect(() => {
     if (!api) return;
@@ -58,16 +63,28 @@ export function HeroSection({
 
   return (
     <div className="relative h-[680px] w-full overflow-hidden bg-slate-900">
+      {/* api 초기화 전 또는 첫 이미지 로드 전 스켈레톤 (바깥 relative div 기준 absolute) */}
+      {hasImages && (!api || !imageLoaded[0]) && (
+        <div className="absolute inset-0 z-20 bg-slate-900 animate-pulse" />
+      )}
+
       {/* 배경 이미지 캐러셀 */}
       {hasImages ? (
-        <Carousel setApi={setApi} className="h-full">
-          <CarouselContent className="h-full" containerClassName="h-full">
+        <Carousel setApi={setApi} className="h-full w-full">
+          <CarouselContent className="h-full !ml-0" containerClassName="h-full">
             {client.profileImages.map((img, idx) => (
-              <CarouselItem key={idx} className="h-full">
+              <CarouselItem key={idx} className="h-full !pl-0">
                 <img
                   src={img}
                   alt={`${client.name} 프로필 ${idx + 1}`}
                   className="w-full h-full object-cover"
+                  onLoad={() =>
+                    setImageLoaded(prev => {
+                      const next = [...prev];
+                      next[idx] = true;
+                      return next;
+                    })
+                  }
                 />
               </CarouselItem>
             ))}
