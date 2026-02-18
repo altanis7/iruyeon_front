@@ -9,7 +9,13 @@ interface MenuItem {
 const menuItems: MenuItem[] = [
   { label: "모든 매니저", path: "/admin" },
   { label: "승인 대기중 명단", path: "/admin/pending" },
-  { label: "내 정보 수정", path: "/admin/settings" },
+];
+
+const managerMenuItems: MenuItem[] = [
+  { label: "회원 목록", path: "/" },
+  { label: "매칭 관리", path: "/match" },
+  { label: "내 회원 목록", path: "/profile" },
+  { label: "내 정보", path: "/setting" },
 ];
 
 export function AdminSidebar() {
@@ -29,6 +35,27 @@ export function AdminSidebar() {
                 "block px-4 py-3 rounded-lg text-sm font-medium transition-colors",
                 isActive
                   ? "bg-pink-100 text-pink-700"
+                  : "text-gray-600 hover:bg-gray-100"
+              )
+            }
+          >
+            {item.label}
+          </NavLink>
+        ))}
+
+        <div className="my-3 border-t border-gray-200" />
+        <p className="px-4 pb-1 text-xs font-medium text-gray-400 uppercase tracking-wide">
+          매니저 메뉴
+        </p>
+        {managerMenuItems.map((item) => (
+          <NavLink
+            key={item.path}
+            to={item.path}
+            className={({ isActive }) =>
+              cn(
+                "block px-4 py-3 rounded-lg text-sm font-medium transition-colors",
+                isActive
+                  ? "bg-blue-50 text-blue-600"
                   : "text-gray-600 hover:bg-gray-100"
               )
             }
