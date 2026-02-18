@@ -321,13 +321,23 @@ a,
 /* ===== Sonner Toast Styles ===== */
 
 [data-sonner-toaster] {
-  font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, sans-serif !important;
+  font-family:
+    "Pretendard",
+    -apple-system,
+    BlinkMacSystemFont,
+    system-ui,
+    sans-serif !important;
   z-index: 9999 !important;
   max-width: calc(100vw - 32px) !important;
 }
 
 [data-sonner-toast].toast-custom {
-  font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  font-family:
+    "Pretendard",
+    -apple-system,
+    BlinkMacSystemFont,
+    system-ui,
+    sans-serif;
   max-width: 90%;
   margin-left: auto;
   margin-right: auto;
@@ -581,4 +591,9 @@ body:has([data-state="open"][role="dialog"]) [data-sonner-toaster] {
 
 [data-rich-colors="true"][data-sonner-toast].toast-warning [data-icon] {
   animation: icon-warning-pulse 500ms ease-in-out;
+}
+
+/* Lucide Icon Stroke Width */
+.lucide {
+  stroke-width: 0.75;
 }
