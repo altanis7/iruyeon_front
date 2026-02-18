@@ -1,21 +1,13 @@
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Clock, Heart, XCircle } from "lucide-react";
+import { Heart } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/shared/components/ui/button";
 import { ToggleSwitch } from "@/shared/components/ui/toggle-switch";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/shared/components/ui/dialog";
 import { FloatingLabelInput } from "@/features/profile/components/FloatingLabelInput";
 import { useAuth, getAutoLoginSetting } from "@/features/auth/hooks/useAuth";
 import { loginAPI } from "@/features/auth/api/authApi";
-
-type StatusDialogType = "pending" | "denied" | null;
 
 export function LoginForm({
   className,
@@ -27,12 +19,9 @@ export function LoginForm({
   const [password, setPassword] = useState("");
   const [autoLogin, setAutoLogin] = useState(() => getAutoLoginSetting());
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [statusDialog, setStatusDialog] = useState<StatusDialogType>(null);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError(null);
     setIsLoading(true);
 
     try {
@@ -42,33 +31,43 @@ export function LoginForm({
 
         // 승인 대기 상태 (ROLE_ANONYMOUS)
         if (role === "ROLE_ANONYMOUS" && status === "PENDING") {
-          setStatusDialog("pending");
+          toast.warning(
+            <>
+              가입 승인 대기 중입니다.
+              <br />
+              관리자 승인 후 로그인이 가능합니다.
+            </>,
+          );
           return;
         }
 
         // 승인 거부 상태 (ROLE_DENIED)
         if (role === "ROLE_DENIED") {
-          setStatusDialog("denied");
+          toast.error(
+            <>
+              가입이 거부되었습니다.
+              <br />
+              관리자에게 연락바랍니다.
+            </>,
+          );
           return;
         }
 
         // 승인된 사용자 (ROLE_MEMBER, ROLE_ADMIN)
         if (role === "ROLE_MEMBER" || role === "ROLE_ADMIN") {
-          login(
-            token,
-            { id: String(id), role, status },
-            autoLogin,
-          );
+          login(token, { id: String(id), role, status }, autoLogin);
           return;
         }
 
         // 예상치 못한 상태
-        setError("로그인 응답이 올바르지 않습니다.");
+        toast.error("로그인 응답이 올바르지 않습니다.");
       } else {
-        setError("로그인 응답이 올바르지 않습니다.");
+        toast.error("로그인 응답이 올바르지 않습니다.");
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "로그인에 실패했습니다.");
+      toast.error(
+        err instanceof Error ? err.message : "로그인에 실패했습니다.",
+      );
     } finally {
       setIsLoading(false);
     }
@@ -96,10 +95,6 @@ export function LoginForm({
           className="flex flex-col gap-4"
           onSubmit={handleSubmit}
         >
-          {error && (
-            <div className="text-sm text-red-500 text-center">{error}</div>
-          )}
-
           <FloatingLabelInput
             label="이메일"
             type="email"
@@ -154,58 +149,6 @@ export function LoginForm({
           연락 부탁드립니다.
         </div>
       </div>
-
-      {/* 승인 대기 다이얼로그 */}
-      <Dialog
-        open={statusDialog === "pending"}
-        onOpenChange={() => setStatusDialog(null)}
-      >
-        <DialogContent className="max-w-[320px]">
-          <DialogHeader className="items-center text-center">
-            <div className="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center mb-2">
-              <Clock className="w-8 h-8 text-amber-500" />
-            </div>
-            <DialogTitle>승인 대기 중</DialogTitle>
-            <DialogDescription className="text-center">
-              가입 승인 대기 중입니다.
-              <br />
-              관리자 승인 후 로그인이 가능합니다.
-            </DialogDescription>
-          </DialogHeader>
-          <Button
-            className="w-full mt-2"
-            onClick={() => setStatusDialog(null)}
-          >
-            확인
-          </Button>
-        </DialogContent>
-      </Dialog>
-
-      {/* 승인 거부 다이얼로그 */}
-      <Dialog
-        open={statusDialog === "denied"}
-        onOpenChange={() => setStatusDialog(null)}
-      >
-        <DialogContent className="max-w-[320px]">
-          <DialogHeader className="items-center text-center">
-            <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mb-2">
-              <XCircle className="w-8 h-8 text-red-500" />
-            </div>
-            <DialogTitle>승인 거부</DialogTitle>
-            <DialogDescription className="text-center">
-              가입이 거부되었습니다.
-              <br />
-              문의가 필요하시면 관리자에게 연락해주세요.
-            </DialogDescription>
-          </DialogHeader>
-          <Button
-            className="w-full mt-2"
-            onClick={() => setStatusDialog(null)}
-          >
-            확인
-          </Button>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
