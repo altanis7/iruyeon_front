@@ -55,12 +55,12 @@ export function MatchPage() {
 
   return (
     <MainLayout>
-      {/* 헤더 */}
-      <div className="sticky top-0 bg-white z-10 px-4 pt-safe-top pt-3 pb-3 border-b">
-        <h1 className="text-xl font-bold mb-3">내 매칭 목록</h1>
+      <Tabs defaultValue="received" className="flex flex-col">
+        {/* 헤더 - 고정 */}
+        <div className="sticky top-0 bg-white z-10 px-4 pt-safe-top pt-3 pb-3 border-b">
+          <h1 className="text-xl font-bold mb-3">매칭 관리</h1>
 
-        {/* 탭 */}
-        <Tabs defaultValue="received" className="w-full">
+          {/* 탭 */}
           <TabsList className="w-full grid grid-cols-3">
             <TabsTrigger value="received" className="relative">
               받은 매칭
@@ -87,128 +87,128 @@ export function MatchPage() {
               )}
             </TabsTrigger>
           </TabsList>
+        </div>
 
-          {/* 받은 매칭 탭 */}
-          <TabsContent value="received" className="mt-0">
-            <div className="p-4 space-y-4">
-              {isReceivedLoading ? (
-                // 로딩 상태
-                <div className="flex items-center justify-center py-12">
-                  <div className="text-sm text-gray-500">로딩 중...</div>
-                </div>
-              ) : receivedMatches.length === 0 ? (
-                // 빈 상태
-                <div className="flex flex-col items-center justify-center py-12 text-center">
-                  <p className="text-gray-500">받은 매칭이 없습니다</p>
-                </div>
-              ) : (
-                // 매칭 목록
-                <>
-                  {receivedMatches.map(match => (
-                    <MatchCard key={match.matchId} match={match} />
-                  ))}
+        {/* 받은 매칭 탭 - 스크롤 영역 */}
+        <TabsContent value="received" className="mt-0">
+          <div className="p-4 space-y-4">
+            {isReceivedLoading ? (
+              // 로딩 상태
+              <div className="flex items-center justify-center py-12">
+                <div className="text-sm text-gray-500">로딩 중...</div>
+              </div>
+            ) : receivedMatches.length === 0 ? (
+              // 빈 상태
+              <div className="flex flex-col items-center justify-center py-12 text-center">
+                <p className="text-gray-500">받은 매칭이 없습니다</p>
+              </div>
+            ) : (
+              // 매칭 목록
+              <>
+                {receivedMatches.map(match => (
+                  <MatchCard key={match.matchId} match={match} />
+                ))}
 
-                  {/* 무한 스크롤 트리거 */}
-                  {hasReceivedNextPage && (
-                    <div className="flex items-center justify-center py-4">
-                      {isReceivedFetchingNextPage ? (
-                        <div className="text-sm text-gray-500">로딩 중...</div>
-                      ) : (
-                        <button
-                          onClick={() => fetchReceivedNextPage()}
-                          className="text-sm text-blue-500 hover:underline"
-                        >
-                          더 보기
-                        </button>
-                      )}
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
-          </TabsContent>
+                {/* 무한 스크롤 트리거 */}
+                {hasReceivedNextPage && (
+                  <div className="flex items-center justify-center py-4">
+                    {isReceivedFetchingNextPage ? (
+                      <div className="text-sm text-gray-500">로딩 중...</div>
+                    ) : (
+                      <button
+                        onClick={() => fetchReceivedNextPage()}
+                        className="text-sm text-blue-500 hover:underline"
+                      >
+                        더 보기
+                      </button>
+                    )}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        </TabsContent>
 
-          {/* 보낸 매칭 탭 */}
-          <TabsContent value="sent" className="mt-0">
-            <div className="p-4 space-y-4">
-              {isSentLoading ? (
-                // 로딩 상태
-                <div className="flex items-center justify-center py-12">
-                  <div className="text-sm text-gray-500">로딩 중...</div>
-                </div>
-              ) : sentMatches.length === 0 ? (
-                // 빈 상태
-                <div className="flex flex-col items-center justify-center py-12 text-center">
-                  <p className="text-gray-500">보낸 매칭이 없습니다</p>
-                </div>
-              ) : (
-                // 매칭 목록
-                <>
-                  {sentMatches.map(match => (
-                    <MatchCard key={match.matchId} match={match} variant="sent" />
-                  ))}
+        {/* 보낸 매칭 탭 - 스크롤 영역 */}
+        <TabsContent value="sent" className="mt-0">
+          <div className="p-4 space-y-4">
+            {isSentLoading ? (
+              // 로딩 상태
+              <div className="flex items-center justify-center py-12">
+                <div className="text-sm text-gray-500">로딩 중...</div>
+              </div>
+            ) : sentMatches.length === 0 ? (
+              // 빈 상태
+              <div className="flex flex-col items-center justify-center py-12 text-center">
+                <p className="text-gray-500">보낸 매칭이 없습니다</p>
+              </div>
+            ) : (
+              // 매칭 목록
+              <>
+                {sentMatches.map(match => (
+                  <MatchCard key={match.matchId} match={match} variant="sent" />
+                ))}
 
-                  {/* 무한 스크롤 트리거 */}
-                  {hasSentNextPage && (
-                    <div className="flex items-center justify-center py-4">
-                      {isSentFetchingNextPage ? (
-                        <div className="text-sm text-gray-500">로딩 중...</div>
-                      ) : (
-                        <button
-                          onClick={() => fetchSentNextPage()}
-                          className="text-sm text-blue-500 hover:underline"
-                        >
-                          더 보기
-                        </button>
-                      )}
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
-          </TabsContent>
+                {/* 무한 스크롤 트리거 */}
+                {hasSentNextPage && (
+                  <div className="flex items-center justify-center py-4">
+                    {isSentFetchingNextPage ? (
+                      <div className="text-sm text-gray-500">로딩 중...</div>
+                    ) : (
+                      <button
+                        onClick={() => fetchSentNextPage()}
+                        className="text-sm text-blue-500 hover:underline"
+                      >
+                        더 보기
+                      </button>
+                    )}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        </TabsContent>
 
-          {/* 매칭 완료 탭 */}
-          <TabsContent value="completed" className="mt-0">
-            <div className="p-4 space-y-4">
-              {isMatchedLoading ? (
-                // 로딩 상태
-                <div className="flex items-center justify-center py-12">
-                  <div className="text-sm text-gray-500">로딩 중...</div>
-                </div>
-              ) : matchedMatches.length === 0 ? (
-                // 빈 상태
-                <div className="flex flex-col items-center justify-center py-12 text-center">
-                  <p className="text-gray-500">매칭 완료 내역이 없습니다</p>
-                </div>
-              ) : (
-                // 매칭 목록
-                <>
-                  {matchedMatches.map(match => (
-                    <MatchCard key={match.matchId} match={match} variant="matched" />
-                  ))}
+        {/* 매칭 완료 탭 - 스크롤 영역 */}
+        <TabsContent value="completed" className="mt-0">
+          <div className="p-4 space-y-4">
+            {isMatchedLoading ? (
+              // 로딩 상태
+              <div className="flex items-center justify-center py-12">
+                <div className="text-sm text-gray-500">로딩 중...</div>
+              </div>
+            ) : matchedMatches.length === 0 ? (
+              // 빈 상태
+              <div className="flex flex-col items-center justify-center py-12 text-center">
+                <p className="text-gray-500">매칭 완료 내역이 없습니다</p>
+              </div>
+            ) : (
+              // 매칭 목록
+              <>
+                {matchedMatches.map(match => (
+                  <MatchCard key={match.matchId} match={match} variant="matched" />
+                ))}
 
-                  {/* 무한 스크롤 트리거 */}
-                  {hasMatchedNextPage && (
-                    <div className="flex items-center justify-center py-4">
-                      {isMatchedFetchingNextPage ? (
-                        <div className="text-sm text-gray-500">로딩 중...</div>
-                      ) : (
-                        <button
-                          onClick={() => fetchMatchedNextPage()}
-                          className="text-sm text-blue-500 hover:underline"
-                        >
-                          더 보기
-                        </button>
-                      )}
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
-          </TabsContent>
-        </Tabs>
-      </div>
+                {/* 무한 스크롤 트리거 */}
+                {hasMatchedNextPage && (
+                  <div className="flex items-center justify-center py-4">
+                    {isMatchedFetchingNextPage ? (
+                      <div className="text-sm text-gray-500">로딩 중...</div>
+                    ) : (
+                      <button
+                        onClick={() => fetchMatchedNextPage()}
+                        className="text-sm text-blue-500 hover:underline"
+                      >
+                        더 보기
+                      </button>
+                    )}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        </TabsContent>
+      </Tabs>
     </MainLayout>
   );
 }
