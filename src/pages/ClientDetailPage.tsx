@@ -103,7 +103,7 @@ export function ClientDetailPage() {
   // 로딩 상태
   if (isLoading) {
     return (
-      <div className="h-dvh bg-slate-50 max-w-md mx-auto overflow-y-auto scrollbar-hide">
+      <div className="h-dvh w-full bg-slate-50 max-w-md mx-auto overflow-y-auto scrollbar-hide shadow-[0_0_20px_#0000000d]">
         <div className="h-[680px] bg-slate-200 animate-pulse" />
         <div className="px-4 py-6 space-y-4">
           <div className="h-40 bg-white rounded-3xl animate-pulse" />
@@ -116,7 +116,7 @@ export function ClientDetailPage() {
   // Not Found 상태
   if (!client) {
     return (
-      <div className="h-dvh flex items-center justify-center bg-slate-50 max-w-md mx-auto">
+      <div className="h-dvh w-full flex items-center justify-center bg-slate-50 max-w-md mx-auto shadow-[0_0_20px_#0000000d]">
         <div className="text-center">
           <p className="text-gray-500 mb-4">고객 정보를 찾을 수 없습니다</p>
           <Button onClick={() => navigate("/profile")}>
@@ -130,7 +130,7 @@ export function ClientDetailPage() {
   return (
     <div
       ref={scrollContainerRef}
-      className="h-dvh overflow-y-auto bg-slate-50 max-w-md mx-auto scrollbar-hide"
+      className="h-dvh w-full overflow-y-auto bg-slate-50 max-w-md mx-auto scrollbar-hide shadow-[0_0_20px_#0000000d]"
     >
       {/* 스티키 바 */}
       <StickyProfileBar client={client} isVisible={showStickyBar} />
