@@ -13,10 +13,9 @@ export function useMatchedMatches() {
     queryKey: ["matches", "matched"],
     queryFn: ({ pageParam = 0 }) =>
       matchApi.getMatchedMatches({ page: pageParam, size: 10 }),
-    getNextPageParam: (lastPage) => {
-      const currentPage = lastPage.data.currentPage;
+    getNextPageParam: (lastPage, allPages) => {
       const totalPages = lastPage.data.totalPages;
-      return currentPage < totalPages ? currentPage + 1 : undefined;
+      return allPages.length < totalPages ? allPages.length : undefined;
     },
     initialPageParam: 0,
   });

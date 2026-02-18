@@ -6,10 +6,9 @@ export function useMyClients() {
     queryKey: ["myClients"],
     queryFn: ({ pageParam = 0 }) =>
       clientApi.getMyClients({ page: pageParam, size: 10 }),
-    getNextPageParam: (lastPage, _allPages) => {
-      const currentPage = lastPage.data.currentPage;
+    getNextPageParam: (lastPage, allPages) => {
       const totalPages = lastPage.data.totalPages;
-      return currentPage < totalPages ? currentPage + 1 : undefined;
+      return allPages.length < totalPages ? allPages.length : undefined;
     },
     initialPageParam: 0,
   });
