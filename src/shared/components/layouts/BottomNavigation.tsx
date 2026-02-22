@@ -12,7 +12,7 @@ const navItems: NavItem[] = [
   { path: "/", label: "메인", icon: Home },
   { path: "/match", label: "매칭관리", icon: Heart },
   { path: "/profile", label: "프로필 관리", icon: UserCircle },
-  { path: "/setting", label: "설정", icon: Settings },
+  { path: "/setting", label: "내 정보", icon: Settings },
 ];
 
 export function BottomNavigation() {
@@ -20,7 +20,7 @@ export function BottomNavigation() {
   const navigate = useNavigate();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-background border-t border-border pb-safe">
+    <nav className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-background border-t border-border pb-safe z-50">
       <div className="flex items-center justify-around h-16">
         {navItems.map(item => {
           const Icon = item.icon;

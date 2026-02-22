@@ -1,45 +1,51 @@
 import { useNavigate } from "react-router-dom";
-import { useCallback, useEffect, useState } from "react";
-
-const AUTH_STORAGE_KEY = "isAuthenticated";
-const USER_STORAGE_KEY = "currentUser";
+import { useCallback, useState } from "react";
+import {
+  getCookie,
+  setCookie,
+  removeCookie,
+} from "@/lib/api/client";
+import type { UserRole, UserStatus } from "@/features/auth/api/authApi";
 
 export interface CurrentUser {
   id: string;
-  email: string;
-  name: string;
+  role: UserRole;
+  status: UserStatus;
+}
+
+// 자동 로그인 설정 저장/조회
+const AUTO_LOGIN_KEY = "auto_login";
+
+export function getAutoLoginSetting(): boolean {
+  return localStorage.getItem(AUTO_LOGIN_KEY) === "true";
+}
+
+export function setAutoLoginSetting(enabled: boolean): void {
+  if (enabled) {
+    localStorage.setItem(AUTO_LOGIN_KEY, "true");
+  } else {
+    localStorage.removeItem(AUTO_LOGIN_KEY);
+  }
 }
 
 export function useAuth() {
   const navigate = useNavigate();
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
-    // 초기 상태를 localStorage에서 가져옴
-    const stored = localStorage.getItem(AUTH_STORAGE_KEY);
-    return stored === "true";
+    return !!getCookie("access_token");
   });
 
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(() => {
-    const stored = localStorage.getItem(USER_STORAGE_KEY);
+    const stored = getCookie("current_user");
     return stored ? JSON.parse(stored) : null;
   });
 
-  // localStorage 변경 감지 (다른 탭에서의 로그인/아웃 동기화)
-  useEffect(() => {
-    const handleStorageChange = () => {
-      const authStored = localStorage.getItem(AUTH_STORAGE_KEY);
-      const userStored = localStorage.getItem(USER_STORAGE_KEY);
-      setIsAuthenticated(authStored === "true");
-      setCurrentUser(userStored ? JSON.parse(userStored) : null);
-    };
-
-    window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
-  }, []);
-
   const login = useCallback(
-    (user: CurrentUser) => {
-      localStorage.setItem(AUTH_STORAGE_KEY, "true");
-      localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
+    (token: string, user: CurrentUser, autoLogin: boolean = false) => {
+      // 자동 로그인 설정에 따라 쿠키 만료 시간 조정
+      const maxAgeDays = autoLogin ? 30 : 1; // 자동 로그인: 30일, 아니면: 1일
+      setCookie("access_token", token, maxAgeDays);
+      setCookie("current_user", JSON.stringify(user), maxAgeDays);
+      setAutoLoginSetting(autoLogin);
       setIsAuthenticated(true);
       setCurrentUser(user);
       navigate("/");
@@ -48,8 +54,9 @@ export function useAuth() {
   );
 
   const logout = useCallback(() => {
-    localStorage.removeItem(AUTH_STORAGE_KEY);
-    localStorage.removeItem(USER_STORAGE_KEY);
+    removeCookie("access_token");
+    removeCookie("current_user");
+    setAutoLoginSetting(false);
     setIsAuthenticated(false);
     setCurrentUser(null);
     navigate("/login");

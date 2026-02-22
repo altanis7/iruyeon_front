@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { clientManagementApi, type UpdateClientRequest } from "../api/profileApi";
 
 /**
@@ -12,7 +13,7 @@ export function useUpdateClient() {
   return useMutation({
     mutationFn: (data: UpdateClientRequest) =>
       clientManagementApi.updateClient(data),
-    onSuccess: (response, variables) => {
+    onSuccess: (_response, variables) => {
       // Invalidate specific client detail
       queryClient.invalidateQueries({
         queryKey: ["client", String(variables.clientId)],
@@ -27,9 +28,11 @@ export function useUpdateClient() {
       queryClient.invalidateQueries({
         queryKey: ["clients"],
       });
+      toast.success("프로필이 수정되었습니다.");
     },
     onError: error => {
       console.error("Update failed:", error);
+      toast.error(error.message || "프로필 수정에 실패했습니다.");
     },
   });
 }

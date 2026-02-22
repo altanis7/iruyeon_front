@@ -7,13 +7,12 @@ import { clientApi } from "../api/profileApi";
 export function useClients() {
   return useInfiniteQuery({
     queryKey: ["clients"],
-    queryFn: ({ pageParam = 1 }) =>
+    queryFn: ({ pageParam = 0 }) =>
       clientApi.getClients({ page: pageParam, size: 10 }),
     getNextPageParam: (lastPage, allPages) => {
-      const currentPage = lastPage.data.currentPage;
       const totalPages = lastPage.data.totalPages;
-      return currentPage < totalPages ? currentPage + 1 : undefined;
+      return allPages.length < totalPages ? allPages.length : undefined;
     },
-    initialPageParam: 1,
+    initialPageParam: 0,
   });
 }

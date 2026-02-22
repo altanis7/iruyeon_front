@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/shared/components/ui/dialog";
+  BottomSheet,
+  BottomSheetContent,
+  BottomSheetHeader,
+  BottomSheetTitle,
+  BottomSheetFooter,
+} from "@/shared/components/ui/bottom-sheet";
 import { Button } from "@/shared/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -32,7 +32,7 @@ export function ProfileSelectDialog({
 }: ProfileSelectDialogProps) {
   const [tempSelected, setTempSelected] = useState<string[]>(selectedValues);
 
-  // 다이얼로그가 열릴 때 현재 선택된 값으로 초기화
+  // 바텀시트가 열릴 때 현재 선택된 값으로 초기화
   useEffect(() => {
     if (open) {
       setTempSelected(selectedValues);
@@ -82,12 +82,12 @@ export function ProfileSelectDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle className="text-center text-lg font-semibold text-red-500">
+    <BottomSheet open={open} onOpenChange={onOpenChange}>
+      <BottomSheetContent>
+        <BottomSheetHeader>
+          <BottomSheetTitle className="text-center text-lg font-semibold text-red-500">
             {title}
-          </DialogTitle>
+          </BottomSheetTitle>
           <p className="text-center text-sm text-gray-600 mt-2">
             선택지에 결혼에 필요한 이성의 프로필이 등록되면 알림을 받으실 수 있습니다!
             {maxSelection && (
@@ -96,7 +96,7 @@ export function ProfileSelectDialog({
               </span>
             )}
           </p>
-        </DialogHeader>
+        </BottomSheetHeader>
 
         {/* 옵션 리스트 - 칩 스타일 버튼 (크기 고정) */}
         <div className="grid grid-cols-2 gap-3 py-4 max-h-96 overflow-y-auto">
@@ -121,26 +121,25 @@ export function ProfileSelectDialog({
           })}
         </div>
 
-        <DialogFooter className={multiSelect ? "grid grid-cols-2 gap-2" : ""}>
-          {multiSelect && (
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleReset}
-              className="bg-gray-200 hover:bg-gray-300 text-black"
-            >
-              초기화
-            </Button>
-          )}
+        <BottomSheetFooter className="flex flex-col gap-2 pt-2">
           <Button
             type="button"
             onClick={handleConfirm}
-            className={`${multiSelect ? "" : "w-full"} bg-gray-700 hover:bg-gray-800 text-white`}
+            className="w-full h-12 rounded-full text-base font-semibold bg-pink-500 hover:bg-pink-600 text-white"
           >
             확인
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          {multiSelect && (
+            <button
+              type="button"
+              onClick={handleReset}
+              className="w-full h-10 text-sm text-gray-500 hover:text-gray-700 transition-colors"
+            >
+              초기화
+            </button>
+          )}
+        </BottomSheetFooter>
+      </BottomSheetContent>
+    </BottomSheet>
   );
 }

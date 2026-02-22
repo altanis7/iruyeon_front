@@ -1,32 +1,39 @@
-import { useState } from "react";
-import { useNavigate, useParams } from "react-router";
-import { ArrowLeft, Edit, Trash2, ToggleLeft, ToggleRight } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { useNavigate, useParams, useSearchParams } from "react-router";
 import { Button } from "@/shared/components/ui/button";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/shared/components/ui/avatar";
-import { Card, CardContent } from "@/shared/components/ui/card";
+import { cn } from "@/lib/utils";
 import { useClient } from "@/features/profile/hooks/useClient";
+import { useClientInfo } from "@/features/profile/hooks/useClientInfo";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useToggleClientStatus } from "@/features/profile/hooks/useToggleClientStatus";
 import { useDeleteClient } from "@/features/profile/hooks/useDeleteClient";
 import { ConfirmDialog } from "@/features/profile/components/ConfirmDialog";
-import RootLayout from "@/shared/components/layouts/RootLayout";
 import {
-  formatValue,
-  formatHeight,
-  formatPreferredAge,
-  formatJobInfo,
-  formatFamilyJob,
-  formatBirthYear,
-} from "@/features/profile/utils/clientFormat";
+  HeroSection,
+  StickyProfileBar,
+  InfoSection,
+  EducationCareerSection,
+  PreferenceSection,
+  FamilySection,
+  ManagerOpinionSection,
+} from "@/features/profile/components/client-detail";
+import { MatchRequestDialog } from "@/features/match/components/MatchRequestDialog";
 
 export function ClientDetailPage() {
   const navigate = useNavigate();
   const { clientId } = useParams<{ clientId: string }>();
-  const { data: response, isLoading } = useClient(clientId!);
+  const [searchParams] = useSearchParams();
+  const isFromProfile = searchParams.get("source") === "profile";
+
+  // 상호 배타적 API 호출: source=profile이면 /info API, 아니면 기존 API
+  const { data: clientResponse, isLoading: clientLoading } = useClient(
+    isFromProfile ? "" : clientId!
+  );
+  const { data: clientInfoResponse, isLoading: clientInfoLoading } =
+    useClientInfo(isFromProfile ? clientId! : "");
+
+  const response = isFromProfile ? clientInfoResponse : clientResponse;
+  const isLoading = isFromProfile ? clientInfoLoading : clientLoading;
   const { currentUser } = useAuth();
 
   // Mutations
@@ -36,6 +43,26 @@ export function ClientDetailPage() {
   // UI State
   const [showStatusDialog, setShowStatusDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showMatchDialog, setShowMatchDialog] = useState(false);
+
+  // Sticky bar visibility state
+  const [showStickyBar, setShowStickyBar] = useState(false);
+  const heroRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // IntersectionObserver for sticky bar
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => setShowStickyBar(!entry.isIntersecting),
+      {
+        root: scrollContainerRef.current,
+        threshold: 0,
+        rootMargin: "-64px 0px 0px 0px",
+      }
+    );
+    if (heroRef.current) observer.observe(heroRef.current);
+    return () => observer.disconnect();
+  }, []);
 
   // ApiResponse wrapper에서 data 추출
   const client = response?.data;
@@ -76,266 +103,73 @@ export function ClientDetailPage() {
   // 로딩 상태
   if (isLoading) {
     return (
-      <RootLayout>
-        <div className="p-6 pt-safe-top pt-12">
-          <div className="animate-pulse space-y-4">
-            <div className="h-8 bg-gray-200 rounded w-1/3" />
-            <div className="h-32 bg-gray-200 rounded w-full" />
-            <div className="space-y-2">
-              <div className="h-4 bg-gray-200 rounded" />
-              <div className="h-4 bg-gray-200 rounded w-5/6" />
-            </div>
-          </div>
+      <div className="h-dvh w-full bg-slate-50 max-w-md mx-auto overflow-y-auto scrollbar-hide shadow-[0_0_20px_#0000000d]">
+        <div className="h-[680px] bg-slate-200 animate-pulse" />
+        <div className="px-4 py-6 space-y-4">
+          <div className="h-40 bg-white rounded-3xl animate-pulse" />
+          <div className="h-40 bg-white rounded-3xl animate-pulse" />
         </div>
-      </RootLayout>
+      </div>
     );
   }
 
   // Not Found 상태
   if (!client) {
     return (
-      <RootLayout>
-        <div className="p-6 pt-safe-top pt-12">
-          <div className="text-center py-12">
-            <p className="text-gray-500 mb-4">고객 정보를 찾을 수 없습니다</p>
-            <Button onClick={() => navigate("/profile")}>
-              프로필 관리로 돌아가기
-            </Button>
-          </div>
+      <div className="h-dvh w-full flex items-center justify-center bg-slate-50 max-w-md mx-auto shadow-[0_0_20px_#0000000d]">
+        <div className="text-center">
+          <p className="text-gray-500 mb-4">고객 정보를 찾을 수 없습니다</p>
+          <Button onClick={() => navigate("/profile")}>
+            프로필 관리로 돌아가기
+          </Button>
         </div>
-      </RootLayout>
+      </div>
     );
   }
 
   return (
-    <RootLayout>
-      {/* 헤더 */}
-      <div className="sticky top-0 bg-white z-10 px-4 pt-safe-top pt-3 pb-3 border-b">
-        <div className="flex items-center justify-between">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate("/profile")}
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <h1 className="text-lg font-semibold">고객 상세</h1>
-          <div className="w-9" /> {/* 균형을 위한 빈 공간 */}
-        </div>
+    <div
+      ref={scrollContainerRef}
+      className="h-dvh w-full overflow-y-auto bg-slate-50 max-w-md mx-auto scrollbar-hide shadow-[0_0_20px_#0000000d]"
+    >
+      {/* 스티키 바 */}
+      <StickyProfileBar client={client} isVisible={showStickyBar} />
+
+      {/* 히어로 섹션 */}
+      <div ref={heroRef}>
+        <HeroSection
+          client={client}
+          isOwner={!!isOwner}
+          onBack={() => navigate(-1)}
+          onToggleStatus={handleToggleStatus}
+          onEdit={() => navigate(`/profile/${clientId}/edit?source=profile`)}
+          onDelete={handleDeleteClick}
+          onReviewList={() => navigate(`/reviews?clientId=${client.id}`)}
+        />
       </div>
 
-      {/* 컨텐츠 */}
-      <div className="p-6 space-y-6">
-        {/* 프로필 사진 (최대 3개) */}
-        {client.profileImages && client.profileImages.length > 0 ? (
-          <div className="flex justify-center gap-3">
-            {client.profileImages.slice(0, 3).map((image, index) => (
-              <Avatar key={index} className="h-24 w-24">
-                <AvatarImage src={image} alt={`${client.name} ${index + 1}`} />
-                <AvatarFallback>{client.name[0]}</AvatarFallback>
-              </Avatar>
-            ))}
-          </div>
-        ) : (
-          <div className="flex justify-center">
-            <Avatar className="h-32 w-32">
-              <AvatarFallback className="text-3xl">
-                {client.name[0]}
-              </AvatarFallback>
-            </Avatar>
-          </div>
-        )}
-
-        {/* 관리 버튼 (소유자만 표시) */}
-        {isOwner && (
-          <div className="flex flex-col gap-2 sm:flex-row">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleToggleStatus}
-              className="flex-1 gap-2"
-            >
-              {client.status === "ACTIVE" ? (
-                <>
-                  <ToggleRight className="h-4 w-4" />
-                  비활동으로 전환
-                </>
-              ) : (
-                <>
-                  <ToggleLeft className="h-4 w-4" />
-                  활동으로 전환
-                </>
-              )}
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                /* TODO: 수정 기능 구현 */
-                alert("수정 기능은 추후 구현 예정입니다.");
-              }}
-              className="flex-1 gap-2"
-            >
-              <Edit className="h-4 w-4" />
-              수정
-            </Button>
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={handleDeleteClick}
-              className="flex-1 gap-2"
-            >
-              <Trash2 className="h-4 w-4" />
-              삭제
-            </Button>
-          </div>
-        )}
-
-        {/* 기본 정보 */}
-        <Card>
-          <CardContent className="pt-6 space-y-4">
-            <h2 className="text-base font-semibold mb-3">기본 정보</h2>
-
-            <InfoRow label="이름" value={formatValue(client.name)} />
-            <InfoRow label="성별" value={formatValue(client.gender)} />
-            <InfoRow label="나이" value={formatValue(client.age)} />
-            <InfoRow label="키" value={formatHeight(client.height)} />
-            <InfoRow label="거주지" value={formatValue(client.address)} />
-            <InfoRow label="본가" value={formatValue(client.homeTown)} />
-          </CardContent>
-        </Card>
-
-        {/* 개인 정보 */}
-        <Card>
-          <CardContent className="pt-6 space-y-4">
-            <h2 className="text-base font-semibold mb-3">개인 정보</h2>
-
-            <InfoRow label="종교" value={formatValue(client.religion)} />
-            <InfoRow
-              label="혼인상태"
-              value={formatValue(client.maritalStatus)}
-            />
-            <InfoRow label="재산" value={formatValue(client.property)} />
-            <InfoRow label="성격" value={formatValue(client.personality)} />
-            <InfoRow label="취미" value={formatValue(client.hobby)} />
-          </CardContent>
-        </Card>
-
-        {/* 학력 및 경력 */}
-        <Card>
-          <CardContent className="pt-6 space-y-4">
-            <h2 className="text-base font-semibold mb-3">학력 및 경력</h2>
-
-            <InfoRow label="학력" value={formatValue(client.eduLevel)} />
-            <InfoRow label="고등학교" value={formatValue(client.highSchool)} />
-            <InfoRow label="대학교" value={formatValue(client.university)} />
-            <InfoRow label="전공" value={formatValue(client.major)} />
-            <InfoRow
-              label="직업"
-              value={formatJobInfo(client.job, client.jobDetail)}
-            />
-            {client.previousJob && (
-              <InfoRow
-                label="이전 직업"
-                value={formatValue(client.previousJob)}
-              />
-            )}
-          </CardContent>
-        </Card>
-
-        {/* 희망 조건 */}
-        <Card>
-          <CardContent className="pt-6 space-y-4">
-            <h2 className="text-base font-semibold mb-3">희망 조건</h2>
-
-            <InfoRow
-              label="희망 나이"
-              value={formatPreferredAge(
-                client.minPreferredAge,
-                client.maxPreferredAge,
-              )}
-            />
-            <InfoRow label="이상형" value={formatValue(client.idealType)} />
-          </CardContent>
-        </Card>
-
-        {/* 가족 정보 */}
+      {/* 콘텐츠 섹션들 */}
+      <div className={cn("px-4 py-6 space-y-4 -mt-4", !isOwner && "pb-24")}>
+        <InfoSection client={client} />
+        <EducationCareerSection client={client} />
+        <PreferenceSection client={client} />
         {client.families && client.families.length > 0 && (
-          <Card>
-            <CardContent className="pt-6 space-y-4">
-              <h2 className="text-base font-semibold mb-3">가족 정보</h2>
-
-              {client.families.map((family, index) => (
-                <div
-                  key={index}
-                  className="border-l-2 border-gray-200 pl-4 space-y-3"
-                >
-                  <h3 className="text-sm font-medium text-gray-700">
-                    {family.relationship}
-                  </h3>
-
-                  <div className="space-y-2 text-sm">
-                    <InfoRow
-                      label="이름"
-                      value={formatValue(family.name)}
-                      small
-                    />
-                    <InfoRow
-                      label="출생년도"
-                      value={formatBirthYear(family.birthYear)}
-                      small
-                    />
-                    <InfoRow
-                      label="거주지"
-                      value={formatValue(family.address)}
-                      small
-                    />
-                    <InfoRow
-                      label="직업"
-                      value={formatFamilyJob(family.job, family.jobDetail)}
-                      small
-                    />
-                    <InfoRow
-                      label="대학교"
-                      value={formatValue(family.university)}
-                      small
-                    />
-                    <InfoRow
-                      label="종교"
-                      value={formatValue(family.religion)}
-                      small
-                    />
-                    <InfoRow
-                      label="재산"
-                      value={formatValue(family.property)}
-                      small
-                    />
-                    {family.info && (
-                      <InfoRow
-                        label="기타"
-                        value={formatValue(family.info)}
-                        small
-                      />
-                    )}
-                  </div>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
+          <FamilySection families={client.families} />
         )}
-
-        {/* 기타 특이사항 */}
-        {client.info && (
-          <Card>
-            <CardContent className="pt-6 space-y-4">
-              <h2 className="text-base font-semibold mb-3">기타 특이사항</h2>
-              <p className="text-sm text-gray-700 leading-relaxed">
-                {client.info}
-              </p>
-            </CardContent>
-          </Card>
-        )}
+        {client.info && <ManagerOpinionSection info={client.info} />}
       </div>
+
+      {/* 플로팅 매칭 신청 버튼 (소유자가 아닐 때만 표시) */}
+      {!isOwner && (
+        <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-white via-white to-transparent max-w-md mx-auto">
+          <Button
+            className="w-full h-14 text-lg font-semibold rounded-2xl bg-rose-500 hover:bg-rose-600 text-white shadow-lg"
+            onClick={() => setShowMatchDialog(true)}
+          >
+            매칭 신청하기
+          </Button>
+        </div>
+      )}
 
       {/* 확인 다이얼로그 */}
       <ConfirmDialog
@@ -358,30 +192,17 @@ export function ClientDetailPage() {
         isLoading={deleteClientMutation.isPending}
         variant="destructive"
       />
-    </RootLayout>
-  );
-}
 
-/**
- * 정보 행 컴포넌트
- */
-function InfoRow({
-  label,
-  value,
-  small = false,
-}: {
-  label: string;
-  value: string;
-  small?: boolean;
-}) {
-  return (
-    <div>
-      <dt
-        className={`${small ? "text-xs" : "text-sm"} font-medium text-gray-500 mb-1`}
-      >
-        {label}
-      </dt>
-      <dd className={`${small ? "text-sm" : "text-base"}`}>{value}</dd>
+      {/* 매칭 신청 다이얼로그 */}
+      {client && (
+        <MatchRequestDialog
+          open={showMatchDialog}
+          onOpenChange={setShowMatchDialog}
+          toClientId={client.id}
+          toClientName={client.name}
+          onSuccess={() => setShowMatchDialog(false)}
+        />
+      )}
     </div>
   );
 }

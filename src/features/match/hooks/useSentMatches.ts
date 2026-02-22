@@ -11,13 +11,12 @@ import { matchApi } from "../api/matchApi";
 export function useSentMatches() {
   return useInfiniteQuery({
     queryKey: ["matches", "sent"],
-    queryFn: ({ pageParam = 1 }) =>
+    queryFn: ({ pageParam = 0 }) =>
       matchApi.getSentMatches({ page: pageParam, size: 10 }),
-    getNextPageParam: (lastPage) => {
-      const currentPage = lastPage.data.currentPage;
+    getNextPageParam: (lastPage, allPages) => {
       const totalPages = lastPage.data.totalPages;
-      return currentPage < totalPages ? currentPage + 1 : undefined;
+      return allPages.length < totalPages ? allPages.length : undefined;
     },
-    initialPageParam: 1,
+    initialPageParam: 0,
   });
 }

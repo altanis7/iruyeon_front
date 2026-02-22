@@ -1,4 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { checkEmailAPI } from "@/features/auth/api/authApi";
 import type {
   CheckEmailRequest,
@@ -12,5 +13,15 @@ import type {
 export const useCheckEmail = () => {
   return useMutation<CheckEmailResponse, Error, CheckEmailRequest>({
     mutationFn: checkEmailAPI,
+    onSuccess: (data) => {
+      if (data.data) {
+        toast.error("이미 사용 중인 이메일입니다.");
+      } else {
+        toast.success("사용 가능한 이메일입니다.");
+      }
+    },
+    onError: (error) => {
+      toast.error(error.message || "이메일 확인에 실패했습니다.");
+    },
   });
 };

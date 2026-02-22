@@ -8,10 +8,16 @@ import { z } from "zod";
  */
 export const familyMemberSchema = z.object({
   name: z.string().min(1, "이름을 입력해주세요"),
-  relationShip: z.string().min(1, "관계를 선택해주세요"),
+  relationship: z.string().min(1, "관계를 선택해주세요"),
+  phoneNumber: z.string().optional(),
   job: z.string().optional(),
   birthYear: z.number().optional(),
   religion: z.string().optional(),
+  jobDetail: z.string().optional(),
+  address: z.string().optional(),
+  university: z.string().optional(),
+  property: z.string().optional(),
+  info: z.string().optional(),
 });
 
 /**
@@ -65,6 +71,9 @@ export const profileSchema = z.object({
   // 희망 상대
   minPreferredAge: z.number().optional(),
   maxPreferredAge: z.number().optional(),
+
+  // 만남 횟수
+  totalMeetingCnt: z.number().min(0, "만남 횟수는 0 이상이어야 합니다").optional(),
 
   // 가족
   family: z.array(familyMemberSchema).optional(),

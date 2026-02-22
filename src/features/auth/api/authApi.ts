@@ -11,15 +11,15 @@ export interface SignupRequest {
   phoneNumber: string;
   gender: string;
   company: string;
+  imageId: number | null;
 }
 
-// 프론트엔드 폼 타입 (passwordConfirm 포함)
+// 프론트엔드 폼 타입
 export interface SignupFormData {
   email: string;
   name: string;
   phoneNumber: string;
   password: string;
-  passwordConfirm: string;
   gender: string;
   company: string;
 }
@@ -41,15 +41,20 @@ export interface LoginRequest {
   password: string;
 }
 
+// 사용자 상태 타입
+export type UserStatus = "PENDING" | "ACTIVE";
+export type UserRole = "ROLE_ANONYMOUS" | "ROLE_MEMBER" | "ROLE_DENIED" | "ROLE_ADMIN";
+
 export interface LoginResponse {
-  success: boolean;
-  message: string;
-  data?: {
-    id: string;
-    email: string;
-    name: string;
-    token?: string;
+  data: {
+    id: number;
+    token: string;
+    role: UserRole;
+    status: UserStatus;
   };
+  status: number;
+  message: string;
+  responseTime: string;
 }
 
 export interface CheckEmailRequest {
@@ -57,9 +62,10 @@ export interface CheckEmailRequest {
 }
 
 export interface CheckEmailResponse {
-  success?: boolean;
-  available?: boolean;
-  message?: string;
+  data: boolean; // true = 중복(사용 불가), false = 사용 가능
+  status: number;
+  message: string;
+  responseTime: string;
 }
 
 // ========== 데이터 변환 함수 ==========
@@ -69,6 +75,7 @@ export interface CheckEmailResponse {
  */
 export const transformSignupData = (
   formData: SignupFormData,
+  imageId: number | null = null,
 ): SignupRequest => {
   return {
     email: formData.email,
@@ -77,7 +84,7 @@ export const transformSignupData = (
     phoneNumber: formData.phoneNumber,
     gender: formData.gender,
     company: formData.company,
-    // passwordConfirm은 제외 (프론트엔드 검증용)
+    imageId,
   };
 };
 
@@ -90,10 +97,7 @@ export const signupAPI = async (
   data: SignupRequest,
 ): Promise<SignupResponse> => {
   try {
-    const response = await apiClient.post<SignupResponse>("/signup", {
-      ...data,
-      imageId: null,
-    });
+    const response = await apiClient.post<SignupResponse>("/signup", data);
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {

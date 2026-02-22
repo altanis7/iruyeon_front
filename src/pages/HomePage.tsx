@@ -4,25 +4,42 @@ import { Menu, Plus } from "lucide-react";
 import { MainLayout } from "@/shared/components/layouts/MainLayout";
 import { Button } from "@/shared/components/ui/button";
 import { useClients } from "@/features/profile/hooks/useClients";
-import { useSearchProfiles } from "@/features/profile/hooks/useSearchProfiles";
+import { useSearchClients } from "@/features/profile/hooks/useSearchClients";
+import { useAuth } from "@/features/auth/hooks/useAuth";
 import { ProfileGrid } from "@/features/profile/components/ProfileGrid";
 import { ProfileSearchBar } from "@/features/profile/components/ProfileSearchBar";
 import { ProfileDrawer } from "@/features/profile/components/ProfileDrawer";
-import { mapClientToDisplay } from "@/features/profile/api/profileApi";
+import { FilterPanel } from "@/features/profile/components/FilterPanel";
+import {
+  mapClientToDisplay,
+  type ClientDisplayData,
+  type FilterSearchParams,
+} from "@/features/profile/api/profileApi";
+import {
+  INITIAL_FILTER_STATE,
+  countActiveFilters,
+  hasActiveFilters,
+} from "@/features/profile/utils/filterOptions";
+import { MatchRequestDialog } from "@/features/match/components/MatchRequestDialog";
 
 export function HomePage() {
   const navigate = useNavigate();
+  const { currentUser } = useAuth();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [searchKeyword, setSearchKeyword] = useState("");
+  const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false);
+  const [committedFilters, setCommittedFilters] = useState<FilterSearchParams>(INITIAL_FILTER_STATE);
+  const [matchDialogOpen, setMatchDialogOpen] = useState(false);
+  const [selectedProfile, setSelectedProfile] =
+    useState<ClientDisplayData | null>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
-  // 검색 중인지 확인
-  const isSearching = searchKeyword.trim().length > 0;
+  const isSearching = hasActiveFilters(committedFilters);
+  const activeFilterCount = countActiveFilters(committedFilters);
 
-  // 검색 쿼리
-  const { data: searchResults, isLoading: isSearchLoading } =
-    useSearchProfiles({ keyword: searchKeyword });
+  // 필터 검색 쿼리
+  const { data: searchResponse, isLoading: isSearchLoading } =
+    useSearchClients(committedFilters);
 
   // 클라이언트 목록 쿼리 (인피니티)
   const {
@@ -39,8 +56,15 @@ export function HomePage() {
       page.data.list.map(mapClientToDisplay),
     ) || [];
 
-  const profiles = isSearching ? searchResults : clients;
+  const profiles = isSearching
+    ? (searchResponse?.data.list.map(mapClientToDisplay) || [])
+    : clients;
   const isLoading = isSearching ? isSearchLoading : isClientLoading;
+
+  const handleMatchRequest = (profile: ClientDisplayData) => {
+    setSelectedProfile(profile);
+    setMatchDialogOpen(true);
+  };
 
   // Intersection Observer 설정 (검색 중이 아닐 때만)
   useEffect(() => {
@@ -82,8 +106,13 @@ export function HomePage() {
 
           {/* 검색바 */}
           <ProfileSearchBar
-            value={searchKeyword}
-            onChange={setSearchKeyword}
+            value={
+              activeFilterCount > 0
+                ? `${activeFilterCount}개 필터 적용중`
+                : ""
+            }
+            onClick={() => setIsFilterPanelOpen(true)}
+            activeFilterCount={activeFilterCount}
           />
 
           {/* 프로필등록 버튼 */}
@@ -101,7 +130,12 @@ export function HomePage() {
 
       {/* 프로필 그리드 */}
       <div className="p-4 pb-6">
-        <ProfileGrid profiles={profiles || []} isLoading={isLoading} />
+        <ProfileGrid
+          profiles={profiles || []}
+          isLoading={isLoading}
+          currentUserId={currentUser?.id ? Number(currentUser.id) : undefined}
+          onMatchRequest={handleMatchRequest}
+        />
 
         {/* 인피니티 스크롤 트리거 (검색 중이 아닐 때만) */}
         {!isSearching && hasNextPage && (
@@ -115,6 +149,31 @@ export function HomePage() {
 
       {/* 햄버거 메뉴 드로어 */}
       <ProfileDrawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen} />
+
+      {/* 필터 패널 */}
+      <FilterPanel
+        open={isFilterPanelOpen}
+        initialFilters={committedFilters}
+        onClose={() => setIsFilterPanelOpen(false)}
+        onSearch={(filters) => {
+          setCommittedFilters(filters);
+          setIsFilterPanelOpen(false);
+        }}
+      />
+
+      {/* 매칭 신청 다이얼로그 */}
+      {selectedProfile && (
+        <MatchRequestDialog
+          open={matchDialogOpen}
+          onOpenChange={setMatchDialogOpen}
+          toClientId={Number(selectedProfile.id)}
+          toClientName={selectedProfile.name}
+          onSuccess={() => {
+            setMatchDialogOpen(false);
+            setSelectedProfile(null);
+          }}
+        />
+      )}
     </MainLayout>
   );
 }
