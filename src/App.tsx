@@ -9,6 +9,7 @@ import { ProfileEditPage } from "@/pages/ProfileEditPage";
 import { SentProfilesPage } from "@/pages/SentProfilesPage";
 import { ReceivedProfilesPage } from "@/pages/ReceivedProfilesPage";
 import { ClientDetailPage } from "@/pages/ClientDetailPage";
+import { ReviewListPage } from "@/pages/ReviewListPage";
 import { AllManagersPage } from "@/pages/admin/AllManagersPage";
 import { PendingManagersPage } from "@/pages/admin/PendingManagersPage";
 import { AdminLayout } from "@/features/admin/components/AdminLayout";
@@ -173,6 +174,14 @@ const App = () => {
             element={
               <ProtectedRoute>
                 <ClientDetailPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/reviews"
+            element={
+              <ProtectedRoute>
+                <ReviewListPage />
               </ProtectedRoute>
             }
           />
