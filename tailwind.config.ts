@@ -36,6 +36,9 @@ export default {
         touch: "44px",
         dvh: "100dvh",
       },
+      height: {
+        dvh: "100dvh",
+      },
       minWidth: {
         touch: "44px",
       },

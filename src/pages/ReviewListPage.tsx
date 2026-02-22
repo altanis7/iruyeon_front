@@ -142,14 +142,14 @@ export function ReviewListPage() {
   // clientId 검증
   if (!clientId) {
     return (
-      <div className="h-dvh w-full flex items-center justify-center bg-amber-50 max-w-md mx-auto">
+      <div className="h-dvh w-full flex items-center justify-center bg-amber-50 max-w-md mx-auto pt-safe-top">
         <p className="text-gray-500">클라이언트 정보가 없습니다</p>
       </div>
     );
   }
 
   return (
-    <div className="h-dvh w-full overflow-y-auto bg-amber-50 max-w-md mx-auto scrollbar-hide shadow-[0_0_20px_#0000000d]">
+    <div className="h-dvh w-full overflow-y-auto bg-amber-50 max-w-md mx-auto scrollbar-hide shadow-[0_0_20px_#0000000d] pt-safe-top">
       {/* 헤더 - 코르크보드 느낌 */}
       <div className="sticky top-0 z-10 bg-amber-100 border-b-2 border-amber-200 px-4 py-3 flex items-center gap-3 shadow-sm">
         <Button
