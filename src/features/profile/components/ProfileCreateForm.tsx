@@ -155,13 +155,11 @@ export function ProfileCreateForm({
       : updateMutation.isPending;
 
   return (
-    <div className="p-6 max-w-2xl">
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        <h2 className="text-xl font-bold mb-4">
-          {mode === "create" ? "프로필 등록" : "프로필 수정"}
-        </h2>
-
-        {/* 1. 프로필 사진 */}
+    <div className="flex flex-col flex-1 min-h-0">
+      {/* 스크롤 가능한 폼 영역 */}
+      <div className="flex-1 overflow-y-auto px-6">
+        <form className="space-y-6 pb-4">
+          {/* 1. 프로필 사진 */}
         <div className="space-y-2">
           <ProfilePhotoUploader
             imageIds={imageIdList}
@@ -393,25 +391,27 @@ export function ProfileCreateForm({
           familyMembers={family || []}
           onFamilyMembersChange={members => setValue("family", members)}
         />
+        </form>
+      </div>
 
-        {/* 등록 완료 버튼 */}
-        <div className="pt-4">
-          <Button
-            type="submit"
-            size="lg"
-            className="w-full"
-            disabled={isPending}
-          >
-            {isPending
-              ? mode === "create"
-                ? "등록 중..."
-                : "수정 중..."
-              : mode === "create"
-                ? "등록 완료"
-                : "수정 완료"}
-          </Button>
-        </div>
-      </form>
+      {/* 하단 고정 버튼 영역 */}
+      <div className="p-4">
+        <Button
+          type="button"
+          size="lg"
+          className="w-full py-6 rounded-full bg-gradient-to-r from-pink-400 to-purple-400 hover:from-pink-500 hover:to-purple-500 text-white font-semibold"
+          disabled={isPending}
+          onClick={handleSubmit(onSubmit)}
+        >
+          {isPending
+            ? mode === "create"
+              ? "등록 중..."
+              : "수정 중..."
+            : mode === "create"
+              ? "등록 완료"
+              : "수정 완료"}
+        </Button>
+      </div>
 
       {/* ===== 다이얼로그들 ===== */}
       <YearSelectDialog
