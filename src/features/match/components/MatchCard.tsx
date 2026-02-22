@@ -6,8 +6,9 @@ import {
   AvatarFallback,
 } from "@/shared/components/ui/avatar";
 import { Button } from "@/shared/components/ui/button";
-import { Heart, MessageCircle, X } from "lucide-react";
+import { Heart, MessageCircle, X, Pencil } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { WriteReviewModal } from "@/features/review/components/WriteReviewModal";
 import type { ReceivedMatch, MemberClientDTO } from "../api/matchApi";
 import { matchStatusConfig } from "../utils/matchFormat";
 import { ChatModal } from "./ChatModal";
@@ -69,6 +70,7 @@ export function MatchCard({
   variant = "received",
 }: MatchCardProps) {
   const [chatOpen, setChatOpen] = useState(false);
+  const [reviewOpen, setReviewOpen] = useState(false);
   const cancelMatch = useCancelMatch();
   const {
     memberClientResponseDTO,
@@ -149,8 +151,33 @@ export function MatchCard({
                 )}
               </Button>
             </>
+          ) : variant === "matched" ? (
+            /* Case 2: 매칭 완료 → 채팅 + 후기 작성 */
+            <>
+              <Button
+                variant="outline"
+                className="flex-1 h-11 relative"
+                onClick={() => setChatOpen(true)}
+              >
+                <MessageCircle className="h-5 w-5 mr-2" />
+                채팅 보기
+                {newChatCnt > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    {newChatCnt}
+                  </span>
+                )}
+              </Button>
+              <Button
+                variant="default"
+                className="flex-1 h-11 bg-rose-500 hover:bg-rose-600"
+                onClick={() => setReviewOpen(true)}
+              >
+                <Pencil className="h-5 w-5 mr-2" />
+                후기 작성
+              </Button>
+            </>
           ) : (
-            /* 채팅 보기 버튼 + 취소 버튼 (보낸 매칭에서 PENDING/UNREAD일 때) */
+            /* Case 3: 보낸 매칭 (sent) → 채팅 + 취소 버튼 */
             <>
               <Button
                 variant="outline"
@@ -183,6 +210,13 @@ export function MatchCard({
 
       {/* 채팅 모달 */}
       <ChatModal matchId={matchId} open={chatOpen} onOpenChange={setChatOpen} />
+
+      {/* 후기 작성 모달 */}
+      <WriteReviewModal
+        match={match}
+        open={reviewOpen}
+        onOpenChange={setReviewOpen}
+      />
     </Card>
   );
 }
