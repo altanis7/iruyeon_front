@@ -144,6 +144,7 @@ export function ClientDetailPage() {
           onToggleStatus={handleToggleStatus}
           onEdit={() => navigate(`/profile/${clientId}/edit?source=profile`)}
           onDelete={handleDeleteClick}
+          onReviewList={() => navigate(`/reviews?clientId=${client.id}`)}
         />
       </div>
 

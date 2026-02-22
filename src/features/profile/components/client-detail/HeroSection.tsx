@@ -10,6 +10,7 @@ import {
   Ruler,
   GraduationCap,
   Heart,
+  FileText,
 } from "lucide-react";
 import {
   Carousel,
@@ -31,6 +32,7 @@ interface HeroSectionProps {
   onToggleStatus: () => void;
   onEdit: () => void;
   onDelete: () => void;
+  onReviewList?: () => void;
 }
 
 export function HeroSection({
@@ -40,6 +42,7 @@ export function HeroSection({
   onToggleStatus,
   onEdit,
   onDelete,
+  onReviewList,
 }: HeroSectionProps) {
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
@@ -114,8 +117,14 @@ export function HeroSection({
           <div className="flex gap-2">
             <GlassButton size="sm" onClick={onToggleStatus}>
               <EyeOff className="w-[18px] h-[18px]" />
-              <span>비공개</span>
+              <span>{client.status === "ACTIVE" ? "비활동" : "활동"}</span>
             </GlassButton>
+            {onReviewList && (
+              <GlassButton size="sm" onClick={onReviewList}>
+                <FileText className="w-[18px] h-[18px]" />
+                <span>후기</span>
+              </GlassButton>
+            )}
             <GlassButton size="icon" onClick={onEdit}>
               <Pencil className="w-[18px] h-[18px]" />
             </GlassButton>
