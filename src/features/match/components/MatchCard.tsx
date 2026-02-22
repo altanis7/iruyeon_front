@@ -10,16 +10,16 @@ import { Heart, HeartCrack, HeartPulse, Loader2, Sparkles, MessageCircle, X, Pen
 import { cn } from "@/lib/utils";
 import { WriteReviewModal } from "@/features/review/components/WriteReviewModal";
 import type { ReceivedMatch, MemberClientDTO } from "../api/matchApi";
-import { matchStatusConfig, type StatusIconType, type StatusIconAnimation } from "../utils/matchFormat";
+import { matchStatusConfig, type StatusIconAnimation } from "../utils/matchFormat";
 
-/** 상태별 아이콘 맵 */
+/** 상태별 아이콘 맵 (lucide 아이콘만, 커스텀 아이콘은 별도 처리) */
 const statusIcons = {
   Heart,
   HeartCrack,
   HeartPulse,
   Loader2,
   Sparkles,
-} as const satisfies Record<StatusIconType, typeof Heart>;
+} as const;
 
 /** 애니메이션 클래스 맵 */
 const animationClasses: Record<NonNullable<StatusIconAnimation>, string> = {
