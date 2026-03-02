@@ -3,8 +3,8 @@ import { useNavigate } from "react-router";
 import { kakaoLoginAPI } from "../api/authApi";
 import { registerFCMTokenOnLogin } from "@/lib/firebase";
 
-const KAKAO_AUTH_URL = "https://kauth.kakao.com/oauth/authorize";
-const REST_API_KEY = import.meta.env.VITE_KAKAO_REST_API_KEY;
+// const KAKAO_AUTH_URL = "https://kauth.kakao.com/oauth/authorize";
+// const REST_API_KEY = import.meta.env.VITE_KAKAO_REST_API_KEY;
 const REDIRECT_URI = import.meta.env.VITE_KAKAO_REDIRECT_URI;
 
 /**
@@ -15,8 +15,8 @@ export const useKakaoLogin = () => {
 
   // 카카오 로그인 페이지로 리다이렉트
   const redirectToKakao = () => {
-    const kakaoAuthUrl = `${KAKAO_AUTH_URL}?client_id=${REST_API_KEY}&redirect_uri=${REDIRECT_URI}&response_type=code`;
-    window.location.href = kakaoAuthUrl;
+    // const kakaoAuthUrl = `${KAKAO_AUTH_URL}?client_id=${REST_API_KEY}&redirect_uri=${REDIRECT_URI}&response_type=code`;
+    window.location.href = REDIRECT_URI;
   };
 
   // 인가 코드를 받아 백엔드로 전송
