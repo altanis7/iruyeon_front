@@ -8,6 +8,7 @@ import { ToggleSwitch } from "@/shared/components/ui/toggle-switch";
 import { FloatingLabelInput } from "@/features/profile/components/FloatingLabelInput";
 import { useAuth, getAutoLoginSetting } from "@/features/auth/hooks/useAuth";
 import { loginAPI } from "@/features/auth/api/authApi";
+import { useKakaoLogin } from "@/features/auth/hooks/useKakaoLogin";
 
 export function LoginForm({
   className,
@@ -15,6 +16,7 @@ export function LoginForm({
 }: React.ComponentPropsWithoutRef<"div">) {
   const navigate = useNavigate();
   const { login } = useAuth();
+  const { redirectToKakao } = useKakaoLogin();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [autoLogin, setAutoLogin] = useState(() => getAutoLoginSetting());
@@ -141,6 +143,37 @@ export function LoginForm({
             disabled={isLoading}
           >
             회원가입
+          </Button>
+
+          {/* 구분선 */}
+          <div className="relative my-2">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-200"></div>
+            </div>
+            <div className="relative flex justify-center text-xs">
+              <span className="bg-white px-2 text-muted-foreground">또는</span>
+            </div>
+          </div>
+
+          {/* 카카오 로그인 버튼 */}
+          <Button
+            type="button"
+            className="w-full h-12 rounded-xl bg-[#FEE500] text-[#000000] hover:bg-[#FEE500]/90 font-medium"
+            onClick={redirectToKakao}
+            disabled={isLoading}
+          >
+            <svg
+              className="w-5 h-5 mr-2"
+              viewBox="0 0 20 18"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M10 0C4.477 0 0 3.36 0 7.5c0 2.685 1.789 5.043 4.479 6.36-.197.725-.73 2.705-.836 3.126-.128.506.185.5.39.363.165-.11 2.67-1.797 3.693-2.487.757.105 1.536.163 2.333.163 5.523 0 10-3.36 10-7.5S15.523 0 10 0z"
+                fill="currentColor"
+              />
+            </svg>
+            카카오로 시작하기
           </Button>
         </div>
         <div className="mt-4 text-center text-sm text-muted-foreground">
