@@ -55,13 +55,9 @@ export function ProfilePickerDialog({
     <BottomSheet open={open} onOpenChange={onOpenChange}>
       <BottomSheetContent>
         <BottomSheetHeader>
-          <BottomSheetTitle className="text-center text-lg font-semibold text-red-500">
+          <BottomSheetTitle className="text-center text-lg font-semibold">
             {title}
           </BottomSheetTitle>
-          <p className="text-center text-sm text-gray-600 mt-2">
-            선택지에 결혼에 필요한 이성의 프로필이 등록되면 알림을 받으실 수
-            있습니다!
-          </p>
         </BottomSheetHeader>
 
         {/* Picker */}
@@ -70,6 +66,7 @@ export function ProfilePickerDialog({
             value={pickerValue}
             onChange={setPickerValue}
             wheelMode="natural"
+            height={100}
           >
             <Picker.Column name="option">
               {options.map(option => (

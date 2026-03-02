@@ -92,7 +92,7 @@ export function MatchResponseDialog({
     <BottomSheet open={open} onOpenChange={handleOpenChange}>
       <BottomSheetContent>
         <BottomSheetHeader>
-          <BottomSheetTitle className="text-center text-lg font-semibold">
+          <BottomSheetTitle className="text-center text-lg font-semibold pb-4">
             {title}
           </BottomSheetTitle>
         </BottomSheetHeader>
@@ -119,11 +119,8 @@ export function MatchResponseDialog({
             </button>
           </div>
         ) : (
-          <div className="pb-4 space-y-4">
+          <div className="space-y-4">
             <div className="space-y-2">
-              <label className="text-xs text-gray-500 font-medium">
-                메시지
-              </label>
               <Textarea
                 placeholder={config[type].placeholder}
                 value={message}

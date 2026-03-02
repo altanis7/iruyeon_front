@@ -40,13 +40,12 @@ export function MatchRequestDialog({
 
   // InfiniteQuery 페이지네이션 데이터 평탄화
   const myClients: MyClientDisplayData[] =
-    data?.pages.flatMap((page) => page.data.list.map(mapMyClientToDisplay)) ||
-    [];
+    data?.pages.flatMap(page => page.data.list.map(mapMyClientToDisplay)) || [];
 
   // 검색 필터링
   const filteredClients = useMemo(() => {
     if (!searchKeyword.trim()) return myClients;
-    return myClients.filter((client) =>
+    return myClients.filter(client =>
       client.name.toLowerCase().includes(searchKeyword.toLowerCase()),
     );
   }, [myClients, searchKeyword]);
@@ -84,7 +83,7 @@ export function MatchRequestDialog({
     <BottomSheet open={open} onOpenChange={handleOpenChange}>
       <BottomSheetContent>
         <BottomSheetHeader>
-          <BottomSheetTitle className="text-center text-lg font-semibold">
+          <BottomSheetTitle className="text-center text-lg font-semibold pb-4">
             <span className="text-gray-900">{toClientName}</span>
             <span className="text-gray-600 font-normal">님에게 매칭 제안</span>
           </BottomSheetTitle>
@@ -98,7 +97,7 @@ export function MatchRequestDialog({
               type="text"
               placeholder="담당 회원 이름으로 검색"
               value={searchKeyword}
-              onChange={(e) => setSearchKeyword(e.target.value)}
+              onChange={e => setSearchKeyword(e.target.value)}
               className="w-full pl-9 pr-4 py-2.5 bg-gray-100 rounded-lg text-sm outline-none focus:ring-2 focus:ring-pink-200"
             />
           </div>
@@ -120,7 +119,7 @@ export function MatchRequestDialog({
               </div>
             ) : (
               <div className="max-h-64 space-y-2 overflow-y-auto">
-                {filteredClients.map((client) => {
+                {filteredClients.map(client => {
                   const isSelected = selectedClientId === client.id;
                   return (
                     <button
@@ -187,7 +186,7 @@ export function MatchRequestDialog({
             <Textarea
               placeholder="상대 매니저에게 전달할 간단한 메시지를 입력하세요."
               value={message}
-              onChange={(e) => setMessage(e.target.value)}
+              onChange={e => setMessage(e.target.value)}
               rows={3}
               className="bg-gray-50 border-gray-200 rounded-xl text-sm resize-none focus:ring-2 focus:ring-pink-200 focus:border-pink-300"
             />

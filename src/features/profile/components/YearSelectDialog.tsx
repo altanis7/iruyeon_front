@@ -39,7 +39,7 @@ export function YearSelectDialog({
   }
 
   const defaultYear = String(
-    selectedYear || Math.floor((maxBirthYear + minBirthYear) / 2)
+    selectedYear || Math.floor((maxBirthYear + minBirthYear) / 2),
   );
 
   const [pickerValue, setPickerValue] = useState<{ year: string }>({
@@ -49,10 +49,12 @@ export function YearSelectDialog({
   useEffect(() => {
     if (open) {
       setPickerValue({
-        year: String(selectedYear || Math.floor((maxBirthYear + minBirthYear) / 2)),
+        year: String(
+          selectedYear || Math.floor((maxBirthYear + minBirthYear) / 2),
+        ),
       });
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, selectedYear]);
 
   const handleConfirm = () => {
@@ -68,7 +70,7 @@ export function YearSelectDialog({
     <BottomSheet open={open} onOpenChange={onOpenChange}>
       <BottomSheetContent>
         <BottomSheetHeader>
-          <BottomSheetTitle className="text-center text-lg font-semibold text-red-500">
+          <BottomSheetTitle className="text-center text-lg font-semibold">
             {title}
           </BottomSheetTitle>
           <p className="text-center text-sm text-gray-600 mt-2">
@@ -88,7 +90,9 @@ export function YearSelectDialog({
                   {({ selected }) => (
                     <div
                       className={
-                        selected ? "font-semibold text-black" : "text-neutral-400"
+                        selected
+                          ? "font-semibold text-black"
+                          : "text-neutral-400"
                       }
                     >
                       {year}년
