@@ -1,6 +1,7 @@
 {
   "short_name": "이루연",
   "name": "이루연 매칭 서비스",
+  "gcm_sender_id": "103953800507",
   "icons": [
     {
       "src": "favicon.ico",
