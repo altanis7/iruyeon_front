@@ -20,7 +20,7 @@ const BottomSheetContent = React.forwardRef<
     side="bottom"
     className={cn(
       "rounded-t-2xl h-auto max-h-[85vh] px-4 overflow-y-auto",
-      "pb-[max(2rem,env(safe-area-inset-bottom))]",
+      // "pb-[max(2rem,env(safe-area-inset-bottom))]",
       "left-1/2 right-auto -translate-x-1/2 w-full max-w-md",
       className,
     )}
