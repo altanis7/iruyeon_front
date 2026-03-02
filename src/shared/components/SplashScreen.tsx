@@ -22,15 +22,15 @@ export function SplashScreen({ onComplete }: { onComplete: () => void }) {
   return (
     <div
       className={cn(
-        "fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-white",
+        "fixed inset-0 z-[9999]",
         "transition-opacity duration-400 ease-out",
         isFading ? "opacity-0" : "opacity-100",
       )}
     >
       <img
-        src="/logo512.png"
+        src="/iruyeonSplash.jpg"
         alt="이루연"
-        className="h-28 w-28 animate-[splash-logo_600ms_ease-out_both]"
+        className="h-full w-full object-cover"
       />
     </div>
   );
