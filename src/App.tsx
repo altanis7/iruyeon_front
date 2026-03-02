@@ -20,10 +20,11 @@ import { Routes, Route, Navigate, useParams, Outlet } from "react-router-dom";
 import RootLayout from "@/shared/components/layouts/RootLayout";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useAuth } from "@/features/auth/hooks/useAuth";
-import { useEffect } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { onMessage } from "firebase/messaging";
 import { toast } from "sonner";
 import { getMessagingInstance } from "@/lib/firebase";
+import { SplashScreen } from "@/shared/components/SplashScreen";
 
 // 보호된 라우트 컴포넌트
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -72,8 +73,19 @@ function ForegroundMessageListener() {
   return null;
 }
 
+const isPWA = () =>
+  window.matchMedia("(display-mode: standalone)").matches ||
+  ("standalone" in window.navigator &&
+    (window.navigator as unknown as { standalone: boolean }).standalone);
+
 const App = () => {
   const queryClient = new QueryClient();
+  const [showSplash, setShowSplash] = useState(isPWA);
+  const handleSplashComplete = useCallback(() => setShowSplash(false), []);
+
+  if (showSplash) {
+    return <SplashScreen onComplete={handleSplashComplete} />;
+  }
 
   return (
     <QueryClientProvider client={queryClient}>
