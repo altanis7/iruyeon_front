@@ -20,6 +20,7 @@ import { Routes, Route, Navigate, useParams, Outlet } from "react-router-dom";
 import RootLayout from "@/shared/components/layouts/RootLayout";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useAuth } from "@/features/auth/hooks/useAuth";
+import { NotificationProvider } from "@/features/notifications/components/NotificationProvider";
 
 // 보호된 라우트 컴포넌트
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -59,7 +60,8 @@ const App = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Routes>
+      <NotificationProvider>
+        <Routes>
         {/* 관리자 페이지 - RootLayout 외부 (전체 너비) */}
         <Route
           path="/admin"
@@ -209,6 +211,7 @@ const App = () => {
           }
         />
       </Routes>
+      </NotificationProvider>
     </QueryClientProvider>
   );
 };
