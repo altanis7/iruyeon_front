@@ -6,7 +6,7 @@ import {
   BottomSheetTitle,
 } from "@/shared/components/ui/bottom-sheet";
 import { Button } from "@/shared/components/ui/button";
-import { Textarea } from "@/shared/components/ui/textarea";
+import { Input } from "@/shared/components/ui/input";
 import { useAcceptMatch } from "../hooks/useAcceptMatch";
 import { useRejectMatch } from "../hooks/useRejectMatch";
 import { useCancelMatch } from "../hooks/useCancelMatch";
@@ -124,12 +124,11 @@ export function MatchResponseDialog({
               <label className="text-xs text-gray-500 font-medium">
                 메시지
               </label>
-              <Textarea
+              <Input
                 placeholder={config[type].placeholder}
                 value={message}
                 onChange={e => setMessage(e.target.value)}
-                rows={3}
-                className="bg-gray-50 border-gray-200 rounded-xl text-sm resize-none focus:ring-2 focus:ring-pink-200 focus:border-pink-300"
+                className="bg-gray-50 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-pink-200 focus:border-pink-300"
               />
             </div>
 
