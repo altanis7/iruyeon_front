@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, LogOut, ChevronRight } from "lucide-react";
 import { MainLayout } from "@/shared/components/layouts/MainLayout";
@@ -5,10 +6,12 @@ import { SettingMenuList } from "@/features/setting/components/SettingMenuList";
 import { useMyInfo } from "@/features/member/hooks/useMyInfo";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { Button } from "@/shared/components/ui/button";
+import { ConfirmDialog } from "@/features/profile/components/ConfirmDialog";
 
 export function SettingPage() {
   const navigate = useNavigate();
   const { currentUser, logout } = useAuth();
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const memberId = currentUser?.id ?? "";
   const { data, isLoading } = useMyInfo(memberId);
 
@@ -52,8 +55,16 @@ export function SettingPage() {
                   </div>
                   {/* 인증 배지 */}
                   <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
-                    <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    <svg
+                      className="w-3 h-3 text-white"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clipRule="evenodd"
+                      />
                     </svg>
                   </div>
                 </div>
@@ -80,7 +91,7 @@ export function SettingPage() {
             <Button
               variant="outline"
               className="w-full py-6 rounded-full bg-red-500 border-red-500 text-white hover:bg-red-600 hover:text-white font-medium"
-              onClick={logout}
+              onClick={() => setShowLogoutDialog(true)}
             >
               <LogOut className="h-5 w-5 mr-2" />
               로그아웃
@@ -88,6 +99,17 @@ export function SettingPage() {
           </div>
         </div>
       </div>
+
+      <ConfirmDialog
+        open={showLogoutDialog}
+        onOpenChange={setShowLogoutDialog}
+        title="로그아웃"
+        description="정말로 로그아웃 하시겠습니까?"
+        confirmText="로그아웃"
+        cancelText="닫기"
+        onConfirm={logout}
+        variant="destructive"
+      />
     </MainLayout>
   );
 }
