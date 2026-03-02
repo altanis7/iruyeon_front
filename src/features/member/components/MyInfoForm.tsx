@@ -77,7 +77,7 @@ type MyInfoFormData = z.infer<typeof myInfoSchema>;
 
 export function MyInfoForm() {
   const navigate = useNavigate();
-  const { currentUser, logout } = useAuth();
+  const { currentUser } = useAuth();
   const memberId = currentUser?.id ?? "";
 
   const { data, isLoading, isError, refetch } = useMyInfo(memberId);
@@ -360,7 +360,7 @@ export function MyInfoForm() {
       </div>
 
       {/* 하단 고정 버튼 영역 */}
-      <div className="p-4 space-y-2">
+      <div className="p-4">
         <Button
           type="submit"
           className="w-full py-6 rounded-full bg-gradient-to-r from-pink-400 to-purple-400 hover:from-pink-500 hover:to-purple-500 text-white font-semibold"
@@ -369,13 +369,6 @@ export function MyInfoForm() {
         >
           {isPending ? "처리 중..." : "정보 수정하기"}
         </Button>
-        <button
-          type="button"
-          onClick={logout}
-          className="w-full py-2 text-sm text-gray-400 hover:text-gray-600 transition-colors"
-        >
-          로그아웃
-        </button>
       </div>
     </div>
   );

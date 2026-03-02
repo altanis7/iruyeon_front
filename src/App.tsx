@@ -3,6 +3,8 @@ import { SignupPage } from "@/pages/SignupPage";
 import { HomePage } from "@/pages/HomePage";
 import { MatchPage } from "@/pages/MatchPage";
 import { SettingPage } from "@/pages/SettingPage";
+import { SettingProfileEditPage } from "@/pages/SettingProfileEditPage";
+import { SettingNotificationPage } from "@/pages/SettingNotificationPage";
 import { ProfilePage } from "@/pages/ProfilePage";
 import { ProfileNewPage } from "@/pages/ProfileNewPage";
 import { ProfileEditPage } from "@/pages/ProfileEditPage";
@@ -114,14 +116,6 @@ const App = () => {
             }
           />
           <Route
-            path="/setting"
-            element={
-              <ProtectedRoute>
-                <SettingPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
             path="/profile"
             element={
               <ProtectedRoute>
@@ -186,6 +180,32 @@ const App = () => {
             }
           />
         </Route>
+
+        {/* 설정 관련 페이지 - 개별 레이아웃 적용 */}
+        <Route
+          path="/setting"
+          element={
+            <ProtectedRoute>
+              <SettingPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/setting/profile"
+          element={
+            <ProtectedRoute>
+              <SettingProfileEditPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/setting/notification"
+          element={
+            <ProtectedRoute>
+              <SettingNotificationPage />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </QueryClientProvider>
   );
