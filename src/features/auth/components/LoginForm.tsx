@@ -9,6 +9,7 @@ import { FloatingLabelInput } from "@/features/profile/components/FloatingLabelI
 import { useAuth, getAutoLoginSetting } from "@/features/auth/hooks/useAuth";
 import { loginAPI } from "@/features/auth/api/authApi";
 import { useKakaoLogin } from "@/features/auth/hooks/useKakaoLogin";
+import { registerFCMTokenOnLogin } from "@/lib/firebase";
 
 export function LoginForm({
   className,
@@ -57,6 +58,7 @@ export function LoginForm({
 
         // 승인된 사용자 (ROLE_MEMBER, ROLE_ADMIN)
         if (role === "ROLE_MEMBER" || role === "ROLE_ADMIN") {
+          registerFCMTokenOnLogin();
           login(token, { id: String(id), role, status }, autoLogin);
           return;
         }

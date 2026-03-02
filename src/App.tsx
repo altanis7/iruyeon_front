@@ -20,7 +20,10 @@ import { Routes, Route, Navigate, useParams, Outlet } from "react-router-dom";
 import RootLayout from "@/shared/components/layouts/RootLayout";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useAuth } from "@/features/auth/hooks/useAuth";
-import { NotificationProvider } from "@/features/notifications/components/NotificationProvider";
+import { useEffect } from "react";
+import { onMessage } from "firebase/messaging";
+import { toast } from "sonner";
+import { getMessagingInstance } from "@/lib/firebase";
 
 // 보호된 라우트 컴포넌트
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -55,13 +58,27 @@ function ProfileRedirect() {
   return <Navigate to={`/client/${id}`} replace />;
 }
 
+function ForegroundMessageListener() {
+  useEffect(() => {
+    const messaging = getMessagingInstance();
+    if (!messaging) return;
+    return onMessage(messaging, payload => {
+      toast(payload.notification?.title || "새 알림", {
+        description: payload.notification?.body || "",
+        duration: 5000,
+      });
+    });
+  }, []);
+  return null;
+}
+
 const App = () => {
   const queryClient = new QueryClient();
 
   return (
     <QueryClientProvider client={queryClient}>
-      <NotificationProvider>
-        <Routes>
+      <ForegroundMessageListener />
+      <Routes>
         {/* 관리자 페이지 - RootLayout 외부 (전체 너비) */}
         <Route
           path="/admin"
@@ -211,7 +228,6 @@ const App = () => {
           }
         />
       </Routes>
-      </NotificationProvider>
     </QueryClientProvider>
   );
 };
