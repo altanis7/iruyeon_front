@@ -1,6 +1,6 @@
 import { LoginForm } from "@/features/auth/components/LoginForm";
 import { SignupPage } from "@/pages/SignupPage";
-import KakaoCallbackPage from "@/pages/auth/KakaoCallbackPage";
+import OAuthSuccessPage from "@/pages/auth/OAuthSuccessPage";
 import { HomePage } from "@/pages/HomePage";
 import { MatchPage } from "@/pages/MatchPage";
 import { SettingPage } from "@/pages/SettingPage";
@@ -117,7 +117,7 @@ const App = () => {
               </AuthRoute>
             }
           />
-          <Route path="/oauth/kakao/callback" element={<KakaoCallbackPage />} />
+          <Route path="/oauth/success" element={<OAuthSuccessPage />} />
 
           {/* 인증 후 페이지 */}
           <Route
