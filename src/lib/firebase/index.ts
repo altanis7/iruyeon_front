@@ -23,20 +23,32 @@ export const getMessagingInstance = () => {
 
 export async function registerFCMTokenOnLogin() {
   try {
-    if (!("Notification" in window)) return;
+    console.log("[FCM] 토큰 등록 시작");
+
+    if (!("Notification" in window)) {
+      console.warn("[FCM] Notification API 미지원");
+      return;
+    }
+
     const permission = await Notification.requestPermission();
+    console.log("[FCM] 알림 권한:", permission);
     if (permission !== "granted") return;
 
     const messagingInstance = getMessagingInstance();
-    if (!messagingInstance) return;
+    if (!messagingInstance) {
+      console.warn("[FCM] messaging 인스턴스 생성 실패");
+      return;
+    }
 
     const token = await getToken(messagingInstance, {
       vapidKey: import.meta.env.VITE_VAPID_KEY,
     });
+    console.log("[FCM] 토큰 획득:", token ? "성공" : "실패");
     if (!token) return;
 
     await apiClient.post("/alarm/fcm", { fcmToken: token });
+    console.log("[FCM] 토큰 백엔드 전송 완료");
   } catch (error) {
-    console.error("FCM token registration failed:", error);
+    console.error("[FCM] 토큰 등록 실패:", error);
   }
 }

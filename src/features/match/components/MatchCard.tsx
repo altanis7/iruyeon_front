@@ -6,11 +6,23 @@ import {
   AvatarFallback,
 } from "@/shared/components/ui/avatar";
 import { Button } from "@/shared/components/ui/button";
-import { Heart, HeartCrack, HeartPulse, Loader2, Sparkles, MessageCircle, X, Pencil } from "lucide-react";
+import {
+  Heart,
+  HeartCrack,
+  HeartPulse,
+  Loader2,
+  Sparkles,
+  MessageCircle,
+  X,
+  Pencil,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { WriteReviewModal } from "@/features/review/components/WriteReviewModal";
 import type { ReceivedMatch, MemberClientDTO } from "../api/matchApi";
-import { matchStatusConfig, type StatusIconAnimation } from "../utils/matchFormat";
+import {
+  matchStatusConfig,
+  type StatusIconAnimation,
+} from "../utils/matchFormat";
 
 /** 상태별 아이콘 맵 (lucide 아이콘만, 커스텀 아이콘은 별도 처리) */
 const statusIcons = {
@@ -32,9 +44,7 @@ function FloatingHeartsIcon({ className }: { className?: string }) {
   return (
     <div className={cn("relative h-5 w-5", className)}>
       {/* 메인 하트 - 두근두근 (outline만) */}
-      <Heart
-        className="absolute inset-0 h-5 w-5 animate-[heartbeat_1s_ease-in-out_infinite]"
-      />
+      <Heart className="absolute inset-0 h-5 w-5 animate-[heartbeat_1s_ease-in-out_infinite]" />
       {/* 떠오르는 미니 하트들 */}
       <Heart
         className="absolute h-2 w-2 fill-current opacity-80 animate-[float-up_2s_ease-out_infinite]"
@@ -95,7 +105,7 @@ function BrokenHeartIcon({ className }: { className?: string }) {
   );
 }
 import { ChatModal } from "./ChatModal";
-import { useCancelMatch } from "../hooks/useCancelMatch";
+import { MatchResponseDialog } from "./MatchResponseDialog";
 
 interface MatchCardProps {
   match: ReceivedMatch;
@@ -154,7 +164,9 @@ export function MatchCard({
 }: MatchCardProps) {
   const [chatOpen, setChatOpen] = useState(false);
   const [reviewOpen, setReviewOpen] = useState(false);
-  const cancelMatch = useCancelMatch();
+  const [acceptOpen, setAcceptOpen] = useState(false);
+  const [rejectOpen, setRejectOpen] = useState(false);
+  const [cancelOpen, setCancelOpen] = useState(false);
   const {
     memberClientResponseDTO,
     oppositeMemberClientDTO,
@@ -168,11 +180,6 @@ export function MatchCard({
     variant === "sent" &&
     (matchStatus === "PENDING" || matchStatus === "UNREAD");
 
-  const handleCancel = () => {
-    if (confirm("매칭 신청을 취소하시겠습니까?")) {
-      cancelMatch.mutate(matchId);
-    }
-  };
   const statusConfig = matchStatusConfig[matchStatus] ?? {
     label: matchStatus ?? "알 수 없음",
     headerBg: "bg-gray-100",
@@ -213,19 +220,23 @@ export function MatchCard({
                 if (iconType === "BrokenHeart") {
                   return (
                     <BrokenHeartIcon
-                      className={cn("h-5 w-5", statusConfig.iconColor ?? "text-gray-900")}
+                      className={cn(
+                        "h-5 w-5",
+                        statusConfig.iconColor ?? "text-gray-900",
+                      )}
                     />
                   );
                 }
 
-                const IconComponent = statusIcons[iconType as keyof typeof statusIcons];
+                const IconComponent =
+                  statusIcons[iconType as keyof typeof statusIcons];
                 return (
                   <IconComponent
                     className={cn(
                       "h-5 w-5",
                       statusConfig.iconColor ?? "text-rose-500",
                       statusConfig.iconFill && "fill-current",
-                      animation && animationClasses[animation]
+                      animation && animationClasses[animation],
                     )}
                   />
                 );
@@ -245,11 +256,16 @@ export function MatchCard({
               <Button
                 variant="default"
                 className="flex-1 h-11 bg-rose-500 hover:bg-rose-600"
+                onClick={() => setAcceptOpen(true)}
               >
                 매칭 수락
               </Button>
               {/* 거절 */}
-              <Button variant="outline" className="flex-1 h-11">
+              <Button
+                variant="outline"
+                className="flex-1 h-11"
+                onClick={() => setRejectOpen(true)}
+              >
                 거절
               </Button>
               {/* 채팅 아이콘 */}
@@ -311,11 +327,10 @@ export function MatchCard({
                 <Button
                   variant="outline"
                   className="h-11 px-4 text-red-500 border-red-300 hover:bg-red-50 hover:border-red-400 hover:text-red-600"
-                  onClick={handleCancel}
-                  disabled={cancelMatch.isPending}
+                  onClick={() => setCancelOpen(true)}
                 >
                   <X className="h-5 w-5 mr-1" />
-                  {cancelMatch.isPending ? "취소 중..." : "매칭 취소"}
+                  매칭 취소
                 </Button>
               )}
             </>
@@ -331,6 +346,26 @@ export function MatchCard({
         match={match}
         open={reviewOpen}
         onOpenChange={setReviewOpen}
+      />
+
+      {/* 매칭 수락/거절 바텀시트 */}
+      <MatchResponseDialog
+        matchId={matchId}
+        type="accept"
+        open={acceptOpen}
+        onOpenChange={setAcceptOpen}
+      />
+      <MatchResponseDialog
+        matchId={matchId}
+        type="reject"
+        open={rejectOpen}
+        onOpenChange={setRejectOpen}
+      />
+      <MatchResponseDialog
+        matchId={matchId}
+        type="cancel"
+        open={cancelOpen}
+        onOpenChange={setCancelOpen}
       />
     </Card>
   );

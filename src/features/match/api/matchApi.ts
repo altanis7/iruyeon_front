@@ -104,6 +104,14 @@ export interface CancelMatchRequest {
 }
 
 /**
+ * 매칭 수락/거절 요청
+ */
+export interface MatchResponseRequest {
+  matchId: number;
+  message: string;
+}
+
+/**
  * 매칭 알림 카운트 데이터
  */
 export interface MatchAlarmData {
@@ -186,9 +194,8 @@ export const matchApi = {
    * 매칭 알림 개수 조회
    */
   getMatchAlarm: async (): Promise<ApiResponse<MatchAlarmData>> => {
-    const response = await apiClient.get<ApiResponse<MatchAlarmData>>(
-      "/match/alarm",
-    );
+    const response =
+      await apiClient.get<ApiResponse<MatchAlarmData>>("/match/alarm");
     return response.data;
   },
 
@@ -214,6 +221,32 @@ export const matchApi = {
   ): Promise<ApiResponse<null>> => {
     const response = await apiClient.post<ApiResponse<null>>(
       "/match/sent/cancel",
+      request,
+    );
+    return response.data;
+  },
+
+  /**
+   * 받은 매칭 수락
+   */
+  acceptMatch: async (
+    request: MatchResponseRequest,
+  ): Promise<ApiResponse<null>> => {
+    const response = await apiClient.post<ApiResponse<null>>(
+      "/match/accept",
+      request,
+    );
+    return response.data;
+  },
+
+  /**
+   * 받은 매칭 거절
+   */
+  rejectMatch: async (
+    request: MatchResponseRequest,
+  ): Promise<ApiResponse<null>> => {
+    const response = await apiClient.post<ApiResponse<null>>(
+      "/match/reject",
       request,
     );
     return response.data;
