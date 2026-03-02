@@ -68,6 +68,10 @@ export interface CheckEmailResponse {
   responseTime: string;
 }
 
+export interface KakaoLoginRequest {
+  code: string;
+}
+
 // ========== 데이터 변환 함수 ==========
 
 /**
@@ -144,6 +148,27 @@ export const loginAPI = async (data: LoginRequest): Promise<LoginResponse> => {
   } catch (error) {
     if (axios.isAxiosError(error)) {
       const message = error.response?.data?.message || "로그인에 실패했습니다.";
+      throw new Error(message);
+    }
+    throw error;
+  }
+};
+
+/**
+ * 카카오 로그인 API
+ */
+export const kakaoLoginAPI = async (
+  code: string,
+): Promise<LoginResponse> => {
+  try {
+    const response = await apiClient.post<LoginResponse>("/oauth2/kakao", {
+      code,
+    });
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const message =
+        error.response?.data?.message || "카카오 로그인에 실패했습니다.";
       throw new Error(message);
     }
     throw error;
