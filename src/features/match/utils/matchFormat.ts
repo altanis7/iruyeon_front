@@ -5,7 +5,14 @@ import type { MatchStatus } from "../api/matchApi";
 /**
  * 아이콘 타입
  */
-export type StatusIconType = "Heart" | "HeartCrack" | "HeartPulse" | "Loader2" | "Sparkles" | "BrokenHeart" | "FloatingHearts";
+export type StatusIconType =
+  | "Heart"
+  | "HeartCrack"
+  | "HeartPulse"
+  | "Loader2"
+  | "Sparkles"
+  | "BrokenHeart"
+  | "FloatingHearts";
 
 /**
  * 아이콘 애니메이션 타입
@@ -31,7 +38,7 @@ export const matchStatusConfig = {
     iconAnimation: null as StatusIconAnimation,
   },
   PENDING: {
-    label: "담당 매니저 확인중",
+    label: "매칭 대기중",
     description: "담당 매니저가 확인하고 있습니다",
     color: "gray",
     bgColor: "bg-gray-100",
