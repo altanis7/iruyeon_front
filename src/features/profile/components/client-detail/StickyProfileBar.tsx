@@ -1,5 +1,6 @@
 import { cn } from '@/lib/utils';
 import { Button } from '@/shared/components/ui/button';
+import { ProfileImage } from '@/shared/components/ui/profile-image';
 import type { ClientDetail, ClientInfoDetail } from '@/features/profile/api/profileApi';
 
 interface StickyProfileBarProps {
@@ -19,17 +20,12 @@ export function StickyProfileBar({ client, isVisible, onPropose }: StickyProfile
       <div className="flex items-center gap-3">
         {/* 미니 프로필 이미지 */}
         <div className="w-8 h-8 rounded-full overflow-hidden bg-slate-200">
-          {client.profileImages?.[0] ? (
-            <img
-              src={client.profileImages[0]}
-              alt="profile"
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-slate-500 text-sm font-medium">
-              {client.name[0]}
-            </div>
-          )}
+          <ProfileImage
+            src={client.profileImages?.[0]}
+            alt="profile"
+            className="w-full h-full object-cover"
+            fallbackSrc="/noImage.png"
+          />
         </div>
 
         {/* 이름 + 키 + 직장 */}

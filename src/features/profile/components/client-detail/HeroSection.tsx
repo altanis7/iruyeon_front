@@ -18,6 +18,7 @@ import {
   CarouselItem,
   type CarouselApi,
 } from "@/shared/components/ui/carousel";
+import { ProfileImage } from "@/shared/components/ui/profile-image";
 import type {
   ClientDetail,
   ClientInfoDetail,
@@ -94,12 +95,13 @@ export function HeroSection({
           </CarouselContent>
         </Carousel>
       ) : (
-        /* 이미지 없을 때 폴백: 이름 이니셜 표시 */
-        <div className="h-full w-full flex items-center justify-center bg-gradient-to-br from-slate-700 to-slate-900">
-          <span className="text-white text-7xl font-bold opacity-30">
-            {client.name.charAt(0)}
-          </span>
-        </div>
+        /* 이미지 없을 때 폴백: ProfileImage 사용 */
+        <ProfileImage
+          src={null}
+          alt={client.name}
+          className="w-full h-full object-cover"
+          fallbackSrc="/noImage.png"
+        />
       )}
 
       {/* 상단 그라디언트 */}
