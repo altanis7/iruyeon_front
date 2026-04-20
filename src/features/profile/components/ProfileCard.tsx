@@ -1,6 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar";
 import { Card, CardContent } from "@/shared/components/ui/card";
 import { Button } from "@/shared/components/ui/button";
+import { ProfileImage } from "@/shared/components/ui/profile-image";
 import { cn } from "@/lib/utils";
 import { Ruler, GraduationCap, Briefcase, MapPin, Heart } from "lucide-react";
 import type { ClientDisplayData } from "../api/profileApi";
@@ -49,19 +50,12 @@ export function ProfileCard({
       {/* 상단 영역: 프로필 사진 (카드 전체 너비) */}
       <div className="relative aspect-[4/5] overflow-hidden bg-gray-100">
         {/* 프로필 사진 (전체 채우기) */}
-        {profile.image ? (
-          <img
-            src={profile.image}
-            alt={profile.name}
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-            <span className="text-4xl text-gray-400">
-              {profile.name ? profile.name[0] : "?"}
-            </span>
-          </div>
-        )}
+        <ProfileImage
+          src={profile.image}
+          alt={profile.name}
+          className="w-full h-full object-cover"
+          fallbackSrc="/noImage.png"
+        />
 
         {/* 상단 그라데이션 (매니저 뱃지 가독성) */}
         <div className="absolute inset-x-0 top-0 h-12 bg-gradient-to-b from-black/20 to-transparent" />
