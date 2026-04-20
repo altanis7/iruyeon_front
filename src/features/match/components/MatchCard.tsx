@@ -6,6 +6,7 @@ import {
   AvatarFallback,
 } from "@/shared/components/ui/avatar";
 import { Button } from "@/shared/components/ui/button";
+import { ProfileImage } from "@/shared/components/ui/profile-image";
 import {
   Heart,
   HeartCrack,
@@ -119,10 +120,11 @@ function ClientProfileCard({ data }: { data: MemberClientDTO }) {
   return (
     <div className="relative flex-1 aspect-[3/4] rounded-2xl overflow-hidden">
       {/* 배경 이미지 */}
-      <img
-        src={data.clientImage ?? "/placeholder-avatar.png"}
+      <ProfileImage
+        src={data.clientImage}
         alt={data.clientName}
         className="absolute inset-0 w-full h-full object-cover"
+        fallbackSrc="/noImage.png"
       />
 
       {/* 그라데이션 오버레이 */}

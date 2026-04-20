@@ -7,6 +7,7 @@ import {
 } from "@/shared/components/ui/bottom-sheet";
 import { Button } from "@/shared/components/ui/button";
 import { Textarea } from "@/shared/components/ui/textarea";
+import { ProfileImage } from "@/shared/components/ui/profile-image";
 import { useMyClients } from "@/features/profile/hooks/useMyClients";
 import {
   mapMyClientToDisplay,
@@ -136,17 +137,12 @@ export function MatchRequestDialog({
                       {/* 프로필 이미지 + 체크 */}
                       <div className="relative flex-shrink-0">
                         <div className="h-14 w-14 overflow-hidden rounded-full bg-gray-200">
-                          {client.image ? (
-                            <img
-                              src={client.image}
-                              alt={client.name}
-                              className="h-full w-full object-cover"
-                            />
-                          ) : (
-                            <div className="flex h-full w-full items-center justify-center text-lg text-gray-400">
-                              {client.name[0]}
-                            </div>
-                          )}
+                          <ProfileImage
+                            src={client.image}
+                            alt={client.name}
+                            className="h-full w-full object-cover"
+                            fallbackSrc="/noImage.png"
+                          />
                         </div>
                         {isSelected && (
                           <div className="absolute -left-1 -top-1 flex h-6 w-6 items-center justify-center rounded-full bg-pink-400 text-white">
