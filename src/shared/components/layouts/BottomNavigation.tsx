@@ -11,7 +11,7 @@ interface NavItem {
 const navItems: NavItem[] = [
   { path: "/", label: "메인", icon: Home },
   { path: "/match", label: "매칭관리", icon: Heart },
-  { path: "/profile", label: "프로필 관리", icon: UserCircle },
+  { path: "/profile", label: "내 회원 관리", icon: UserCircle },
   { path: "/setting", label: "내 정보", icon: Settings },
 ];
 
