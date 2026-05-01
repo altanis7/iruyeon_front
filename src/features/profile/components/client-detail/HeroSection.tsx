@@ -1,16 +1,17 @@
 import { useState, useEffect } from "react";
 import {
   ChevronLeft,
+  ChevronRight,
   EyeOff,
   Pencil,
   Trash2,
   Briefcase,
   MapPin,
   Phone,
-  Wallet,
+  HeartHandshake,
   Ruler,
   GraduationCap,
-  Heart,
+  Church,
   FileText,
 } from "lucide-react";
 import {
@@ -106,6 +107,24 @@ export function HeroSection({
         />
       )}
 
+      {/* 캐러셀 커스텀 화살표 */}
+      {current > 1 && (
+        <button
+          onClick={() => api?.scrollPrev()}
+          className="absolute left-3 top-1/2 -translate-y-1/2 z-10 text-white/80 hover:text-white"
+        >
+          <ChevronLeft className="w-8 h-8 drop-shadow-lg" strokeWidth={1.5} />
+        </button>
+      )}
+      {current < count && (
+        <button
+          onClick={() => api?.scrollNext()}
+          className="absolute right-3 top-1/2 -translate-y-1/2 z-10 text-white/80 hover:text-white"
+        >
+          <ChevronRight className="w-8 h-8 drop-shadow-lg" strokeWidth={1.5} />
+        </button>
+      )}
+
       {/* 상단 그라디언트 */}
       <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-black/40 via-black/20 to-transparent pointer-events-none" />
 
@@ -119,9 +138,17 @@ export function HeroSection({
         </GlassButton>
         {isOwner && (
           <div className="flex gap-2">
-            <GlassButton size="sm" onClick={onToggleStatus}>
+            <GlassButton
+              size="sm"
+              variant={client.status !== "ACTIVE" ? "inactive" : "default"}
+              onClick={onToggleStatus}
+            >
               <EyeOff className="w-[18px] h-[18px]" />
-              <span>{client.status === "ACTIVE" ? "비활동" : "활동"}</span>
+              <span>
+                {client.status === "ACTIVE"
+                  ? "비활동"
+                  : getStatusLabel(client.status)}
+              </span>
             </GlassButton>
             {onReviewList && (
               <GlassButton size="sm" onClick={onReviewList}>
@@ -186,9 +213,9 @@ export function HeroSection({
         {/* 인포그래픽 배지 4열 */}
         <div className="grid grid-cols-4 gap-2">
           <InfoBadge
-            icon={Wallet}
-            label="자산"
-            value={client.property || "정보 없음"}
+            icon={HeartHandshake}
+            label="초혼"
+            value={client.maritalStatus || "정보 없음"}
           />
           <InfoBadge icon={Ruler} label="키" value={`${client.height}cm`} />
           <InfoBadge
@@ -196,9 +223,20 @@ export function HeroSection({
             label="학력"
             value={client.university || client.eduLevel}
           />
-          <InfoBadge icon={Heart} label="상태" value={client.maritalStatus} />
+          <InfoBadge
+            icon={Church}
+            label="종교"
+            value={client.religion || "정보 없음"}
+          />
         </div>
       </div>
     </div>
   );
+}
+
+function getStatusLabel(status: string): string {
+  if (status === "INACTIVE_MARRIED") return "비활동 · 성혼완료";
+  if (status === "INACTIVE_DATING") return "비활동 · 교제중";
+  if (status === "INACTIVE") return "비활동 · 해당없음";
+  return "비활동";
 }

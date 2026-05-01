@@ -287,6 +287,8 @@ export interface ClientDetail {
   phoneNumber: string | null;
   profileImages: string[]; // 프로필 이미지 배열 (최대 3개)
   families: ClientFamilyMember[]; // 가족 구성원 배열
+  totalMeetingCnt?: number | null; // 전체 만남 횟수 (내 회원 API에서만 값 존재)
+  currentMeetingCnt?: number | null; // 현재 만남 횟수 (내 회원 API에서만 값 존재)
 }
 
 // 클라이언트 상세 정보 (GET /client/:id/info 응답)
@@ -452,13 +454,21 @@ export function mapMyClientToDisplay(
  */
 
 // 상태 전환 API
+export type ClientStatus =
+  | "ACTIVE"
+  | "INACTIVE"
+  | "INACTIVE_MARRIED"
+  | "INACTIVE_DATING"
+  | "DELETED";
+
 export interface ToggleStatusRequest {
   memberId: number;
+  status: ClientStatus;
 }
 
 export interface ToggleStatusResponse {
   clientId: number;
-  newStatus: "ACTIVE" | "INACTIVE";
+  newStatus: ClientStatus;
   message: string;
 }
 
@@ -536,9 +546,11 @@ export const clientManagementApi = {
    */
   toggleClientStatus: async (
     memberId: number,
+    status: ClientStatus,
   ): Promise<ApiResponse<ToggleStatusResponse>> => {
     const response = await apiClient.post<ApiResponse<ToggleStatusResponse>>(
       `/client/status/${memberId}`,
+      { status },
     );
     return response.data;
   },

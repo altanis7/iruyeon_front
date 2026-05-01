@@ -1,4 +1,4 @@
-import { MessageSquareText } from 'lucide-react';
+import { MessageSquareText } from "lucide-react";
 
 interface ManagerOpinionSectionProps {
   info: string;
@@ -15,7 +15,7 @@ export function ManagerOpinionSection({ info }: ManagerOpinionSectionProps) {
       {/* 섹션 제목 */}
       <h2 className="text-xs font-bold opacity-60 mb-3 uppercase tracking-wider flex items-center gap-2">
         <MessageSquareText className="w-4 h-4" />
-        매니저 종합 의견
+        소개 및 장점
       </h2>
 
       {/* 의견 텍스트 카드 */}

@@ -1,13 +1,18 @@
-import { GraduationCap, BookOpen, Briefcase } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { SectionTitle } from './SectionTitle';
-import type { ClientDetail, ClientInfoDetail } from '@/features/profile/api/profileApi';
+import { GraduationCap, BookOpen, Briefcase } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { SectionTitle } from "./SectionTitle";
+import type {
+  ClientDetail,
+  ClientInfoDetail,
+} from "@/features/profile/api/profileApi";
 
 interface EducationCareerSectionProps {
   client: ClientDetail | ClientInfoDetail;
 }
 
-export function EducationCareerSection({ client }: EducationCareerSectionProps) {
+export function EducationCareerSection({
+  client,
+}: EducationCareerSectionProps) {
   return (
     <section className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
       <SectionTitle icon={GraduationCap} title="학력 및 경력" color="blue" />
@@ -46,6 +51,18 @@ export function EducationCareerSection({ client }: EducationCareerSectionProps) 
           description="근무 중"
           hasBorderTop
         />
+
+        {/* 이전 직장 */}
+        {client.previousJob && (
+          <TimelineItem
+            icon={Briefcase}
+            iconBg="bg-slate-50"
+            iconColor="text-slate-500"
+            label="이전 직장"
+            title={client.previousJob}
+            hasBorderTop
+          />
+        )}
       </div>
     </section>
   );
@@ -73,24 +90,33 @@ function TimelineItem({
   hasBorderTop,
 }: TimelineItemProps) {
   return (
-    <div className={cn('flex gap-4', hasBorderTop && 'border-t border-slate-50 pt-5')}>
+    <div
+      className={cn(
+        "flex gap-4",
+        hasBorderTop && "border-t border-slate-50 pt-5",
+      )}
+    >
       <div
         className={cn(
-          'w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0',
+          "w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0",
           iconBg,
         )}
       >
-        <Icon className={cn('w-5 h-5', iconColor)} />
+        <Icon className={cn("w-5 h-5", iconColor)} />
       </div>
       <div>
         <p className="text-xs text-slate-400 uppercase font-bold tracking-tight mb-0.5">
           {label}
         </p>
         <p className="text-sm font-bold">
-          {title || '정보 없음'}
-          {subtitle && <span className="font-normal text-slate-500 ml-1">{subtitle}</span>}
+          {title || "정보 없음"}
+          {subtitle && (
+            <span className="font-normal text-slate-500 ml-1">{subtitle}</span>
+          )}
         </p>
-        {description && <p className="text-xs text-slate-400 mt-0.5">{description}</p>}
+        {description && (
+          <p className="text-xs text-slate-400 mt-0.5">{description}</p>
+        )}
       </div>
     </div>
   );

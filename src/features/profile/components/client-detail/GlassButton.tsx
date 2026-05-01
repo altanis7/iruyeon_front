@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 
 interface GlassButtonProps {
-  variant?: "default" | "danger";
+  variant?: "default" | "danger" | "inactive";
   size?: "icon" | "sm" | "md";
   children: React.ReactNode;
   onClick?: () => void;
@@ -32,11 +32,15 @@ export function GlassButton({
           "bg-red-500/80 text-white border-red-400/30",
           "hover:bg-red-500/90",
         ],
+        variant === "inactive" && [
+          "bg-red-500/80 text-white border-red-400/30",
+          "hover:bg-red-500/90",
+        ],
         // size 스타일 - 높이 통일 (40px = h-10)
         size === "icon" && "w-10 h-10",
         size === "sm" && "h-10 px-3 gap-1 text-xs font-medium",
         size === "md" && "h-10 px-5 text-sm font-medium",
-        className
+        className,
       )}
     >
       {children}

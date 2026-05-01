@@ -16,8 +16,11 @@ import {
   PreferenceSection,
   FamilySection,
   ManagerOpinionSection,
+  MeetingStatsSection,
+  InactiveStatusSheet,
 } from "@/features/profile/components/client-detail";
 import { MatchRequestDialog } from "@/features/match/components/MatchRequestDialog";
+import type { ClientStatus } from "@/features/profile/api/profileApi";
 
 export function ClientDetailPage() {
   const navigate = useNavigate();
@@ -43,8 +46,10 @@ export function ClientDetailPage() {
 
   // UI State
   const [showStatusDialog, setShowStatusDialog] = useState(false);
+  const [showInactiveSheet, setShowInactiveSheet] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showMatchDialog, setShowMatchDialog] = useState(false);
+  const [showDeletedOverlay, setShowDeletedOverlay] = useState(false);
 
   // Sticky bar visibility state
   const [showStickyBar, setShowStickyBar] = useState(false);
@@ -68,22 +73,52 @@ export function ClientDetailPage() {
   // ApiResponse wrapper에서 data 추출
   const client = response?.data;
 
+  // 탈퇴 회원 overlay
+  useEffect(() => {
+    if (client?.status === "DELETED") {
+      setShowDeletedOverlay(true);
+    }
+  }, [client?.status]);
+
   // 소유권 확인 (현재 로그인한 사용자의 ID와 클라이언트의 memberId가 일치하는지)
   const isOwner =
     currentUser && client && currentUser.id === String(client.memberId);
 
   // ===== 이벤트 핸들러 =====
   const handleToggleStatus = () => {
-    setShowStatusDialog(true);
+    if (!client) return;
+    if (client.status === "ACTIVE") {
+      // 비활동 전환: 사유 선택 시트
+      setShowInactiveSheet(true);
+    } else {
+      // 활동 전환: 확인 다이얼로그
+      setShowStatusDialog(true);
+    }
   };
 
+  // 활동으로 전환 확인
   const confirmToggleStatus = () => {
     if (!client) return;
-    toggleStatusMutation.mutate(client.memberId, {
-      onSuccess: () => {
-        setShowStatusDialog(false);
+    toggleStatusMutation.mutate(
+      { memberId: client.memberId, status: "ACTIVE" },
+      {
+        onSuccess: () => {
+          setShowStatusDialog(false);
+        },
       },
-    });
+    );
+  };
+
+  // 비활동 사유 선택 후 처리
+  const handleSelectInactiveStatus = (
+    status: Extract<
+      ClientStatus,
+      "INACTIVE_MARRIED" | "INACTIVE_DATING" | "INACTIVE"
+    >,
+  ) => {
+    if (!client) return;
+    setShowInactiveSheet(false);
+    toggleStatusMutation.mutate({ memberId: client.memberId, status });
   };
 
   const handleDeleteClick = () => {
@@ -128,16 +163,47 @@ export function ClientDetailPage() {
     );
   }
 
+  const isDeleted = client.status === "DELETED";
+
   return (
     <div
       ref={scrollContainerRef}
       className="h-dvh w-full overflow-y-auto bg-slate-50 max-w-md mx-auto scrollbar-hide shadow-[0_0_20px_#0000000d] pt-safe-top"
     >
+      {/* 탈퇴 회원 오버레이 */}
+      {showDeletedOverlay && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 max-w-md mx-auto">
+          <div className="bg-white rounded-3xl p-8 mx-6 text-center shadow-2xl">
+            <div className="w-14 h-14 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4">
+              <span className="text-2xl">🚫</span>
+            </div>
+            <h2 className="text-lg font-bold text-slate-900 mb-2">
+              탈퇴한 회원입니다
+            </h2>
+            <p className="text-sm text-slate-500 mb-6">
+              해당 회원은 서비스에서 탈퇴하였습니다.
+            </p>
+            <Button
+              className="w-full h-12 rounded-full bg-slate-900 text-white font-semibold"
+              onClick={() => {
+                setShowDeletedOverlay(false);
+                navigate(-1);
+              }}
+            >
+              돌아가기
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* 스티키 바 */}
       <StickyProfileBar client={client} isVisible={showStickyBar} />
 
       {/* 히어로 섹션 */}
-      <div ref={heroRef}>
+      <div
+        ref={heroRef}
+        className={cn(isDeleted && "blur-sm pointer-events-none")}
+      >
         <HeroSection
           client={client}
           isOwner={!!isOwner}
@@ -150,7 +216,13 @@ export function ClientDetailPage() {
       </div>
 
       {/* 콘텐츠 섹션들 */}
-      <div className={cn("px-4 py-6 space-y-4 -mt-4", !isOwner && "pb-24")}>
+      <div
+        className={cn(
+          "px-4 py-6 space-y-4 -mt-4",
+          !isOwner && "pb-24",
+          isDeleted && "blur-sm pointer-events-none select-none",
+        )}
+      >
         <InfoSection client={client} />
         <EducationCareerSection client={client} />
         <PreferenceSection client={client} />
@@ -158,10 +230,17 @@ export function ClientDetailPage() {
           <FamilySection families={client.families} />
         )}
         {client.info && <ManagerOpinionSection info={client.info} />}
+        {isOwner && (
+          <MeetingStatsSection
+            totalMeetingCnt={client.totalMeetingCnt}
+            currentMeetingCnt={client.currentMeetingCnt}
+            phoneNumber={client.phoneNumber}
+          />
+        )}
       </div>
 
       {/* 플로팅 매칭 신청 버튼 (소유자가 아닐 때만 표시) */}
-      {!isOwner && (
+      {!isOwner && !isDeleted && (
         <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-white via-white to-transparent max-w-md mx-auto">
           <Button
             className="w-full h-14 text-lg font-semibold rounded-2xl bg-rose-500 hover:bg-rose-600 text-white shadow-lg"
@@ -172,12 +251,19 @@ export function ClientDetailPage() {
         </div>
       )}
 
-      {/* 확인 다이얼로그 */}
+      {/* 비활동 사유 선택 시트 */}
+      <InactiveStatusSheet
+        open={showInactiveSheet}
+        onOpenChange={setShowInactiveSheet}
+        onSelect={handleSelectInactiveStatus}
+      />
+
+      {/* 활동 전환 확인 다이얼로그 */}
       <ConfirmDialog
         open={showStatusDialog}
         onOpenChange={setShowStatusDialog}
         title="상태 변경"
-        description={`정말로 ${client.status === "ACTIVE" ? "비활동" : "활동"} 상태로 변경하시겠습니까?`}
+        description="정말로 활동 상태로 변경하시겠습니까?"
         confirmText="변경"
         onConfirm={confirmToggleStatus}
         isLoading={toggleStatusMutation.isPending}
