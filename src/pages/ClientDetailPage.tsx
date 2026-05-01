@@ -23,17 +23,18 @@ export function ClientDetailPage() {
   const navigate = useNavigate();
   const { clientId } = useParams<{ clientId: string }>();
   const [searchParams] = useSearchParams();
-  const isFromProfile = searchParams.get("source") === "profile";
+  const source = searchParams.get("source");
+  const useInfoApi = source === "profile" || source === "matched";
 
-  // 상호 배타적 API 호출: source=profile이면 /info API, 아니면 기존 API
+  // 상호 배타적 API 호출: source=profile 또는 source=matched이면 /info API, 아니면 기존 API
   const { data: clientResponse, isLoading: clientLoading } = useClient(
-    isFromProfile ? "" : clientId!
+    useInfoApi ? "" : clientId!,
   );
   const { data: clientInfoResponse, isLoading: clientInfoLoading } =
-    useClientInfo(isFromProfile ? clientId! : "");
+    useClientInfo(useInfoApi ? clientId! : "");
 
-  const response = isFromProfile ? clientInfoResponse : clientResponse;
-  const isLoading = isFromProfile ? clientInfoLoading : clientLoading;
+  const response = useInfoApi ? clientInfoResponse : clientResponse;
+  const isLoading = useInfoApi ? clientInfoLoading : clientLoading;
   const { currentUser } = useAuth();
 
   // Mutations
@@ -58,7 +59,7 @@ export function ClientDetailPage() {
         root: scrollContainerRef.current,
         threshold: 0,
         rootMargin: "-64px 0px 0px 0px",
-      }
+      },
     );
     if (heroRef.current) observer.observe(heroRef.current);
     return () => observer.disconnect();

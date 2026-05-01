@@ -6,6 +6,7 @@ import {
   Trash2,
   Briefcase,
   MapPin,
+  Phone,
   Wallet,
   Ruler,
   GraduationCap,
@@ -23,6 +24,7 @@ import type {
   ClientDetail,
   ClientInfoDetail,
 } from "@/features/profile/api/profileApi";
+import { formatPhoneNumber } from "@/features/profile/utils/clientFormat";
 import { GlassButton } from "./GlassButton";
 import { InfoBadge } from "./InfoBadge";
 
@@ -156,6 +158,16 @@ export function HeroSection({
             {client.gender}
           </span>
         </div>
+
+        {/* 전화번호 */}
+        {client.phoneNumber && (
+          <div className="flex items-center gap-2 text-white/80 mb-1">
+            <Phone className="w-4 h-4 opacity-70" />
+            <span className="text-sm">
+              {formatPhoneNumber(client.phoneNumber)}
+            </span>
+          </div>
+        )}
 
         {/* 직장 정보 */}
         <div className="flex items-center gap-2 text-white/90 mb-1">

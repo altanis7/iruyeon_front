@@ -90,3 +90,18 @@ export function formatNameWithBirthYear(
   if (!birthYear) return formatValue(name);
   return `${name}(${birthYear}년생)`;
 }
+
+/**
+ * 전화번호 하이픈 포맷 (예: "01024523333" → "010-2452-3333")
+ */
+export function formatPhoneNumber(phone: string | null | undefined): string {
+  if (!phone) return "정보 없음";
+  const digits = phone.replace(/\D/g, "");
+  if (digits.length === 11)
+    return digits.replace(/(\d{3})(\d{4})(\d{4})/, "$1-$2-$3");
+  if (digits.length === 10)
+    return digits.replace(/(\d{3})(\d{3})(\d{4})/, "$1-$2-$3");
+  if (digits.length === 9)
+    return digits.replace(/(\d{2})(\d{3})(\d{4})/, "$1-$2-$3");
+  return phone;
+}
