@@ -14,6 +14,7 @@ import { SentProfilesPage } from "@/pages/SentProfilesPage";
 import { ReceivedProfilesPage } from "@/pages/ReceivedProfilesPage";
 import { ClientDetailPage } from "@/pages/ClientDetailPage";
 import { ReviewListPage } from "@/pages/ReviewListPage";
+import { ManagerDetailPage } from "@/pages/ManagerDetailPage";
 import { AllManagersPage } from "@/pages/admin/AllManagersPage";
 import { PendingManagersPage } from "@/pages/admin/PendingManagersPage";
 import { AdminLayout } from "@/features/admin/components/AdminLayout";
@@ -267,6 +268,14 @@ const App = () => {
             element={
               <ProtectedRoute>
                 <ReviewListPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/manager/:memberId"
+            element={
+              <ProtectedRoute>
+                <ManagerDetailPage />
               </ProtectedRoute>
             }
           />

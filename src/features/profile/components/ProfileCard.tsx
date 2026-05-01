@@ -8,6 +8,7 @@ import { Button } from "@/shared/components/ui/button";
 import { ProfileImage } from "@/shared/components/ui/profile-image";
 import { cn } from "@/lib/utils";
 import { Ruler, GraduationCap, Briefcase, MapPin, Heart } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import type { ClientDisplayData } from "../api/profileApi";
 import {
   formatValue,
@@ -43,9 +44,16 @@ export function ProfileCard({
   const isActive = profile.status === "ACTIVE";
   const statusLabel = formatClientStatus(profile.status);
 
+  const navigate = useNavigate();
+
   const handleMatchClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     onMatchRequest?.();
+  };
+
+  const handleManagerClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigate(`/manager/${String(profile.memberId)}`);
   };
 
   return (
@@ -91,8 +99,11 @@ export function ProfileCard({
         </div>
 
         {/* 담당 매니저 뱃지 (좌상단) */}
-        <div className="absolute top-2 left-2 z-10">
-          <div className="flex items-center gap-1.5 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1 shadow-sm">
+        <div
+          className="absolute top-2 left-2 z-10"
+          onClick={handleManagerClick}
+        >
+          <div className="flex items-center gap-1.5 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1 shadow-sm cursor-pointer hover:bg-white transition-colors">
             <Avatar className="h-5 w-5">
               <AvatarImage
                 src={profile.memberImage ?? undefined}

@@ -124,6 +124,13 @@ function ClientProfileCard({
   data: MemberClientDTO;
   onClick?: () => void;
 }) {
+  const navigate = useNavigate();
+
+  const handleManagerClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigate(`/manager/${String(data.memberId)}`);
+  };
+
   return (
     <div
       className="relative flex-1 aspect-[3/4] rounded-2xl overflow-hidden cursor-pointer"
@@ -141,7 +148,10 @@ function ClientProfileCard({
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
 
       {/* 매니저 뱃지 (이미지 위 왼쪽 상단) */}
-      <div className="absolute top-2 left-2 flex items-center gap-1.5 bg-black/50 backdrop-blur-sm rounded-full px-2.5 py-1">
+      <div
+        className="absolute top-2 left-2 flex items-center gap-1.5 bg-black/50 backdrop-blur-sm rounded-full px-2.5 py-1 cursor-pointer hover:bg-black/70 transition-colors"
+        onClick={handleManagerClick}
+      >
         <Avatar className="h-4 w-4">
           <AvatarImage src={data.memberImage ?? undefined} />
           <AvatarFallback className="text-[8px] bg-gray-600 text-white">
