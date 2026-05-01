@@ -82,7 +82,7 @@ export function MatchRequestDialog({
 
   return (
     <BottomSheet open={open} onOpenChange={handleOpenChange}>
-      <BottomSheetContent>
+      <BottomSheetContent onOpenAutoFocus={e => e.preventDefault()}>
         <BottomSheetHeader>
           <BottomSheetTitle className="text-center text-lg font-semibold pb-4">
             <span className="text-gray-900">{toClientName}</span>
