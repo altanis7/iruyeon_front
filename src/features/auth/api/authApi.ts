@@ -5,7 +5,6 @@ import axios from "axios";
 
 // API 요청 타입 (백엔드 스펙과 일치)
 export interface SignupRequest {
-  email: string;
   pwd: string;
   name: string;
   phoneNumber: string;
@@ -16,7 +15,6 @@ export interface SignupRequest {
 
 // 프론트엔드 폼 타입
 export interface SignupFormData {
-  email: string;
   name: string;
   phoneNumber: string;
   password: string;
@@ -37,7 +35,7 @@ export interface SignupResponse {
 }
 
 export interface LoginRequest {
-  email: string;
+  phoneNumber: string;
   password: string;
 }
 
@@ -61,11 +59,11 @@ export interface LoginResponse {
   responseTime: string;
 }
 
-export interface CheckEmailRequest {
-  email: string;
+export interface CheckPhoneNumberRequest {
+  phoneNumber: string;
 }
 
-export interface CheckEmailResponse {
+export interface CheckPhoneNumberResponse {
   data: boolean; // true = 중복(사용 불가), false = 사용 가능
   status: number;
   message: string;
@@ -82,7 +80,6 @@ export const transformSignupData = (
   imageId: number | null = null,
 ): SignupRequest => {
   return {
-    email: formData.email,
     pwd: formData.password, // password → pwd 변환
     name: formData.name,
     phoneNumber: formData.phoneNumber,
@@ -114,21 +111,21 @@ export const signupAPI = async (
 };
 
 /**
- * 이메일 중복 확인 API
+ * 전화번호 중복 확인 API
  */
-export const checkEmailAPI = async (
-  data: CheckEmailRequest,
-): Promise<CheckEmailResponse> => {
+export const checkPhoneNumberAPI = async (
+  data: CheckPhoneNumberRequest,
+): Promise<CheckPhoneNumberResponse> => {
   try {
-    const response = await apiClient.post<CheckEmailResponse>(
-      "/email/check",
+    const response = await apiClient.post<CheckPhoneNumberResponse>(
+      "/phone/check",
       data,
     );
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
       const message =
-        error.response?.data?.message || "이메일 중복 확인에 실패했습니다.";
+        error.response?.data?.message || "전화번호 중복 확인에 실패했습니다.";
       throw new Error(message);
     }
     throw error;
@@ -141,7 +138,7 @@ export const checkEmailAPI = async (
 export const loginAPI = async (data: LoginRequest): Promise<LoginResponse> => {
   try {
     const response = await apiClient.post<LoginResponse>("/login", {
-      email: data.email,
+      phone: data.phoneNumber,
       password: data.password,
     });
     return response.data;

@@ -14,12 +14,16 @@ import {
   DialogTitle,
 } from "@/shared/components/ui/dialog";
 import { useSignup } from "@/features/auth/hooks/useSignup";
-import { useCheckEmail } from "@/features/auth/hooks/useCheckEmail";
+import { useCheckPhoneNumber } from "@/features/auth/hooks/useCheckPhoneNumber";
 import { transformSignupData } from "@/features/auth/api/authApi";
 import { ProfileImageUpload } from "@/features/upload/components/ProfileImageUpload";
 import { FloatingLabelInput } from "@/features/profile/components/FloatingLabelInput";
 import { GenderToggle } from "@/features/profile/components/GenderToggle";
 import { cn } from "@/lib/utils";
+import {
+  formatPhoneNumber,
+  removePhoneNumberHyphens,
+} from "@/features/auth/utils/phoneNumber";
 
 // Zod 유효성 검사 스키마
 const signupSchema = z
@@ -28,10 +32,6 @@ const signupSchema = z
       .string()
       .min(2, { message: "이름은 최소 2자 이상이어야 합니다." })
       .max(50, { message: "이름은 최대 50자까지 입력 가능합니다." }),
-    email: z
-      .string()
-      .min(1, { message: "이메일을 입력하세요." })
-      .email({ message: "올바른 이메일 형식을 입력하세요." }),
     phoneNumber: z.string().regex(/^010-\d{4}-\d{4}$/, {
       message: "휴대폰 번호 형식이 올바르지 않습니다. (예: 010-1234-5678)",
     }),
@@ -42,9 +42,9 @@ const signupSchema = z
     gender: z.string().min(1, { message: "성별을 선택하세요." }),
     password: z
       .string()
-      .min(8, { message: "비밀번호는 최소 8자 이상이어야 합니다." })
-      .regex(/^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])/, {
-        message: "비밀번호는 영문, 숫자, 특수문자를 포함해야 합니다.",
+      .min(6, { message: "비밀번호는 최소 6자 이상이어야 합니다." })
+      .regex(/[A-Za-z]/, {
+        message: "비밀번호는 영문을 포함해야 합니다.",
       }),
     passwordConfirm: z.string().min(1, { message: "비밀번호 확인을 입력하세요." }),
   })
@@ -54,20 +54,18 @@ const signupSchema = z
   });
 
 // 비밀번호 유효성 검사 헬퍼
-const checkPasswordLength = (password: string) => password.length >= 8;
-const checkPasswordComplexity = (password: string) =>
-  /[A-Za-z]/.test(password) &&
-  /\d/.test(password) &&
-  /[!@#$%^&*(),.?":{}|<>]/.test(password);
+const checkPasswordLength = (password: string) => password.length >= 6;
+const checkPasswordHasEnglish = (password: string) => /[A-Za-z]/.test(password);
 
 type SignupFormData = z.infer<typeof signupSchema>;
 
 export function SignupForm() {
   const navigate = useNavigate();
   const { mutate: signup, isPending } = useSignup();
-  const { mutate: checkEmail, isPending: isCheckingEmail } = useCheckEmail();
+  const { mutate: checkPhoneNumber, isPending: isCheckingPhoneNumber } =
+    useCheckPhoneNumber();
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
-  const [emailCheckStatus, setEmailCheckStatus] = useState<
+  const [phoneCheckStatus, setPhoneCheckStatus] = useState<
     "unchecked" | "available" | "duplicate" | "error"
   >("unchecked");
   const [profileImageId, setProfileImageId] = useState<number | null>(null);
@@ -96,27 +94,40 @@ export function SignupForm() {
     },
   });
 
-  const email = watch("email");
+  const phoneNumber = watch("phoneNumber");
   const password = watch("password");
+
+  // 전화번호 입력 시 자동 포맷팅
+  const handlePhoneNumberChange = (value: string) => {
+    const formatted = formatPhoneNumber(value);
+    setValue("phoneNumber", formatted, { shouldValidate: true });
+  };
 
   // 비밀번호 유효성 상태
   const isPasswordLengthValid = checkPasswordLength(password || "");
-  const isPasswordComplexityValid = checkPasswordComplexity(password || "");
+  const isPasswordHasEnglish = checkPasswordHasEnglish(password || "");
 
-  // 이메일 변경 시 확인 상태 초기화
+  // 전화번호 변경 시 확인 상태 초기화
   useEffect(() => {
-    setEmailCheckStatus("unchecked");
+    setPhoneCheckStatus("unchecked");
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [email]);
+  }, [phoneNumber]);
 
   const onSubmit = (data: SignupFormData) => {
-    // 이메일 중복확인 필수
-    if (emailCheckStatus !== "available") {
-      alert("이메일 중복확인을 해주세요.");
+    // 전화번호 중복확인 필수
+    if (phoneCheckStatus !== "available") {
+      alert("전화번호 중복확인을 해주세요.");
       return;
     }
 
-    const apiData = transformSignupData(data, profileImageId);
+    // 전화번호 하이픈 제거 후 API 전송
+    const apiData = transformSignupData(
+      {
+        ...data,
+        phoneNumber: removePhoneNumberHyphens(data.phoneNumber),
+      },
+      profileImageId,
+    );
 
     signup(apiData, {
       onSuccess: () => {
@@ -128,26 +139,26 @@ export function SignupForm() {
     });
   };
 
-  const handleEmailCheck = () => {
-    const currentEmail = watch("email");
-    if (!currentEmail) {
-      setEmailCheckStatus("error");
+  const handlePhoneNumberCheck = () => {
+    const currentPhoneNumber = watch("phoneNumber");
+    if (!currentPhoneNumber) {
+      setPhoneCheckStatus("error");
       return;
     }
 
-    checkEmail(
-      { email: currentEmail },
+    checkPhoneNumber(
+      { phoneNumber: removePhoneNumberHyphens(currentPhoneNumber) },
       {
-        onSuccess: response => {
+        onSuccess: (response) => {
           // data: false = 중복 아님(사용 가능), data: true = 중복(사용 불가)
           if (response.data === false) {
-            setEmailCheckStatus("available");
+            setPhoneCheckStatus("available");
           } else {
-            setEmailCheckStatus("duplicate");
+            setPhoneCheckStatus("duplicate");
           }
         },
         onError: () => {
-          setEmailCheckStatus("error");
+          setPhoneCheckStatus("error");
         },
       },
     );
@@ -188,39 +199,41 @@ export function SignupForm() {
               />
             </div>
 
-            {/* 이메일 - FloatingLabelInput + 버튼 */}
+            {/* 전화번호 - FloatingLabelInput + 버튼 */}
             <div className="space-y-2">
               <div className="flex gap-2">
                 <div className="flex-1">
                   <FloatingLabelInput
-                    label="이메일"
-                    type="email"
-                    value={watch("email") || ""}
-                    onChange={(value) => setValue("email", value, { shouldValidate: true })}
-                    placeholder="example@email.com"
-                    hasError={!!errors.email}
-                    errorMessage={errors.email?.message}
-                    disabled={isPending || isCheckingEmail}
+                    label="전화번호"
+                    type="tel"
+                    value={watch("phoneNumber") || ""}
+                    onChange={handlePhoneNumberChange}
+                    placeholder="010-1234-5678"
+                    hasError={!!errors.phoneNumber}
+                    errorMessage={errors.phoneNumber?.message}
+                    disabled={isPending || isCheckingPhoneNumber}
                     required
                   />
                 </div>
                 <Button
                   type="button"
-                  onClick={handleEmailCheck}
-                  disabled={isPending || isCheckingEmail || !watch("email")}
+                  onClick={handlePhoneNumberCheck}
+                  disabled={
+                    isPending || isCheckingPhoneNumber || !watch("phoneNumber")
+                  }
                   className="shrink-0 self-start h-[58px] bg-pink-500 hover:bg-pink-600 text-white rounded-xl"
                 >
-                  {isCheckingEmail ? "확인 중..." : "중복확인"}
+                  {isCheckingPhoneNumber ? "확인 중..." : "중복확인"}
                 </Button>
               </div>
-              {emailCheckStatus === "available" && (
+              {phoneCheckStatus === "available" && (
                 <p className="text-sm text-teal-500">
-                  사용 가능한 이메일입니다.
+                  사용 가능한 전화번호입니다.
                 </p>
               )}
-              {emailCheckStatus === "duplicate" && (
+              {phoneCheckStatus === "duplicate" && (
                 <p className="text-sm text-red-500">
-                  이미 사용 중인 이메일입니다.
+                  이미 사용 중인 전화번호입니다.
                 </p>
               )}
             </div>
@@ -232,7 +245,7 @@ export function SignupForm() {
                 type="password"
                 value={watch("password") || ""}
                 onChange={(value) => setValue("password", value, { shouldValidate: true })}
-                placeholder="8~20자, 영문+숫자+특수문자 포함"
+                placeholder="영문 6자 이상"
                 hasError={!!errors.password}
                 errorMessage={errors.password?.message}
                 disabled={isPending}
@@ -253,23 +266,23 @@ export function SignupForm() {
                       isPasswordLengthValid ? "text-teal-500" : "text-gray-400",
                     )}
                   >
-                    8자 이상
+                    6자 이상
                   </span>
                 </div>
                 <div className="flex items-center gap-1">
                   <Check
                     className={cn(
                       "h-4 w-4",
-                      isPasswordComplexityValid ? "text-teal-500" : "text-gray-400",
+                      isPasswordHasEnglish ? "text-teal-500" : "text-gray-400",
                     )}
                   />
                   <span
                     className={cn(
                       "text-sm",
-                      isPasswordComplexityValid ? "text-teal-500" : "text-gray-400",
+                      isPasswordHasEnglish ? "text-teal-500" : "text-gray-400",
                     )}
                   >
-                    영문, 숫자, 특수문자 포함
+                    영문 포함
                   </span>
                 </div>
               </div>
@@ -294,19 +307,6 @@ export function SignupForm() {
               onChange={(value) => setValue("name", value, { shouldValidate: true })}
               hasError={!!errors.name}
               errorMessage={errors.name?.message}
-              disabled={isPending}
-              required
-            />
-
-            {/* 전화번호 */}
-            <FloatingLabelInput
-              label="전화번호"
-              type="tel"
-              value={watch("phoneNumber") || ""}
-              onChange={(value) => setValue("phoneNumber", value, { shouldValidate: true })}
-              placeholder="010-1234-5678"
-              hasError={!!errors.phoneNumber}
-              errorMessage={errors.phoneNumber?.message}
               disabled={isPending}
               required
             />
