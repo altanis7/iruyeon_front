@@ -32,6 +32,20 @@ import {
   PROFESSIONAL_JOB_SUBOPTIONS,
 } from "../constants/profileOptions";
 
+// 전화번호 하이픈 포매팅 유틸
+const formatPhoneNumber = (digits: string): string => {
+  const d = digits.replace(/\D/g, "").slice(0, 11);
+  if (d.startsWith("02")) {
+    if (d.length <= 2) return d;
+    if (d.length <= 5) return `${d.slice(0, 2)}-${d.slice(2)}`;
+    if (d.length <= 9) return `${d.slice(0, 2)}-${d.slice(2, 5)}-${d.slice(5)}`;
+    return `${d.slice(0, 2)}-${d.slice(2, 6)}-${d.slice(6)}`;
+  }
+  if (d.length <= 3) return d;
+  if (d.length <= 7) return `${d.slice(0, 3)}-${d.slice(3)}`;
+  return `${d.slice(0, 3)}-${d.slice(3, 7)}-${d.slice(7)}`;
+};
+
 interface ProfileCreateFormProps {
   mode?: "create" | "edit";
   defaultValues?: ProfileFormData;
@@ -87,6 +101,17 @@ export function ProfileCreateForm({
       family: [],
     },
   });
+
+  // 전화번호 표시용 상태 (하이픈 포함)
+  const [displayPhoneNumber, setDisplayPhoneNumber] = useState(
+    formatPhoneNumber(externalDefaults?.phoneNumber ?? ""),
+  );
+
+  // 수정 모드에서 외부 데이터 도착 시 동기화
+  useEffect(() => {
+    const raw = externalDefaults?.phoneNumber ?? "";
+    setDisplayPhoneNumber(formatPhoneNumber(raw));
+  }, [externalDefaults?.phoneNumber]);
 
   // 다이얼로그 상태
   const [birthYearDialogOpen, setBirthYearDialogOpen] = useState(false);
@@ -197,9 +222,13 @@ export function ProfileCreateForm({
           {/* 3. 전화번호 */}
           <FloatingLabelInput
             label="전화번호"
-            value={watch("phoneNumber")}
-            onChange={value => setValue("phoneNumber", value)}
-            placeholder="01012345678"
+            value={displayPhoneNumber}
+            onChange={value => {
+              const digits = value.replace(/\D/g, "").slice(0, 11);
+              setDisplayPhoneNumber(formatPhoneNumber(digits));
+              setValue("phoneNumber", digits);
+            }}
+            placeholder="010-1234-5678"
             type="tel"
             required
             hasError={!!errors.phoneNumber}
