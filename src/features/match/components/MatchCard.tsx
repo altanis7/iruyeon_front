@@ -225,9 +225,7 @@ export function MatchCard({
           <ClientProfileCard
             data={memberClientResponseDTO}
             onClick={() =>
-              navigate(
-                `/client/${memberClientResponseDTO.clientId}${variant === "matched" ? "?source=matched" : ""}`,
-              )
+              navigate(`/client/${memberClientResponseDTO.clientId}`)
             }
           />
 
@@ -278,9 +276,7 @@ export function MatchCard({
           <ClientProfileCard
             data={oppositeMemberClientDTO}
             onClick={() =>
-              navigate(
-                `/client/${oppositeMemberClientDTO.clientId}${variant === "matched" ? "?source=matched" : ""}`,
-              )
+              navigate(`/client/${oppositeMemberClientDTO.clientId}`)
             }
           />
         </div>
