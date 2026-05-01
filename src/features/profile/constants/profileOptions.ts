@@ -19,6 +19,14 @@ export const JOB_OPTIONS = [
   "기타",
 ] as const;
 
+// 전문직 하위 옵션
+export const PROFESSIONAL_JOB_SUBOPTIONS = [
+  "법조계 전문직",
+  "의료계 전문직",
+  "금융계 전문직",
+  "기술계 전문직",
+] as const;
+
 // 학력 수준 (기존 EDUCATION_TIERS 대체)
 export const EDUCATION_LEVELS = [
   "고졸",

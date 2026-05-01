@@ -29,7 +29,9 @@ export function convertFormDataToUpdateRequest(
     maritalStatus: formData.maritalStatus,
 
     // 선택 필드 (빈 문자열은 undefined로 변환)
-    imageIdList: formData.imageIdList?.length ? formData.imageIdList : undefined,
+    imageIdList: formData.imageIdList?.length
+      ? formData.imageIdList
+      : undefined,
     university: formData.university || undefined,
     highSchool: formData.highSchool || undefined,
     major: formData.major || undefined,
@@ -39,6 +41,7 @@ export function convertFormDataToUpdateRequest(
     hobby: formData.hobby || undefined,
     personality: formData.personality || undefined,
     idealType: formData.idealType || undefined,
+    lastNameOrigin: formData.lastNameOrigin || undefined,
     homeTown: formData.homeTown || undefined,
     info: formData.info || undefined,
     minPreferredAge: formData.minPreferredAge ?? undefined,

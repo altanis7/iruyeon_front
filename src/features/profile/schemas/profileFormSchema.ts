@@ -61,7 +61,8 @@ export const profileSchema = z.object({
   personality: z.string().optional(),
   idealType: z.string().optional(),
 
-  // 본가/기타
+  // 본적/본가/기타
+  lastNameOrigin: z.string().optional(),
   homeTown: z.string().optional(),
   info: z
     .string()
@@ -73,7 +74,10 @@ export const profileSchema = z.object({
   maxPreferredAge: z.number().optional(),
 
   // 만남 횟수
-  totalMeetingCnt: z.number().min(0, "만남 횟수는 0 이상이어야 합니다").optional(),
+  totalMeetingCnt: z
+    .number()
+    .min(0, "만남 횟수는 0 이상이어야 합니다")
+    .optional(),
 
   // 가족
   family: z.array(familyMemberSchema).optional(),

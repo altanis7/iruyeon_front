@@ -57,7 +57,8 @@ export interface Profile {
   personality?: string; // 성격 - 키워드 쉼표 연결
   idealType?: string; // 이상형 - 키워드 쉼표 연결
 
-  // 본가/기타
+  // 본적/본가/기타
+  lastNameOrigin?: string; // 본적
   homeTown?: string; // 본가 - hometown → homeTown
   info?: string; // 기타 특이사항 (최대 100자) - notes → info
 
@@ -271,6 +272,7 @@ export interface ClientDetail {
   jobDetail: string; // 직업 상세
   previousJob: string; // 이전 직업
   info: string; // 기타 특이사항
+  lastNameOrigin?: string; // 본적
   homeTown: string; // 본가
   gender: string; // 성별
   status: string; // 상태 (ACTIVE 등)
@@ -487,6 +489,7 @@ export interface UpdateClientRequest {
   hobby?: string;
   personality?: string;
   idealType?: string;
+  lastNameOrigin?: string;
   homeTown?: string;
   info?: string;
   minPreferredAge?: number;

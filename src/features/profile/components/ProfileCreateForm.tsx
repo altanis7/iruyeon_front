@@ -29,6 +29,7 @@ import {
   RELIGION_OPTIONS,
   MARITAL_STATUS_OPTIONS,
   PERSONALITY_KEYWORDS,
+  PROFESSIONAL_JOB_SUBOPTIONS,
 } from "../constants/profileOptions";
 
 interface ProfileCreateFormProps {
@@ -60,6 +61,7 @@ export function ProfileCreateForm({
     defaultValues: externalDefaults ?? {
       imageIdList: [],
       name: "",
+      lastNameOrigin: "",
       phoneNumber: "",
       gender: "",
       birthYear: undefined,
@@ -89,6 +91,7 @@ export function ProfileCreateForm({
   // 다이얼로그 상태
   const [birthYearDialogOpen, setBirthYearDialogOpen] = useState(false);
   const [jobDialogOpen, setJobDialogOpen] = useState(false);
+  const [jobSubDialogOpen, setJobSubDialogOpen] = useState(false);
   const [heightDialogOpen, setHeightDialogOpen] = useState(false);
   const [religionDialogOpen, setReligionDialogOpen] = useState(false);
   const [maritalStatusDialogOpen, setMaritalStatusDialogOpen] = useState(false);
@@ -160,237 +163,247 @@ export function ProfileCreateForm({
       <div className="flex-1 overflow-y-auto px-6">
         <form className="space-y-6 pb-4">
           {/* 1. 프로필 사진 */}
-        <div className="space-y-2">
-          <ProfilePhotoUploader
-            imageIds={imageIdList}
-            imageUrls={imageUrls}
-            onImagesChange={handleImagesChange}
+          <div className="space-y-2">
+            <ProfilePhotoUploader
+              imageIds={imageIdList}
+              imageUrls={imageUrls}
+              onImagesChange={handleImagesChange}
+            />
+            {errors.imageIdList && (
+              <p className="text-sm text-red-500">
+                {errors.imageIdList.message}
+              </p>
+            )}
+          </div>
+
+          {/* 2. 이름 */}
+          <FloatingLabelInput
+            label="이름"
+            value={watch("name")}
+            onChange={value => setValue("name", value)}
+            required
+            hasError={!!errors.name}
+            errorMessage={errors.name?.message}
           />
-          {errors.imageIdList && (
-            <p className="text-sm text-red-500">{errors.imageIdList.message}</p>
-          )}
-        </div>
 
-        {/* 2. 이름 */}
-        <FloatingLabelInput
-          label="이름"
-          value={watch("name")}
-          onChange={value => setValue("name", value)}
-          required
-          hasError={!!errors.name}
-          errorMessage={errors.name?.message}
-        />
+          {/* 본적 */}
+          <FloatingLabelInput
+            label="본적"
+            value={watch("lastNameOrigin") || ""}
+            onChange={value => setValue("lastNameOrigin", value)}
+            placeholder="예: 경주 김씨"
+          />
 
-        {/* 3. 전화번호 */}
-        <FloatingLabelInput
-          label="전화번호"
-          value={watch("phoneNumber")}
-          onChange={value => setValue("phoneNumber", value)}
-          placeholder="01012345678"
-          type="tel"
-          required
-          hasError={!!errors.phoneNumber}
-          errorMessage={errors.phoneNumber?.message}
-        />
+          {/* 3. 전화번호 */}
+          <FloatingLabelInput
+            label="전화번호"
+            value={watch("phoneNumber")}
+            onChange={value => setValue("phoneNumber", value)}
+            placeholder="01012345678"
+            type="tel"
+            required
+            hasError={!!errors.phoneNumber}
+            errorMessage={errors.phoneNumber?.message}
+          />
 
-        {/* 4. 성별 */}
-        <GenderToggle
-          value={gender}
-          onChange={value => setValue("gender", value)}
-          hasError={!!errors.gender}
-          errorMessage={errors.gender?.message}
-        />
+          {/* 4. 성별 */}
+          <GenderToggle
+            value={gender}
+            onChange={value => setValue("gender", value)}
+            hasError={!!errors.gender}
+            errorMessage={errors.gender?.message}
+          />
 
-        {/* 5. 출생년도 */}
-        <FloatingLabelSelect
-          label="출생년도"
-          value={birthYear}
-          displayValue={
-            birthYear
-              ? `${birthYear}년생 (만 ${new Date().getFullYear() - birthYear}세)`
-              : ""
-          }
-          onClick={() => setBirthYearDialogOpen(true)}
-          placeholder="출생년도를 선택하세요"
-          required
-          hasError={!!errors.birthYear}
-          errorMessage={errors.birthYear?.message}
-        />
+          {/* 5. 출생년도 */}
+          <FloatingLabelSelect
+            label="출생년도"
+            value={birthYear}
+            displayValue={
+              birthYear
+                ? `${birthYear}년생 (만 ${new Date().getFullYear() - birthYear}세)`
+                : ""
+            }
+            onClick={() => setBirthYearDialogOpen(true)}
+            placeholder="출생년도를 선택하세요"
+            required
+            hasError={!!errors.birthYear}
+            errorMessage={errors.birthYear?.message}
+          />
 
-        {/* 6. 직업 */}
-        <FloatingLabelSelect
-          label="직업"
-          value={job}
-          onClick={() => setJobDialogOpen(true)}
-          placeholder="직업을 선택하세요"
-          required
-          hasError={!!errors.job}
-          errorMessage={errors.job?.message}
-        />
+          {/* 6. 직업 */}
+          <FloatingLabelSelect
+            label="직업"
+            value={job}
+            onClick={() => setJobDialogOpen(true)}
+            placeholder="직업을 선택하세요"
+            required
+            hasError={!!errors.job}
+            errorMessage={errors.job?.message}
+          />
 
-        {/* 7. 직업 상세 */}
-        <FloatingLabelInput
-          label="직업 상세"
-          value={watch("jobDetail") || ""}
-          onChange={value => setValue("jobDetail", value)}
-          placeholder="예: 삼성전자"
-        />
+          {/* 7. 직업 상세 */}
+          <FloatingLabelInput
+            label="직업 상세"
+            value={watch("jobDetail") || ""}
+            onChange={value => setValue("jobDetail", value)}
+            placeholder="예: 삼성전자"
+          />
 
-        {/* 8. 이전 직업 */}
-        <FloatingLabelInput
-          label="이전 직업"
-          value={watch("previousJob") || ""}
-          onChange={value => setValue("previousJob", value)}
-          placeholder="예: LG전자"
-        />
+          {/* 8. 이전 직업 */}
+          <FloatingLabelInput
+            label="이전 직업"
+            value={watch("previousJob") || ""}
+            onChange={value => setValue("previousJob", value)}
+            placeholder="예: LG전자"
+          />
 
-        {/* 9. 학력 */}
-        <EducationSelect
-          value={eduLevel}
-          onChange={level => setValue("eduLevel", level)}
-          required
-          hasError={!!errors.eduLevel}
-          errorMessage={errors.eduLevel?.message}
-        />
+          {/* 9. 학력 */}
+          <EducationSelect
+            value={eduLevel}
+            onChange={level => setValue("eduLevel", level)}
+            required
+            hasError={!!errors.eduLevel}
+            errorMessage={errors.eduLevel?.message}
+          />
 
-        {/* 10. 대학교명 */}
-        <FloatingLabelInput
-          label="대학교명"
-          value={watch("university") || ""}
-          onChange={value => setValue("university", value)}
-          placeholder="예: 성균관대학교"
-        />
+          {/* 10. 대학교명 */}
+          <FloatingLabelInput
+            label="대학교명"
+            value={watch("university") || ""}
+            onChange={value => setValue("university", value)}
+            placeholder="예: 성균관대학교"
+          />
 
-        {/* 11. 고등학교 */}
-        <FloatingLabelInput
-          label="고등학교"
-          value={watch("highSchool") || ""}
-          onChange={value => setValue("highSchool", value)}
-          placeholder="예: 휘문고등학교"
-        />
+          {/* 11. 고등학교 */}
+          <FloatingLabelInput
+            label="고등학교"
+            value={watch("highSchool") || ""}
+            onChange={value => setValue("highSchool", value)}
+            placeholder="예: 휘문고등학교"
+          />
 
-        {/* 12. 전공 */}
-        <FloatingLabelInput
-          label="전공"
-          value={watch("major") || ""}
-          onChange={value => setValue("major", value)}
-          placeholder="예: 물리학과"
-        />
+          {/* 12. 전공 */}
+          <FloatingLabelInput
+            label="전공"
+            value={watch("major") || ""}
+            onChange={value => setValue("major", value)}
+            placeholder="예: 물리학과"
+          />
 
-        {/* 13. 키 */}
-        <FloatingLabelSelect
-          label="키"
-          value={height}
-          displayValue={height ? `${height}cm` : ""}
-          onClick={() => setHeightDialogOpen(true)}
-          placeholder="키를 입력하세요"
-          required
-          hasError={!!errors.height}
-          errorMessage={errors.height?.message}
-        />
+          {/* 13. 키 */}
+          <FloatingLabelSelect
+            label="키"
+            value={height}
+            displayValue={height ? `${height}cm` : ""}
+            onClick={() => setHeightDialogOpen(true)}
+            placeholder="키를 입력하세요"
+            required
+            hasError={!!errors.height}
+            errorMessage={errors.height?.message}
+          />
 
-        {/* 14. 거주지 */}
-        <FloatingLabelInput
-          label="거주지"
-          value={watch("address")}
-          onChange={value => setValue("address", value)}
-          placeholder="예: 서울특별시 마포구"
-          required
-          hasError={!!errors.address}
-          errorMessage={errors.address?.message}
-        />
+          {/* 14. 거주지 */}
+          <FloatingLabelInput
+            label="거주지"
+            value={watch("address")}
+            onChange={value => setValue("address", value)}
+            placeholder="예: 서울특별시 마포구"
+            required
+            hasError={!!errors.address}
+            errorMessage={errors.address?.message}
+          />
 
-        {/* 15. 재산 */}
-        <PropertyInput
-          value={watch("property") || ""}
-          onChange={value => setValue("property", value)}
-        />
+          {/* 15. 재산 */}
+          <PropertyInput
+            value={watch("property") || ""}
+            onChange={value => setValue("property", value)}
+          />
 
-        {/* 16. 종교 */}
-        <FloatingLabelSelect
-          label="종교"
-          value={religion}
-          onClick={() => setReligionDialogOpen(true)}
-          placeholder="종교를 선택하세요"
-          required
-          hasError={!!errors.religion}
-          errorMessage={errors.religion?.message}
-        />
+          {/* 16. 종교 */}
+          <FloatingLabelSelect
+            label="종교"
+            value={religion}
+            onClick={() => setReligionDialogOpen(true)}
+            placeholder="종교를 선택하세요"
+            required
+            hasError={!!errors.religion}
+            errorMessage={errors.religion?.message}
+          />
 
-        {/* 17. 취미 */}
-        <FloatingLabelInput
-          label="취미"
-          value={watch("hobby") || ""}
-          onChange={value => setValue("hobby", value)}
-          placeholder="예: 러닝, 헬스"
-        />
+          {/* 17. 취미 */}
+          <FloatingLabelInput
+            label="취미"
+            value={watch("hobby") || ""}
+            onChange={value => setValue("hobby", value)}
+            placeholder="예: 러닝, 헬스"
+          />
 
-        {/* 18. 성격 */}
-        <KeywordPickerSection
-          label="성격"
-          keywords={PERSONALITY_KEYWORDS}
-          selectedKeywords={personalityArray}
-          onSelectionChange={handlePersonalityChange}
-          maxSelection={3}
-          emptyText="아직 선택된 성격이 없습니다."
-          emptySubText="버튼을 눌러 성격을 선택해주세요."
-        />
+          {/* 18. 성격 */}
+          <KeywordPickerSection
+            label="성격"
+            keywords={PERSONALITY_KEYWORDS}
+            selectedKeywords={personalityArray}
+            onSelectionChange={handlePersonalityChange}
+            maxSelection={3}
+            emptyText="아직 선택된 성격이 없습니다."
+            emptySubText="버튼을 눌러 성격을 선택해주세요."
+          />
 
-        {/* 19. 이상형 */}
-        <KeywordPickerSection
-          label="이상형"
-          keywords={PERSONALITY_KEYWORDS}
-          selectedKeywords={idealTypeArray}
-          onSelectionChange={handleIdealTypeChange}
-          maxSelection={3}
-          emptyText="아직 선택된 이상형이 없습니다."
-          emptySubText="버튼을 눌러 이상형을 선택해주세요."
-        />
+          {/* 19. 이상형 */}
+          <KeywordPickerSection
+            label="이상형"
+            keywords={PERSONALITY_KEYWORDS}
+            selectedKeywords={idealTypeArray}
+            onSelectionChange={handleIdealTypeChange}
+            maxSelection={3}
+            emptyText="아직 선택된 이상형이 없습니다."
+            emptySubText="버튼을 눌러 이상형을 선택해주세요."
+          />
 
-        {/* 20. 원하는 상대 나이 */}
-        <AgeRangeInput
-          minAge={watch("minPreferredAge")}
-          maxAge={watch("maxPreferredAge")}
-          onMinChange={year => setValue("minPreferredAge", year)}
-          onMaxChange={year => setValue("maxPreferredAge", year)}
-        />
+          {/* 20. 원하는 상대 나이 */}
+          <AgeRangeInput
+            minAge={watch("minPreferredAge")}
+            maxAge={watch("maxPreferredAge")}
+            onMinChange={year => setValue("minPreferredAge", year)}
+            onMaxChange={year => setValue("maxPreferredAge", year)}
+          />
 
-        {/* 21. 혼인 여부 */}
-        <FloatingLabelSelect
-          label="혼인 여부"
-          value={maritalStatus}
-          onClick={() => setMaritalStatusDialogOpen(true)}
-          placeholder="혼인 여부를 선택하세요"
-          required
-          hasError={!!errors.maritalStatus}
-          errorMessage={errors.maritalStatus?.message}
-        />
+          {/* 21. 혼인 여부 */}
+          <FloatingLabelSelect
+            label="혼인 여부"
+            value={maritalStatus}
+            onClick={() => setMaritalStatusDialogOpen(true)}
+            placeholder="혼인 여부를 선택하세요"
+            required
+            hasError={!!errors.maritalStatus}
+            errorMessage={errors.maritalStatus?.message}
+          />
 
-        {/* 22. 본가 */}
-        <FloatingLabelInput
-          label="본가"
-          value={watch("homeTown") || ""}
-          onChange={value => setValue("homeTown", value)}
-          placeholder="예: 서울"
-        />
+          {/* 22. 본가 */}
+          <FloatingLabelInput
+            label="본가"
+            value={watch("homeTown") || ""}
+            onChange={value => setValue("homeTown", value)}
+            placeholder="예: 서울"
+          />
 
-        {/* 23. 기타 특이사항 */}
-        <FloatingLabelTextarea
-          label="기타 특이사항"
-          value={watch("info") || ""}
-          onChange={value => setValue("info", value)}
-          placeholder="기타 특이사항을 입력하세요"
-          maxLength={100}
-          rows={4}
-          hasError={!!errors.info}
-          errorMessage={errors.info?.message}
-        />
+          {/* 23. 기타 특이사항 */}
+          <FloatingLabelTextarea
+            label="기타 특이사항"
+            value={watch("info") || ""}
+            onChange={value => setValue("info", value)}
+            placeholder="기타 특이사항을 입력하세요"
+            maxLength={100}
+            rows={4}
+            hasError={!!errors.info}
+            errorMessage={errors.info?.message}
+          />
 
-        {/* 24. 가족 정보 */}
-        <FamilyMembersSection
-          familyMembers={family || []}
-          onFamilyMembersChange={members => setValue("family", members)}
-        />
+          {/* 24. 가족 정보 */}
+          <FamilyMembersSection
+            familyMembers={family || []}
+            onFamilyMembersChange={members => setValue("family", members)}
+          />
         </form>
       </div>
 
@@ -430,7 +443,31 @@ export function ProfileCreateForm({
         onOpenChange={setJobDialogOpen}
         title="직업 선택"
         options={JOB_OPTIONS}
-        selectedValue={job || ""}
+        selectedValue={
+          PROFESSIONAL_JOB_SUBOPTIONS.includes(job as never)
+            ? "전문직"
+            : job || ""
+        }
+        onConfirm={value => {
+          if (value === "전문직") {
+            setJobDialogOpen(false);
+            setJobSubDialogOpen(true);
+          } else {
+            setValue("job", value);
+          }
+        }}
+      />
+
+      <ProfilePickerDialog
+        open={jobSubDialogOpen}
+        onOpenChange={setJobSubDialogOpen}
+        title="전문직 종류 선택"
+        options={PROFESSIONAL_JOB_SUBOPTIONS}
+        selectedValue={
+          PROFESSIONAL_JOB_SUBOPTIONS.includes(job as never)
+            ? job
+            : PROFESSIONAL_JOB_SUBOPTIONS[0]
+        }
         onConfirm={value => setValue("job", value)}
       />
 

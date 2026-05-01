@@ -2,7 +2,12 @@
  * ClientDetail -> ProfileFormData 변환 유틸리티
  * 상세 조회 API 응답을 폼 데이터로 변환
  */
-import type { ClientDetail, ClientInfoDetail, ClientInfoFamilyMember, ClientFamilyMember } from "../api/profileApi";
+import type {
+  ClientDetail,
+  ClientInfoDetail,
+  ClientInfoFamilyMember,
+  ClientFamilyMember,
+} from "../api/profileApi";
 import type { ProfileFormData } from "../schemas/profileFormSchema";
 
 /**
@@ -30,7 +35,9 @@ export function parseBirthYearFromAge(age: string): number {
 /**
  * ClientDetail API 응답을 ProfileFormData로 변환
  */
-export function clientDetailToFormData(client: ClientDetail | ClientInfoDetail): ProfileFormData {
+export function clientDetailToFormData(
+  client: ClientDetail | ClientInfoDetail,
+): ProfileFormData {
   return {
     // 필수 필드
     name: client.name,
@@ -55,6 +62,7 @@ export function clientDetailToFormData(client: ClientDetail | ClientInfoDetail):
     hobby: client.hobby || undefined,
     personality: client.personality || undefined,
     idealType: client.idealType || undefined,
+    lastNameOrigin: client.lastNameOrigin || undefined,
     homeTown: client.homeTown || undefined,
     info: client.info || undefined,
     minPreferredAge: client.minPreferredAge || undefined,
@@ -62,22 +70,23 @@ export function clientDetailToFormData(client: ClientDetail | ClientInfoDetail):
     totalMeetingCnt: undefined, // ClientDetail에 없음
 
     // 가족 정보: ClientFamilyMember[] -> FamilyMember[]
-    family: client.families?.map(f => {
-      const isInfoFamily = "age" in f;
-      return {
-        name: f.name,
-        relationship: f.relationship,
-        job: f.job ?? undefined,
-        birthYear: isInfoFamily
-          ? parseBirthYearFromAge((f as ClientInfoFamilyMember).age)
-          : (f as ClientFamilyMember).birthYear,
-        religion: f.religion,
-        jobDetail: f.jobDetail || undefined,
-        address: f.address || undefined,
-        university: f.university || undefined,
-        property: f.property || undefined,
-        info: f.info ?? undefined,
-      };
-    }) ?? [],
+    family:
+      client.families?.map(f => {
+        const isInfoFamily = "age" in f;
+        return {
+          name: f.name,
+          relationship: f.relationship,
+          job: f.job ?? undefined,
+          birthYear: isInfoFamily
+            ? parseBirthYearFromAge((f as ClientInfoFamilyMember).age)
+            : (f as ClientFamilyMember).birthYear,
+          religion: f.religion,
+          jobDetail: f.jobDetail || undefined,
+          address: f.address || undefined,
+          university: f.university || undefined,
+          property: f.property || undefined,
+          info: f.info ?? undefined,
+        };
+      }) ?? [],
   };
 }
