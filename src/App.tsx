@@ -17,15 +17,25 @@ import { ReviewListPage } from "@/pages/ReviewListPage";
 import { AllManagersPage } from "@/pages/admin/AllManagersPage";
 import { PendingManagersPage } from "@/pages/admin/PendingManagersPage";
 import { AdminLayout } from "@/features/admin/components/AdminLayout";
-import { Routes, Route, Navigate, useParams, Outlet } from "react-router-dom";
+import {
+  Routes,
+  Route,
+  Navigate,
+  useParams,
+  Outlet,
+  useLocation,
+} from "react-router-dom";
 import RootLayout from "@/shared/components/layouts/RootLayout";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useAuth } from "@/features/auth/hooks/useAuth";
+import type { CurrentUser } from "@/features/auth/hooks/useAuth";
+import { getCookie } from "@/lib/api/client";
 import { useEffect, useState, useCallback } from "react";
 import { onMessage } from "firebase/messaging";
 import { toast } from "sonner";
 import { getMessagingInstance } from "@/lib/firebase";
 import { SplashScreen } from "@/shared/components/SplashScreen";
+import { PrivacyDisclaimerPopup } from "@/features/auth/components/PrivacyDisclaimerPopup";
 
 // 보호된 라우트 컴포넌트
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -75,6 +85,21 @@ function ProfileRedirect() {
   return <Navigate to={`/client/${id}`} replace />;
 }
 
+function PrivacyDisclaimerController() {
+  useLocation();
+
+  const isAuthenticated = !!getCookie("access_token");
+  const currentUser = (() => {
+    const stored = getCookie("current_user");
+    return stored ? (JSON.parse(stored) as CurrentUser) : null;
+  })();
+
+  const isMember = isAuthenticated && currentUser?.role === "ROLE_MEMBER";
+  return (
+    <PrivacyDisclaimerPopup enabled={isMember} userId={currentUser?.id ?? ""} />
+  );
+}
+
 function ForegroundMessageListener() {
   useEffect(() => {
     const messaging = getMessagingInstance();
@@ -106,6 +131,7 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <ForegroundMessageListener />
+      <PrivacyDisclaimerController />
       <Routes>
         {/* 관리자 페이지 - RootLayout 외부 (전체 너비) */}
         <Route
