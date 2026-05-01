@@ -5,6 +5,7 @@ import { MainLayout } from "@/shared/components/layouts/MainLayout";
 import { SettingMenuList } from "@/features/setting/components/SettingMenuList";
 import { useMyInfo } from "@/features/member/hooks/useMyInfo";
 import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useDeleteMember } from "@/features/member/hooks/useDeleteMember";
 import { Button } from "@/shared/components/ui/button";
 import { ConfirmDialog } from "@/features/profile/components/ConfirmDialog";
 
@@ -12,8 +13,12 @@ export function SettingPage() {
   const navigate = useNavigate();
   const { currentUser, logout } = useAuth();
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+  const [showWithdrawalDialog, setShowWithdrawalDialog] = useState(false);
+  const [showWithdrawalSuccessDialog, setShowWithdrawalSuccessDialog] =
+    useState(false);
   const memberId = currentUser?.id ?? "";
   const { data, isLoading } = useMyInfo(memberId);
+  const { mutate: deleteMember, isPending: isDeleting } = useDeleteMember();
 
   const memberData = data?.data;
 
@@ -97,6 +102,17 @@ export function SettingPage() {
               로그아웃
             </Button>
           </div>
+
+          {/* 회원 탈퇴 */}
+          <div className="px-4 mt-3 mb-4 flex justify-center">
+            <button
+              type="button"
+              onClick={() => setShowWithdrawalDialog(true)}
+              className="text-sm text-gray-400 underline underline-offset-2 hover:text-gray-600 transition-colors"
+            >
+              회원 탈퇴
+            </button>
+          </div>
         </div>
       </div>
 
@@ -109,6 +125,35 @@ export function SettingPage() {
         cancelText="닫기"
         onConfirm={logout}
         variant="destructive"
+      />
+
+      <ConfirmDialog
+        open={showWithdrawalDialog}
+        onOpenChange={setShowWithdrawalDialog}
+        title="회원 탈퇴"
+        description="정말로 탈퇴하시겠습니까? 모든 데이터가 삭제되며 복구할 수 없습니다."
+        confirmText="탈퇴하기"
+        cancelText="취소"
+        isLoading={isDeleting}
+        onConfirm={() => {
+          deleteMember(undefined, {
+            onSuccess: () => {
+              setShowWithdrawalDialog(false);
+              setShowWithdrawalSuccessDialog(true);
+            },
+          });
+        }}
+        variant="destructive"
+      />
+
+      <ConfirmDialog
+        open={showWithdrawalSuccessDialog}
+        onOpenChange={() => {}}
+        title="탈퇴 완료"
+        description="탈퇴가 완료되었습니다."
+        confirmText="확인"
+        cancelText=""
+        onConfirm={logout}
       />
     </MainLayout>
   );

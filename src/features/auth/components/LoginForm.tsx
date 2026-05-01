@@ -46,13 +46,7 @@ export function LoginForm({
 
         // 승인 대기 상태 (ROLE_ANONYMOUS)
         if (role === "ROLE_ANONYMOUS" && status === "PENDING") {
-          toast.warning(
-            <>
-              가입 승인 대기 중입니다.
-              <br />
-              관리자 승인 후 로그인이 가능합니다.
-            </>,
-          );
+          login(token, { id: String(id), role, status }, autoLogin);
           return;
         }
 

@@ -1,6 +1,7 @@
 import { LoginForm } from "@/features/auth/components/LoginForm";
 import { SignupPage } from "@/pages/SignupPage";
 import OAuthSuccessPage from "@/pages/auth/OAuthSuccessPage";
+import ApprovalPendingPage from "@/pages/auth/ApprovalPendingPage";
 import { HomePage } from "@/pages/HomePage";
 import { MatchPage } from "@/pages/MatchPage";
 import { SettingPage } from "@/pages/SettingPage";
@@ -28,14 +29,29 @@ import { SplashScreen } from "@/shared/components/SplashScreen";
 
 // 보호된 라우트 컴포넌트
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated } = useAuth();
-  return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />;
+  const { isAuthenticated, currentUser } = useAuth();
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  if (currentUser?.role === "ROLE_ANONYMOUS")
+    return <Navigate to="/pending" replace />;
+  return <>{children}</>;
 }
 
 // 인증된 사용자용 라우트 컴포넌트 (로그인 페이지 접근 방지)
 function AuthRoute({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated } = useAuth();
-  return !isAuthenticated ? <>{children}</> : <Navigate to="/" replace />;
+  const { isAuthenticated, currentUser } = useAuth();
+  if (!isAuthenticated) return <>{children}</>;
+  if (currentUser?.role === "ROLE_ANONYMOUS")
+    return <Navigate to="/pending" replace />;
+  return <Navigate to="/" replace />;
+}
+
+// 승인 대기 사용자 전용 라우트 컴포넌트
+function PendingRoute({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated, currentUser } = useAuth();
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  if (currentUser?.role !== "ROLE_ANONYMOUS")
+    return <Navigate to="/" replace />;
+  return <>{children}</>;
 }
 
 // 관리자 전용 라우트 컴포넌트
@@ -130,6 +146,22 @@ const App = () => {
             }
           />
           <Route path="/oauth/success" element={<OAuthSuccessPage />} />
+          <Route
+            path="/pending"
+            element={
+              <PendingRoute>
+                <ApprovalPendingPage />
+              </PendingRoute>
+            }
+          />
+          <Route
+            path="/pending/edit"
+            element={
+              <PendingRoute>
+                <SettingProfileEditPage />
+              </PendingRoute>
+            }
+          />
 
           {/* 인증 후 페이지 */}
           <Route

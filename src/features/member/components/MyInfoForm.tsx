@@ -156,12 +156,7 @@ export function MyInfoForm() {
       requestData.imageId = changedImageId;
     }
 
-    try {
-      await updateMyInfo({ memberId, data: requestData });
-      alert("정보가 수정되었습니다.");
-    } catch {
-      alert("정보 수정에 실패했습니다.");
-    }
+    await updateMyInfo({ memberId, data: requestData });
   };
 
   if (isLoading) {

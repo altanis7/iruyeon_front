@@ -55,19 +55,21 @@ export function ConfirmDialog({
               "w-full h-12 rounded-full text-base font-semibold",
               variant === "destructive"
                 ? "bg-destructive hover:bg-destructive/90 text-white"
-                : "bg-pink-500 hover:bg-pink-600 text-white"
+                : "bg-pink-500 hover:bg-pink-600 text-white",
             )}
           >
             {isLoading ? "처리 중..." : confirmText}
           </Button>
-          <button
-            type="button"
-            onClick={() => onOpenChange(false)}
-            disabled={isLoading}
-            className="w-full h-10 text-sm text-gray-500 hover:text-gray-700 transition-colors disabled:opacity-50"
-          >
-            {cancelText}
-          </button>
+          {cancelText && (
+            <button
+              type="button"
+              onClick={() => onOpenChange(false)}
+              disabled={isLoading}
+              className="w-full h-10 text-sm text-gray-500 hover:text-gray-700 transition-colors disabled:opacity-50"
+            >
+              {cancelText}
+            </button>
+          )}
         </BottomSheetFooter>
       </BottomSheetContent>
     </BottomSheet>

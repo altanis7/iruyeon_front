@@ -27,10 +27,7 @@ export default function OAuthSuccessPage() {
     }
 
     if (role === "ROLE_ANONYMOUS" && status === "PENDING") {
-      toast.warning(
-        "가입 승인 대기 중입니다. 관리자 승인 후 로그인이 가능합니다.",
-      );
-      navigate("/login", { replace: true });
+      login(token, { id, role, status });
       return;
     }
 

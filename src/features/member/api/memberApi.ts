@@ -63,3 +63,8 @@ export async function updateMember(
   );
   return response.data;
 }
+
+export async function deleteMemberAPI(): Promise<ApiResponse> {
+  const response = await apiClient.delete<ApiResponse>("/member");
+  return response.data;
+}

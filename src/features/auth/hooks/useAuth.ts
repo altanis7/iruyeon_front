@@ -1,10 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useCallback, useState } from "react";
-import {
-  getCookie,
-  setCookie,
-  removeCookie,
-} from "@/lib/api/client";
+import { getCookie, setCookie, removeCookie } from "@/lib/api/client";
 import type { UserRole, UserStatus } from "@/features/auth/api/authApi";
 
 export interface CurrentUser {
@@ -48,7 +44,11 @@ export function useAuth() {
       setAutoLoginSetting(autoLogin);
       setIsAuthenticated(true);
       setCurrentUser(user);
-      navigate("/");
+      if (user.role === "ROLE_ANONYMOUS") {
+        navigate("/pending");
+      } else {
+        navigate("/");
+      }
     },
     [navigate],
   );
