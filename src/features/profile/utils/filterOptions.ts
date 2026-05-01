@@ -28,18 +28,38 @@ export const FILTER_LABELS: Record<FilterCategory, string> = {
   keyword: "키워드",
 };
 
-export const FILTER_OPTIONS: Partial<Record<FilterCategory, readonly string[]>> = {
-  job: ["대기업", "중견기업", "중소기업", "공기업/기관", "교육", "전문직", "프리랜서", "자영업자", "기타"],
+export const PROFESSIONAL_SUB_OPTIONS = [
+  "법조계 전문직",
+  "의료계 전문직",
+  "금융계 전문직",
+  "기술계 전문직",
+] as const;
+
+export const FILTER_OPTIONS: Partial<
+  Record<FilterCategory, readonly string[]>
+> = {
+  job: [
+    "대기업",
+    "중견기업",
+    "중소기업",
+    "공기업/기관",
+    "교육",
+    "전문직",
+    "프리랜서",
+    "자영업자",
+    "기타",
+  ],
   religion: ["기독교", "불교", "천주교", "무교", "기타"],
   gender: ["여자", "남자"],
-  eduLevel: ["학사", "전문학사", "석사", "박사", "고졸"],
+  eduLevel: ["박사", "석사", "학사", "전문학사", "고졸"],
   universities: [
     "서울대/연세대/고려대/카이스트",
     "서강대/성균관대/한양대/이화여대",
     "중앙대/경희대/외대/시립대",
     "인서울",
+    "지방대",
+    "전문대",
     "해외대",
-    "그 외",
   ],
   maritalStatus: ["초혼", "재혼"],
 };
@@ -79,7 +99,8 @@ export function getFilterSummaryText(
     case "birthYear": {
       const minBY = filters.minBirthYear ?? BIRTH_YEAR_MIN;
       const maxBY = filters.maxBirthYear ?? BIRTH_YEAR_MAX;
-      if (minBY === BIRTH_YEAR_MIN && maxBY === BIRTH_YEAR_MAX) return "모든 출생년도";
+      if (minBY === BIRTH_YEAR_MIN && maxBY === BIRTH_YEAR_MAX)
+        return "모든 출생년도";
       const currentYear = new Date().getFullYear();
       return `${currentYear - minBY}세(${minBY}년생) 이상 ~ ${currentYear - maxBY}세(${maxBY}년생) 이하`;
     }
@@ -94,15 +115,23 @@ export function getFilterSummaryText(
     case "job":
       return filters.job?.length ? filters.job.join(", ") : "모든 직업";
     case "religion":
-      return filters.religion?.length ? filters.religion.join(", ") : "모든 종교";
+      return filters.religion?.length
+        ? filters.religion.join(", ")
+        : "모든 종교";
     case "gender":
       return filters.gender?.length ? filters.gender.join(", ") : "모든 성별";
     case "eduLevel":
-      return filters.eduLevel?.length ? filters.eduLevel.join(", ") : "모든 학력";
+      return filters.eduLevel?.length
+        ? filters.eduLevel.join(", ")
+        : "모든 학력";
     case "universities":
-      return filters.universities?.length ? filters.universities.join(", ") : "모든 대학교";
+      return filters.universities?.length
+        ? filters.universities.join(", ")
+        : "모든 대학교";
     case "maritalStatus":
-      return filters.maritalStatus?.length ? filters.maritalStatus.join(", ") : "모든 결혼 여부";
+      return filters.maritalStatus?.length
+        ? filters.maritalStatus.join(", ")
+        : "모든 결혼 여부";
     default:
       return "";
   }
@@ -139,7 +168,11 @@ export function resetCategoryFilter(
 ): FilterSearchParams {
   switch (category) {
     case "birthYear":
-      return { ...filters, minBirthYear: BIRTH_YEAR_MIN, maxBirthYear: BIRTH_YEAR_MAX };
+      return {
+        ...filters,
+        minBirthYear: BIRTH_YEAR_MIN,
+        maxBirthYear: BIRTH_YEAR_MAX,
+      };
     case "height":
       return { ...filters, minHeight: HEIGHT_MIN, maxHeight: HEIGHT_MAX };
     case "keyword":

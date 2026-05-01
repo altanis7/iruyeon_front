@@ -15,6 +15,7 @@ import {
   BIRTH_YEAR_MAX,
   HEIGHT_MIN,
   HEIGHT_MAX,
+  PROFESSIONAL_SUB_OPTIONS,
   getFilterSummaryText,
   resetCategoryFilter,
 } from "@/features/profile/utils/filterOptions";
@@ -27,7 +28,9 @@ interface FilterPanelProps {
 }
 
 // FilterCategory → FilterSearchParams 배열 필드 매핑
-const categoryToField: Partial<Record<FilterCategory, keyof FilterSearchParams>> = {
+const categoryToField: Partial<
+  Record<FilterCategory, keyof FilterSearchParams>
+> = {
   job: "job",
   religion: "religion",
   gender: "gender",
@@ -43,13 +46,19 @@ export function FilterPanel({
   onSearch,
 }: FilterPanelProps) {
   const [draft, setDraft] = useState<FilterSearchParams>(initialFilters);
-  const [selectedCategory, setSelectedCategory] = useState<FilterCategory | null>(null);
+  const [selectedCategory, setSelectedCategory] =
+    useState<FilterCategory | null>(null);
+  const [showProfessionalSub, setShowProfessionalSub] = useState(false);
+  const [draftSnapshot, setDraftSnapshot] = useState<FilterSearchParams | null>(
+    null,
+  );
 
-  // 패널 열릴 때마다 draft 초기화 (hook order 유지를 위해 early return 전에 위치)
   useEffect(() => {
     if (open) {
       setDraft(initialFilters);
       setSelectedCategory(null);
+      setShowProfessionalSub(false);
+      setDraftSnapshot(null);
     }
   }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -65,10 +74,6 @@ export function FilterPanel({
 
   const handleResetCategory = (category: FilterCategory) => {
     setDraft(prev => resetCategoryFilter(category, prev));
-  };
-
-  const handleBack = () => {
-    setSelectedCategory(null);
   };
 
   const toggleArrayField = (field: keyof FilterSearchParams, value: string) => {
@@ -88,16 +93,125 @@ export function FilterPanel({
     );
   };
 
-  // ─── 2단계: 상세 선택 뷰 ───────────────────────────────────────────
-  if (selectedCategory) {
-    const field = categoryToField[selectedCategory];
-    const selectedValues = field ? ((draft[field] as string[]) ?? []) : [];
+  // Level 1 → Level 2 진입
+  const handleSelectCategory = (category: FilterCategory) => {
+    setDraftSnapshot({ ...draft });
+    setSelectedCategory(category);
+    setShowProfessionalSub(false);
+  };
+
+  // Level 2 뒤로가기 (취소)
+  const handleBackFromLevel2 = () => {
+    if (draftSnapshot) setDraft(draftSnapshot);
+    setSelectedCategory(null);
+    setShowProfessionalSub(false);
+  };
+
+  // Level 2 선택 버튼 (확정)
+  const handleConfirmLevel2 = () => {
+    setSelectedCategory(null);
+    setShowProfessionalSub(false);
+  };
+
+  // Level 2 → Level 3 진입 (전문직 클릭)
+  const handleEnterProfessionalSub = () => {
+    setDraftSnapshot({ ...draft });
+    setShowProfessionalSub(true);
+  };
+
+  // Level 3 뒤로가기 (취소)
+  const handleBackFromLevel3 = () => {
+    if (draftSnapshot) setDraft(draftSnapshot);
+    setShowProfessionalSub(false);
+  };
+
+  // Level 3 선택 버튼 (확정)
+  const handleConfirmLevel3 = () => {
+    setShowProfessionalSub(false);
+    setSelectedCategory(null);
+  };
+
+  // ─── Level 3: 전문직 세부 선택 뷰 ──────────────────────────────────
+  if (selectedCategory === "job" && showProfessionalSub) {
+    const selectedJobs = (draft.job as string[]) ?? [];
 
     return (
       <div className="fixed inset-y-0 left-1/2 -translate-x-1/2 w-full max-w-md z-[60] bg-white flex flex-col">
-        {/* 헤더 */}
         <div className="flex items-center justify-between px-4 h-14 border-b shrink-0">
-          <button onClick={handleBack} className="p-1 -ml-1">
+          <button onClick={handleBackFromLevel3} className="p-1 -ml-1">
+            <ArrowLeft className="h-5 w-5" />
+          </button>
+          <span className="font-semibold text-base">전문직</span>
+          <button
+            onClick={() => handleResetCategory("job")}
+            className="text-sm text-gray-500 active:text-rose-500"
+          >
+            삭제
+          </button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto">
+          <ul>
+            {PROFESSIONAL_SUB_OPTIONS.map(option => {
+              const isSelected = selectedJobs.includes(option);
+              return (
+                <li key={option}>
+                  <button
+                    className="w-full flex items-center justify-between px-4 py-4 border-b text-left active:bg-gray-50"
+                    onClick={() => toggleArrayField("job", option)}
+                  >
+                    <div>
+                      <span
+                        className={cn(
+                          "text-sm",
+                          isSelected && "text-rose-500 font-medium",
+                        )}
+                      >
+                        {option}
+                      </span>
+                      <span className="block text-xs text-gray-400 mt-0.5">
+                        {option === "법조계 전문직" &&
+                          "판사, 검사, 변호사, 변리사"}
+                        {option === "의료계 전문직" && "의사, 약사"}
+                        {option === "금융계 전문직" && "회계사, 세무사"}
+                        {option === "기술계 전문직" && "건축사, 기술사"}
+                      </span>
+                    </div>
+                    {isSelected && (
+                      <Check className="h-4 w-4 text-rose-500 shrink-0" />
+                    )}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+
+        <div className="px-4 py-4 border-t shrink-0">
+          <Button
+            className="w-full h-12 bg-rose-500 hover:bg-rose-600 text-white rounded-full text-base font-semibold"
+            onClick={handleConfirmLevel3}
+          >
+            선택
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // ─── Level 2: 상세 선택 뷰 ──────────────────────────────────────────
+  if (selectedCategory) {
+    const field = categoryToField[selectedCategory];
+    const selectedValues = field ? ((draft[field] as string[]) ?? []) : [];
+    const selectedJobs = (draft.job as string[]) ?? [];
+    const hasProfessionalSub = PROFESSIONAL_SUB_OPTIONS.some(opt =>
+      selectedJobs.includes(opt),
+    );
+
+    return (
+      <div className="fixed inset-y-0 left-1/2 -translate-x-1/2 w-full max-w-md z-[60] bg-white flex flex-col">
+        <div className="flex items-center justify-between px-4 h-14 border-b shrink-0">
+          <button onClick={handleBackFromLevel2} className="p-1 -ml-1">
             <ArrowLeft className="h-5 w-5" />
           </button>
           <span className="font-semibold text-base">
@@ -111,18 +225,23 @@ export function FilterPanel({
           </button>
         </div>
 
-        {/* 콘텐츠 */}
         <div className="flex-1 overflow-y-auto">
           {/* 출생년도 범위 슬라이더 */}
           {selectedCategory === "birthYear" && (
             <div className="px-4 py-6">
-              <p className="text-sm text-gray-500 mb-4">원하는 상대방 출생년도 범위를 선택하세요</p>
+              <p className="text-sm text-gray-500 mb-4">
+                원하는 상대방 출생년도 범위를 선택하세요
+              </p>
               <div className="flex justify-between items-center mb-6">
                 <span className="text-sm text-rose-500 font-medium">
-                  {new Date().getFullYear() - (draft.minBirthYear ?? BIRTH_YEAR_MIN)}세({draft.minBirthYear ?? BIRTH_YEAR_MIN}년생) 이상
+                  {new Date().getFullYear() -
+                    (draft.minBirthYear ?? BIRTH_YEAR_MIN)}
+                  세({draft.minBirthYear ?? BIRTH_YEAR_MIN}년생) 이상
                 </span>
                 <span className="text-sm text-rose-500 font-medium">
-                  {new Date().getFullYear() - (draft.maxBirthYear ?? BIRTH_YEAR_MAX)}세({draft.maxBirthYear ?? BIRTH_YEAR_MAX}년생) 이하
+                  {new Date().getFullYear() -
+                    (draft.maxBirthYear ?? BIRTH_YEAR_MAX)}
+                  세({draft.maxBirthYear ?? BIRTH_YEAR_MAX}년생) 이하
                 </span>
               </div>
               <DualRangeSlider
@@ -131,8 +250,12 @@ export function FilterPanel({
                 step={1}
                 minValue={draft.minBirthYear ?? BIRTH_YEAR_MIN}
                 maxValue={draft.maxBirthYear ?? BIRTH_YEAR_MAX}
-                onMinChange={v => setDraft(prev => ({ ...prev, minBirthYear: v }))}
-                onMaxChange={v => setDraft(prev => ({ ...prev, maxBirthYear: v }))}
+                onMinChange={v =>
+                  setDraft(prev => ({ ...prev, minBirthYear: v }))
+                }
+                onMaxChange={v =>
+                  setDraft(prev => ({ ...prev, maxBirthYear: v }))
+                }
                 unit="년"
               />
             </div>
@@ -141,7 +264,9 @@ export function FilterPanel({
           {/* 키 범위 슬라이더 */}
           {selectedCategory === "height" && (
             <div className="px-4 py-6">
-              <p className="text-sm text-gray-500 mb-4">원하는 상대방 키 범위를 선택하세요</p>
+              <p className="text-sm text-gray-500 mb-4">
+                원하는 상대방 키 범위를 선택하세요
+              </p>
               <div className="flex justify-between items-center mb-6">
                 <span className="text-sm text-rose-500 font-medium">
                   {draft.minHeight ?? HEIGHT_MIN}cm 이상
@@ -180,6 +305,28 @@ export function FilterPanel({
           {field && (
             <ul>
               {(FILTER_OPTIONS[selectedCategory] ?? []).map(option => {
+                // 직업 카테고리에서 '전문직'은 네비게이션 아이템으로 처리
+                if (selectedCategory === "job" && option === "전문직") {
+                  return (
+                    <li key={option}>
+                      <button
+                        className="w-full flex items-center justify-between px-4 py-4 border-b text-left active:bg-gray-50"
+                        onClick={handleEnterProfessionalSub}
+                      >
+                        <span
+                          className={cn(
+                            "text-sm",
+                            hasProfessionalSub && "text-rose-500 font-medium",
+                          )}
+                        >
+                          전문직
+                        </span>
+                        <ChevronRight className="h-4 w-4 text-gray-400 shrink-0" />
+                      </button>
+                    </li>
+                  );
+                }
+
                 const isSelected = selectedValues.includes(option);
                 return (
                   <li key={option}>
@@ -206,23 +353,21 @@ export function FilterPanel({
           )}
         </div>
 
-        {/* 결과 보기 버튼 */}
         <div className="px-4 py-4 border-t shrink-0">
           <Button
             className="w-full h-12 bg-rose-500 hover:bg-rose-600 text-white rounded-full text-base font-semibold"
-            onClick={handleSearch}
+            onClick={handleConfirmLevel2}
           >
-            결과 보기
+            선택
           </Button>
         </div>
       </div>
     );
   }
 
-  // ─── 1단계: 필터 목록 뷰 ──────────────────────────────────────────
+  // ─── Level 1: 필터 목록 뷰 ────────────────────────────────────────
   return (
     <div className="fixed inset-y-0 left-1/2 -translate-x-1/2 w-full max-w-md z-[60] bg-white flex flex-col">
-      {/* 헤더 */}
       <div className="flex items-center justify-between px-4 h-14 border-b shrink-0">
         <button
           onClick={onClose}
@@ -239,7 +384,6 @@ export function FilterPanel({
         </button>
       </div>
 
-      {/* 필터 목록 */}
       <div className="flex-1 overflow-y-auto">
         <ul>
           {FILTER_CATEGORY_ORDER.map(category => {
@@ -249,7 +393,7 @@ export function FilterPanel({
               <li key={category}>
                 <button
                   className="w-full flex items-center justify-between px-4 py-4 border-b text-left active:bg-gray-50"
-                  onClick={() => setSelectedCategory(category)}
+                  onClick={() => handleSelectCategory(category)}
                 >
                   <div className="flex-1 min-w-0">
                     <div className="text-sm font-semibold">
@@ -272,7 +416,6 @@ export function FilterPanel({
         </ul>
       </div>
 
-      {/* 결과 보기 버튼 */}
       <div className="px-4 py-4 border-t shrink-0">
         <Button
           className="w-full h-12 bg-rose-500 hover:bg-rose-600 text-white rounded-full text-base font-semibold"
