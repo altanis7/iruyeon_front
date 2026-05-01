@@ -6,19 +6,13 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Check } from "lucide-react";
 
 import { Button } from "@/shared/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/shared/components/ui/dialog";
 import { useSignup } from "@/features/auth/hooks/useSignup";
 import { useCheckPhoneNumber } from "@/features/auth/hooks/useCheckPhoneNumber";
 import { transformSignupData } from "@/features/auth/api/authApi";
 import { ProfileImageUpload } from "@/features/upload/components/ProfileImageUpload";
 import { FloatingLabelInput } from "@/features/profile/components/FloatingLabelInput";
 import { GenderToggle } from "@/features/profile/components/GenderToggle";
+import { ApprovalPendingDialog } from "@/features/auth/components/ApprovalPendingDialog";
 import { cn } from "@/lib/utils";
 import {
   formatPhoneNumber,
@@ -164,7 +158,7 @@ export function SignupForm() {
     );
   };
 
-  const handleDialogClose = () => {
+  const handleConfirm = () => {
     setShowSuccessDialog(false);
     navigate("/login"); // 로그인 페이지로 이동
   };
@@ -345,24 +339,11 @@ export function SignupForm() {
         </div>
       </div>
 
-      {/* 성공 다이얼로그 */}
-      <Dialog open={showSuccessDialog} onOpenChange={handleDialogClose}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>회원가입 신청 완료</DialogTitle>
-            <DialogDescription className="pt-4 text-base">
-              가입자의 실명 인증을 위해{" "}
-              <span className="font-semibold text-foreground">
-                00-0000-0000
-              </span>
-              으로 문의주시면 감사하겠습니다.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex justify-end pt-4">
-            <Button onClick={handleDialogClose}>확인</Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {/* 승인 대기 다이얼로그 */}
+      <ApprovalPendingDialog
+        open={showSuccessDialog}
+        onConfirm={handleConfirm}
+      />
     </>
   );
 }
