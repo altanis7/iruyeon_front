@@ -13,6 +13,7 @@ import { ProfileImageUpload } from "@/features/upload/components/ProfileImageUpl
 import { FloatingLabelInput } from "@/features/profile/components/FloatingLabelInput";
 import { GenderToggle } from "@/features/profile/components/GenderToggle";
 import { ApprovalPendingDialog } from "@/features/auth/components/ApprovalPendingDialog";
+import { AgreementSection } from "@/features/auth/components/AgreementSection";
 import { cn } from "@/lib/utils";
 import {
   formatPhoneNumber,
@@ -27,7 +28,7 @@ const signupSchema = z
       .min(2, { message: "이름은 최소 2자 이상이어야 합니다." })
       .max(50, { message: "이름은 최대 50자까지 입력 가능합니다." }),
     phoneNumber: z.string().regex(/^010-\d{4}-\d{4}$/, {
-      message: "휴대폰 번호 형식이 올바르지 않습니다. (예: 010-1234-5678)",
+      message: "휴대폰 번호 형식이 올바르지 않습니다.",
     }),
     company: z
       .string()
@@ -40,9 +41,11 @@ const signupSchema = z
       .regex(/[A-Za-z]/, {
         message: "비밀번호는 영문을 포함해야 합니다.",
       }),
-    passwordConfirm: z.string().min(1, { message: "비밀번호 확인을 입력하세요." }),
+    passwordConfirm: z
+      .string()
+      .min(1, { message: "비밀번호 확인을 입력하세요." }),
   })
-  .refine((data) => data.password === data.passwordConfirm, {
+  .refine(data => data.password === data.passwordConfirm, {
     message: "비밀번호가 일치하지 않습니다.",
     path: ["passwordConfirm"],
   });
@@ -64,6 +67,9 @@ export function SignupForm() {
   >("unchecked");
   const [profileImageId, setProfileImageId] = useState<number | null>(null);
   const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null);
+  const [termsAgreed, setTermsAgreed] = useState(false);
+  const [privacyAgreed, setPrivacyAgreed] = useState(false);
+  const isAllAgreed = termsAgreed && privacyAgreed;
 
   const handleImageChange = (
     imageId: number | null,
@@ -82,6 +88,9 @@ export function SignupForm() {
     resolver: zodResolver(signupSchema),
     mode: "onTouched",
     defaultValues: {
+      name: "",
+      phoneNumber: "",
+      company: "",
       gender: "",
       password: "",
       passwordConfirm: "",
@@ -114,6 +123,11 @@ export function SignupForm() {
       return;
     }
 
+    if (!termsAgreed || !privacyAgreed) {
+      alert("이용약관 및 개인정보 처리방침에 모두 동의해주세요.");
+      return;
+    }
+
     // 전화번호 하이픈 제거 후 API 전송
     const apiData = transformSignupData(
       {
@@ -143,7 +157,7 @@ export function SignupForm() {
     checkPhoneNumber(
       { phoneNumber: removePhoneNumberHyphens(currentPhoneNumber) },
       {
-        onSuccess: (response) => {
+        onSuccess: response => {
           // data: false = 중복 아님(사용 가능), data: true = 중복(사용 불가)
           if (response.data === false) {
             setPhoneCheckStatus("available");
@@ -169,11 +183,7 @@ export function SignupForm() {
         {/* 상단 헤더 영역 */}
         <div className="sticky top-0 bg-white z-10 px-4 pt-safe-top pt-3 pb-3 border-b">
           <div className="flex items-center justify-between">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => navigate("/")}
-            >
+            <Button variant="ghost" size="icon" onClick={() => navigate("/")}>
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <h1 className="text-lg font-semibold">회원가입</h1>
@@ -238,7 +248,9 @@ export function SignupForm() {
                 label="비밀번호"
                 type="password"
                 value={watch("password") || ""}
-                onChange={(value) => setValue("password", value, { shouldValidate: true })}
+                onChange={value =>
+                  setValue("password", value, { shouldValidate: true })
+                }
                 placeholder="영문 6자 이상"
                 hasError={!!errors.password}
                 errorMessage={errors.password?.message}
@@ -287,7 +299,9 @@ export function SignupForm() {
               label="비밀번호 확인"
               type="password"
               value={watch("passwordConfirm") || ""}
-              onChange={(value) => setValue("passwordConfirm", value, { shouldValidate: true })}
+              onChange={value =>
+                setValue("passwordConfirm", value, { shouldValidate: true })
+              }
               hasError={!!errors.passwordConfirm}
               errorMessage={errors.passwordConfirm?.message}
               disabled={isPending}
@@ -298,7 +312,9 @@ export function SignupForm() {
             <FloatingLabelInput
               label="이름"
               value={watch("name") || ""}
-              onChange={(value) => setValue("name", value, { shouldValidate: true })}
+              onChange={value =>
+                setValue("name", value, { shouldValidate: true })
+              }
               hasError={!!errors.name}
               errorMessage={errors.name?.message}
               disabled={isPending}
@@ -308,7 +324,9 @@ export function SignupForm() {
             {/* 성별 */}
             <GenderToggle
               value={watch("gender") || ""}
-              onChange={(value) => setValue("gender", value, { shouldValidate: true })}
+              onChange={value =>
+                setValue("gender", value, { shouldValidate: true })
+              }
               hasError={!!errors.gender}
               errorMessage={errors.gender?.message}
             />
@@ -317,11 +335,21 @@ export function SignupForm() {
             <FloatingLabelInput
               label="회사명"
               value={watch("company") || ""}
-              onChange={(value) => setValue("company", value, { shouldValidate: true })}
+              onChange={value =>
+                setValue("company", value, { shouldValidate: true })
+              }
               hasError={!!errors.company}
               errorMessage={errors.company?.message}
               disabled={isPending}
               required
+            />
+
+            <AgreementSection
+              termsAgreed={termsAgreed}
+              privacyAgreed={privacyAgreed}
+              onTermsChange={setTermsAgreed}
+              onPrivacyChange={setPrivacyAgreed}
+              disabled={isPending}
             />
           </form>
         </div>
@@ -331,7 +359,7 @@ export function SignupForm() {
           <Button
             type="submit"
             className="w-full py-6 rounded-full bg-gradient-to-r from-pink-400 to-purple-400 hover:from-pink-500 hover:to-purple-500 text-white font-semibold"
-            disabled={isPending}
+            disabled={isPending || !isAllAgreed}
             onClick={handleSubmit(onSubmit)}
           >
             {isPending ? "처리 중..." : "회원가입"}
