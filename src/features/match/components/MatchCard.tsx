@@ -105,6 +105,7 @@ function BrokenHeartIcon({ className }: { className?: string }) {
     </svg>
   );
 }
+import { useNavigate } from "react-router-dom";
 import { ChatModal } from "./ChatModal";
 import { MatchResponseDialog } from "./MatchResponseDialog";
 
@@ -116,9 +117,18 @@ interface MatchCardProps {
 }
 
 /** 클라이언트 프로필 카드 (이미지 배경 + 텍스트 오버레이) */
-function ClientProfileCard({ data }: { data: MemberClientDTO }) {
+function ClientProfileCard({
+  data,
+  onClick,
+}: {
+  data: MemberClientDTO;
+  onClick?: () => void;
+}) {
   return (
-    <div className="relative flex-1 aspect-[3/4] rounded-2xl overflow-hidden">
+    <div
+      className="relative flex-1 aspect-[3/4] rounded-2xl overflow-hidden cursor-pointer"
+      onClick={onClick}
+    >
       {/* 배경 이미지 */}
       <ProfileImage
         src={data.clientImage}
@@ -164,6 +174,7 @@ export function MatchCard({
   className,
   variant = "received",
 }: MatchCardProps) {
+  const navigate = useNavigate();
   const [chatOpen, setChatOpen] = useState(false);
   const [reviewOpen, setReviewOpen] = useState(false);
   const [acceptOpen, setAcceptOpen] = useState(false);
@@ -201,7 +212,12 @@ export function MatchCard({
         {/* 프로필 이미지 영역 */}
         <div className="relative flex gap-2 items-center">
           {/* 우리측 클라이언트 */}
-          <ClientProfileCard data={memberClientResponseDTO} />
+          <ClientProfileCard
+            data={memberClientResponseDTO}
+            onClick={() =>
+              navigate(`/client/${memberClientResponseDTO.clientId}`)
+            }
+          />
 
           {/* 중앙 아이콘 - 상태별 차별화 */}
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
@@ -247,7 +263,12 @@ export function MatchCard({
           </div>
 
           {/* 상대측 클라이언트 */}
-          <ClientProfileCard data={oppositeMemberClientDTO} />
+          <ClientProfileCard
+            data={oppositeMemberClientDTO}
+            onClick={() =>
+              navigate(`/client/${oppositeMemberClientDTO.clientId}`)
+            }
+          />
         </div>
 
         {/* 하단 버튼 */}
