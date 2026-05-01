@@ -85,17 +85,17 @@ export interface SearchProfileParams {
 
 // 필터 검색 파라미터 (API 필드명 기준)
 export interface FilterSearchParams {
-  job?: string[];           // 직업 다중선택
-  minBirthYear?: number;    // 최소 출생년도
-  maxBirthYear?: number;    // 최대 출생년도
-  eduLevel?: string[];      // 학력 다중선택
-  universities?: string[];  // 대학교 다중선택
-  gender?: string[];        // 성별 다중선택
+  job?: string[]; // 직업 다중선택
+  minBirthYear?: number; // 최소 출생년도
+  maxBirthYear?: number; // 최대 출생년도
+  eduLevel?: string[]; // 학력 다중선택
+  universities?: string[]; // 대학교 다중선택
+  gender?: string[]; // 성별 다중선택
   maritalStatus?: string[]; // 결혼여부 다중선택
-  religion?: string[];      // 종교 다중선택
-  minHeight?: number;       // 최소 키
-  maxHeight?: number;       // 최대 키
-  keyword?: string;         // 키워드 검색
+  religion?: string[]; // 종교 다중선택
+  minHeight?: number; // 최소 키
+  maxHeight?: number; // 최대 키
+  keyword?: string; // 키워드 검색
 }
 
 import { apiClient } from "@/lib/api/client";
@@ -128,7 +128,12 @@ export interface ClientListItem {
   gender: string;
   height: number;
   birthYear: number;
-  status: "ACTIVE" | "INACTIVE";
+  status:
+    | "ACTIVE"
+    | "INACTIVE"
+    | "INACTIVE_MARRIED"
+    | "INACTIVE_DATING"
+    | "DELETED";
   totalMeetingCnt: number;
   currentMeetingCnt: number;
 }
@@ -160,7 +165,12 @@ export interface ClientDisplayData {
   memberId: number;
   memberName: string;
   memberImage: string | null;
-  status: "ACTIVE" | "INACTIVE";
+  status:
+    | "ACTIVE"
+    | "INACTIVE"
+    | "INACTIVE_MARRIED"
+    | "INACTIVE_DATING"
+    | "DELETED";
 }
 
 // 내 회원 리스트 아이템 (GET /client/my 응답)
@@ -179,7 +189,12 @@ export interface MyClientListItem {
   birthYear: number;
   totalMeetingCnt?: number; // 전체 만남 횟수
   currentMeetingCnt?: number; // 현재 만남 횟수
-  status: "ACTIVE" | "INACTIVE"; // 활동 상태
+  status:
+    | "ACTIVE"
+    | "INACTIVE"
+    | "INACTIVE_MARRIED"
+    | "INACTIVE_DATING"
+    | "DELETED";
 }
 
 // 내 회원 페이지네이션 응답 데이터
@@ -202,7 +217,12 @@ export interface MyClientDisplayData {
   height: number;
   totalMeetingCnt?: number;
   currentMeetingCnt?: number;
-  status: "ACTIVE" | "INACTIVE";
+  status:
+    | "ACTIVE"
+    | "INACTIVE"
+    | "INACTIVE_MARRIED"
+    | "INACTIVE_DATING"
+    | "DELETED";
 }
 
 // 클라이언트 가족 구성원 정보 (GET /client/:id 응답)
@@ -359,13 +379,19 @@ export const clientApi = {
     if ((params.religion?.length ?? 0) > 0) body.religion = params.religion;
     if ((params.gender?.length ?? 0) > 0) body.gender = params.gender;
     if ((params.eduLevel?.length ?? 0) > 0) body.eduLevel = params.eduLevel;
-    if ((params.universities?.length ?? 0) > 0) body.universities = params.universities;
-    if ((params.maritalStatus?.length ?? 0) > 0) body.maritalStatus = params.maritalStatus;
+    if ((params.universities?.length ?? 0) > 0)
+      body.universities = params.universities;
+    if ((params.maritalStatus?.length ?? 0) > 0)
+      body.maritalStatus = params.maritalStatus;
     if (params.keyword?.trim()) body.keyword = params.keyword.trim();
-    if (params.minBirthYear !== undefined && params.minBirthYear !== 1960) body.minBirthYear = params.minBirthYear;
-    if (params.maxBirthYear !== undefined && params.maxBirthYear !== 2005) body.maxBirthYear = params.maxBirthYear;
-    if (params.minHeight !== undefined && params.minHeight !== 140) body.minHeight = params.minHeight;
-    if (params.maxHeight !== undefined && params.maxHeight !== 200) body.maxHeight = params.maxHeight;
+    if (params.minBirthYear !== undefined && params.minBirthYear !== 1960)
+      body.minBirthYear = params.minBirthYear;
+    if (params.maxBirthYear !== undefined && params.maxBirthYear !== 2005)
+      body.maxBirthYear = params.maxBirthYear;
+    if (params.minHeight !== undefined && params.minHeight !== 140)
+      body.minHeight = params.minHeight;
+    if (params.maxHeight !== undefined && params.maxHeight !== 200)
+      body.maxHeight = params.maxHeight;
     const response = await apiClient.post<ApiResponse<ClientListData>>(
       "/client/search",
       body,
@@ -377,9 +403,7 @@ export const clientApi = {
 /**
  * ClientListItem을 UI 표시용 ClientDisplayData로 변환
  */
-export function mapClientToDisplay(
-  client: ClientListItem,
-): ClientDisplayData {
+export function mapClientToDisplay(client: ClientListItem): ClientDisplayData {
   return {
     id: String(client.clientId),
     name: client.clientName,
@@ -536,11 +560,12 @@ export const clientManagementApi = {
   deleteClient: async (
     clientId: number,
   ): Promise<ApiResponse<DeleteClientResponse>> => {
-    const response = await apiClient.delete<
-      ApiResponse<DeleteClientResponse>
-    >(`/client`, {
-      params: { id: clientId },
-    });
+    const response = await apiClient.delete<ApiResponse<DeleteClientResponse>>(
+      `/client`,
+      {
+        params: { id: clientId },
+      },
+    );
     return response.data;
   },
 };

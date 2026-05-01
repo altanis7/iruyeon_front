@@ -28,8 +28,9 @@ export function useToggleClientStatus() {
       queryClient.invalidateQueries({
         queryKey: ["clients"],
       });
-      const newStatus = response.data.newStatus === "ACTIVE" ? "활성화" : "비활성화";
-      toast.success(`프로필이 ${newStatus}되었습니다.`);
+      const newStatus =
+        response.data.newStatus === "ACTIVE" ? "활동" : "비활동";
+      toast.success(`프로필이 ${newStatus} 상태로 변경되었습니다.`);
     },
     onError: error => {
       console.error("Status toggle failed:", error);

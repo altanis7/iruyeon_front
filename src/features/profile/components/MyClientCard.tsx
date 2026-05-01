@@ -4,7 +4,11 @@ import { ProfileImage } from "@/shared/components/ui/profile-image";
 import { cn } from "@/lib/utils";
 import { Ruler, GraduationCap, Briefcase, MapPin } from "lucide-react";
 import type { MyClientDisplayData } from "../api/profileApi";
-import { formatValue, formatHeight } from "../utils/clientFormat";
+import {
+  formatValue,
+  formatHeight,
+  formatClientStatus,
+} from "../utils/clientFormat";
 
 interface MyClientCardProps {
   client: MyClientDisplayData;
@@ -32,6 +36,7 @@ export function MyClientCard({
   const displayJob = formatValue(client.job);
   const displayAddress = formatValue(client.address);
   const isActive = client.status === "ACTIVE";
+  const statusLabel = formatClientStatus(client.status);
 
   return (
     <Card
@@ -61,7 +66,9 @@ export function MyClientCard({
         <div className="absolute inset-x-0 bottom-2 z-10 flex items-center justify-between px-3">
           <div className="flex items-baseline gap-1 text-white drop-shadow-md">
             <span className="font-bold text-base">{client.name}</span>
-            <span className="text-xs font-normal">({client.birthYear}년생)</span>
+            <span className="text-xs font-normal">
+              ({client.birthYear}년생)
+            </span>
           </div>
           <span
             className={cn(
@@ -69,7 +76,7 @@ export function MyClientCard({
               isActive ? "bg-pink-500 text-white" : "bg-gray-500 text-white",
             )}
           >
-            {isActive ? "활동" : "비활동"}
+            {statusLabel}
           </span>
         </div>
       </div>

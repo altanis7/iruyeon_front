@@ -1,11 +1,19 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/shared/components/ui/avatar";
 import { Card, CardContent } from "@/shared/components/ui/card";
 import { Button } from "@/shared/components/ui/button";
 import { ProfileImage } from "@/shared/components/ui/profile-image";
 import { cn } from "@/lib/utils";
 import { Ruler, GraduationCap, Briefcase, MapPin, Heart } from "lucide-react";
 import type { ClientDisplayData } from "../api/profileApi";
-import { formatValue, formatHeight } from "../utils/clientFormat";
+import {
+  formatValue,
+  formatHeight,
+  formatClientStatus,
+} from "../utils/clientFormat";
 
 interface ProfileCardProps {
   profile: ClientDisplayData;
@@ -33,6 +41,7 @@ export function ProfileCard({
   const displayJob = formatValue(profile.job);
   const displayAddress = formatValue(profile.address);
   const isActive = profile.status === "ACTIVE";
+  const statusLabel = formatClientStatus(profile.status);
 
   const handleMatchClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -67,17 +76,17 @@ export function ProfileCard({
         <div className="absolute inset-x-0 bottom-2 z-10 flex items-center justify-between px-3">
           <div className="flex items-baseline gap-1 text-white drop-shadow-md">
             <span className="font-bold text-base">{profile.name}</span>
-            <span className="text-xs font-normal">({profile.birthYear}년생)</span>
+            <span className="text-xs font-normal">
+              ({profile.birthYear}년생)
+            </span>
           </div>
           <span
             className={cn(
               "text-[10px] font-medium px-2 py-0.5 rounded-full shrink-0",
-              isActive
-                ? "bg-pink-500 text-white"
-                : "bg-gray-500 text-white",
+              isActive ? "bg-pink-500 text-white" : "bg-gray-500 text-white",
             )}
           >
-            {isActive ? "활동" : "비활동"}
+            {statusLabel}
           </span>
         </div>
 

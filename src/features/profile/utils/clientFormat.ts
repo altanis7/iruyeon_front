@@ -2,12 +2,29 @@
  * 클라이언트 데이터 포맷팅 유틸리티
  */
 
+export type ClientStatus =
+  | "ACTIVE"
+  | "INACTIVE"
+  | "INACTIVE_MARRIED"
+  | "INACTIVE_DATING"
+  | "DELETED";
+
+const CLIENT_STATUS_MAP: Record<ClientStatus, string> = {
+  ACTIVE: "활동",
+  INACTIVE: "비활동",
+  INACTIVE_MARRIED: "성혼 완료",
+  INACTIVE_DATING: "교제중",
+  DELETED: "탈퇴",
+};
+
+export function formatClientStatus(status: ClientStatus): string {
+  return CLIENT_STATUS_MAP[status] ?? status;
+}
+
 /**
  * null 또는 빈 문자열 처리
  */
-export function formatValue(
-  value: string | number | null | undefined,
-): string {
+export function formatValue(value: string | number | null | undefined): string {
   if (value === null || value === undefined || value === "") {
     return "정보 없음";
   }
@@ -36,10 +53,7 @@ export function formatPreferredAge(
 /**
  * 직업 정보 포맷 (직업 + 직업상세)
  */
-export function formatJobInfo(
-  job: string,
-  jobDetail: string | null,
-): string {
+export function formatJobInfo(job: string, jobDetail: string | null): string {
   if (!jobDetail) return formatValue(job);
   return `${job} · ${jobDetail}`;
 }
