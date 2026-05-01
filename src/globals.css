@@ -164,42 +164,42 @@ a,
 :root {
   --radius: 0.625rem;
 
-  /* Toast - Pill Glass Style (12% opacity) */
-  --toast-success-bg: rgba(76, 174, 79, 0.12);
-  --toast-success-border: rgba(76, 174, 79, 0.2);
-  --toast-success-text: #2d5a2f;
-  --toast-success-desc: #4a6b4c;
+  /* Toast - Pill Glass Style (12% opacity) - 핑크 계열로 통일 */
+  --toast-success-bg: rgba(236, 72, 153, 0.12);
+  --toast-success-border: rgba(236, 72, 153, 0.2);
+  --toast-success-text: #831843;
+  --toast-success-desc: #9d174d;
   --toast-success-icon: #ffffff;
-  --toast-success-icon-bg: #4cae4f;
-  --toast-success-shadow: rgba(76, 174, 79, 0.15);
-  --toast-success-close: #4a6b4c;
+  --toast-success-icon-bg: #ec4899;
+  --toast-success-shadow: rgba(236, 72, 153, 0.15);
+  --toast-success-close: #9d174d;
 
-  --toast-error-bg: rgba(244, 67, 54, 0.12);
-  --toast-error-border: rgba(244, 67, 54, 0.2);
-  --toast-error-text: #b91c1c;
-  --toast-error-desc: #6b4c4c;
+  --toast-error-bg: rgba(236, 72, 153, 0.12);
+  --toast-error-border: rgba(236, 72, 153, 0.2);
+  --toast-error-text: #831843;
+  --toast-error-desc: #9d174d;
   --toast-error-icon: #ffffff;
-  --toast-error-icon-bg: #f44336;
-  --toast-error-shadow: rgba(244, 67, 54, 0.15);
-  --toast-error-close: #6b4c4c;
+  --toast-error-icon-bg: #ec4899;
+  --toast-error-shadow: rgba(236, 72, 153, 0.15);
+  --toast-error-close: #9d174d;
 
-  --toast-info-bg: rgba(59, 130, 246, 0.12);
-  --toast-info-border: rgba(59, 130, 246, 0.2);
-  --toast-info-text: #2d3b5a;
-  --toast-info-desc: #4c576b;
+  --toast-info-bg: rgba(236, 72, 153, 0.12);
+  --toast-info-border: rgba(236, 72, 153, 0.2);
+  --toast-info-text: #831843;
+  --toast-info-desc: #9d174d;
   --toast-info-icon: #ffffff;
-  --toast-info-icon-bg: #3b82f6;
-  --toast-info-shadow: rgba(59, 130, 246, 0.15);
-  --toast-info-close: #4c576b;
+  --toast-info-icon-bg: #ec4899;
+  --toast-info-shadow: rgba(236, 72, 153, 0.15);
+  --toast-info-close: #9d174d;
 
-  --toast-warning-bg: rgba(245, 158, 11, 0.12);
-  --toast-warning-border: rgba(245, 158, 11, 0.2);
-  --toast-warning-text: #5a4a2d;
-  --toast-warning-desc: #6b5c4c;
+  --toast-warning-bg: rgba(236, 72, 153, 0.12);
+  --toast-warning-border: rgba(236, 72, 153, 0.2);
+  --toast-warning-text: #831843;
+  --toast-warning-desc: #9d174d;
   --toast-warning-icon: #ffffff;
-  --toast-warning-icon-bg: #f59e0b;
-  --toast-warning-shadow: rgba(245, 158, 11, 0.15);
-  --toast-warning-close: #6b5c4c;
+  --toast-warning-icon-bg: #ec4899;
+  --toast-warning-shadow: rgba(236, 72, 153, 0.15);
+  --toast-warning-close: #9d174d;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -236,41 +236,41 @@ a,
 .dark {
   --background: oklch(0.145 0 0);
 
-  /* Toast - Dark Mode (Pill Glass) */
-  --toast-success-bg: rgba(76, 174, 79, 0.18);
-  --toast-success-border: rgba(76, 174, 79, 0.25);
+  /* Toast - Dark Mode (Pill Glass) - 핑크 계열로 통일 */
+  --toast-success-bg: rgba(236, 72, 153, 0.18);
+  --toast-success-border: rgba(236, 72, 153, 0.25);
   --toast-success-text: #ffffff;
   --toast-success-desc: rgba(255, 255, 255, 0.85);
   --toast-success-icon: #ffffff;
-  --toast-success-icon-bg: #4cae4f;
-  --toast-success-shadow: rgba(76, 174, 79, 0.2);
+  --toast-success-icon-bg: #ec4899;
+  --toast-success-shadow: rgba(236, 72, 153, 0.2);
   --toast-success-close: rgba(255, 255, 255, 0.6);
 
-  --toast-error-bg: rgba(244, 67, 54, 0.18);
-  --toast-error-border: rgba(244, 67, 54, 0.25);
+  --toast-error-bg: rgba(236, 72, 153, 0.18);
+  --toast-error-border: rgba(236, 72, 153, 0.25);
   --toast-error-text: #ffffff;
   --toast-error-desc: rgba(255, 255, 255, 0.85);
   --toast-error-icon: #ffffff;
-  --toast-error-icon-bg: #f44336;
-  --toast-error-shadow: rgba(244, 67, 54, 0.2);
+  --toast-error-icon-bg: #ec4899;
+  --toast-error-shadow: rgba(236, 72, 153, 0.2);
   --toast-error-close: rgba(255, 255, 255, 0.6);
 
-  --toast-info-bg: rgba(59, 130, 246, 0.18);
-  --toast-info-border: rgba(59, 130, 246, 0.25);
+  --toast-info-bg: rgba(236, 72, 153, 0.18);
+  --toast-info-border: rgba(236, 72, 153, 0.25);
   --toast-info-text: #ffffff;
   --toast-info-desc: rgba(255, 255, 255, 0.85);
   --toast-info-icon: #ffffff;
-  --toast-info-icon-bg: #3b82f6;
-  --toast-info-shadow: rgba(59, 130, 246, 0.2);
+  --toast-info-icon-bg: #ec4899;
+  --toast-info-shadow: rgba(236, 72, 153, 0.2);
   --toast-info-close: rgba(255, 255, 255, 0.6);
 
-  --toast-warning-bg: rgba(245, 158, 11, 0.18);
-  --toast-warning-border: rgba(245, 158, 11, 0.25);
+  --toast-warning-bg: rgba(236, 72, 153, 0.18);
+  --toast-warning-border: rgba(236, 72, 153, 0.25);
   --toast-warning-text: #ffffff;
   --toast-warning-desc: rgba(255, 255, 255, 0.85);
   --toast-warning-icon: #ffffff;
-  --toast-warning-icon-bg: #f59e0b;
-  --toast-warning-shadow: rgba(245, 158, 11, 0.2);
+  --toast-warning-icon-bg: #ec4899;
+  --toast-warning-shadow: rgba(236, 72, 153, 0.2);
   --toast-warning-close: rgba(255, 255, 255, 0.6);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
@@ -331,6 +331,10 @@ a,
     sans-serif !important;
   z-index: 9999 !important;
   max-width: calc(100vw - 32px) !important;
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
 }
 
 [data-sonner-toast].toast-custom {
@@ -492,34 +496,34 @@ a,
   color: var(--toast-warning-close);
 }
 
-/* Dialog 오버레이 위 토스트: 다크 모드 색상으로 전환 */
+/* Dialog 오버레이 위 토스트: 핑크 계열로 통일 */
 body:has([data-state="open"][role="dialog"]) [data-sonner-toaster] {
-  --toast-success-bg: rgba(76, 174, 79, 0.18);
-  --toast-success-border: rgba(76, 174, 79, 0.25);
+  --toast-success-bg: rgba(236, 72, 153, 0.18);
+  --toast-success-border: rgba(236, 72, 153, 0.25);
   --toast-success-text: #ffffff;
   --toast-success-desc: rgba(255, 255, 255, 0.85);
-  --toast-success-shadow: rgba(76, 174, 79, 0.2);
+  --toast-success-shadow: rgba(236, 72, 153, 0.2);
   --toast-success-close: rgba(255, 255, 255, 0.6);
 
-  --toast-error-bg: rgba(244, 67, 54, 0.18);
-  --toast-error-border: rgba(244, 67, 54, 0.25);
+  --toast-error-bg: rgba(236, 72, 153, 0.18);
+  --toast-error-border: rgba(236, 72, 153, 0.25);
   --toast-error-text: #ffffff;
   --toast-error-desc: rgba(255, 255, 255, 0.85);
-  --toast-error-shadow: rgba(244, 67, 54, 0.2);
+  --toast-error-shadow: rgba(236, 72, 153, 0.2);
   --toast-error-close: rgba(255, 255, 255, 0.6);
 
-  --toast-info-bg: rgba(59, 130, 246, 0.18);
-  --toast-info-border: rgba(59, 130, 246, 0.25);
+  --toast-info-bg: rgba(236, 72, 153, 0.18);
+  --toast-info-border: rgba(236, 72, 153, 0.25);
   --toast-info-text: #ffffff;
   --toast-info-desc: rgba(255, 255, 255, 0.85);
-  --toast-info-shadow: rgba(59, 130, 246, 0.2);
+  --toast-info-shadow: rgba(236, 72, 153, 0.2);
   --toast-info-close: rgba(255, 255, 255, 0.6);
 
-  --toast-warning-bg: rgba(245, 158, 11, 0.18);
-  --toast-warning-border: rgba(245, 158, 11, 0.25);
+  --toast-warning-bg: rgba(236, 72, 153, 0.18);
+  --toast-warning-border: rgba(236, 72, 153, 0.25);
   --toast-warning-text: #ffffff;
   --toast-warning-desc: rgba(255, 255, 255, 0.85);
-  --toast-warning-shadow: rgba(245, 158, 11, 0.2);
+  --toast-warning-shadow: rgba(236, 72, 153, 0.2);
   --toast-warning-close: rgba(255, 255, 255, 0.6);
 }
 

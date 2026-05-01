@@ -180,7 +180,7 @@ export function ProfileCard({
           <Button
             variant="default"
             size="sm"
-            className="w-full bg-gradient-to-r from-pink-400 to-pink-500 hover:from-pink-500 hover:to-pink-600 text-white rounded-full text-xs h-9"
+            className="w-full bg-gradient-to-r from-pink-400 to-pink-500 hover:from-pink-500 hover:to-pink-600 text-white rounded-full text-xs h-9 transition-all duration-200 hover:shadow-lg hover:scale-[1.02]"
             onClick={handleMatchClick}
           >
             <Heart className="h-3.5 w-3.5 mr-1.5 fill-current" />
