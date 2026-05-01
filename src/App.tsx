@@ -106,8 +106,8 @@ function ForegroundMessageListener() {
     const messaging = getMessagingInstance();
     if (!messaging) return;
     return onMessage(messaging, payload => {
-      toast(payload.notification?.title || "새 알림", {
-        description: payload.notification?.body || "",
+      toast(payload.data?.title || "새 알림", {
+        description: payload.data?.body || "",
         duration: 5000,
       });
     });
