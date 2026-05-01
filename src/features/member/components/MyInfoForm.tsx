@@ -19,30 +19,22 @@ import {
 } from "@/features/member/api/memberApi";
 import { cn } from "@/lib/utils";
 
-// 비밀번호 유효성 검사 헬퍼
-const checkPasswordLength = (password: string) => password.length >= 8;
-const checkPasswordComplexity = (password: string) =>
-  /[A-Za-z]/.test(password) &&
-  /\d/.test(password) &&
-  /[!@#$%^&*(),.?":{}|<>]/.test(password);
+// 비밀번호 유효성 검사 헬퍼 (SignupForm과 동일)
+const checkPasswordLength = (password: string) => password.length >= 6;
+const checkPasswordHasEnglish = (password: string) => /[A-Za-z]/.test(password);
 
 const myInfoSchema = z
   .object({
-    email: z.string().email(),
     currentPassword: z.string().optional(),
     newPassword: z
       .string()
       .optional()
-      .refine(
-        (val) => {
-          if (!val) return true;
-          return (
-            val.length >= 8 &&
-            /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])/.test(val)
-          );
-        },
-        { message: "비밀번호는 8자 이상, 영문, 숫자, 특수문자를 포함해야 합니다." },
-      ),
+      .refine(val => !val || val.length >= 6, {
+        message: "비밀번호는 최소 6자 이상이어야 합니다.",
+      })
+      .refine(val => !val || /[A-Za-z]/.test(val), {
+        message: "비밀번호는 영문을 포함해야 합니다.",
+      }),
     newPasswordConfirm: z.string().optional(),
     name: z
       .string()
@@ -58,14 +50,24 @@ const myInfoSchema = z
       .max(100, { message: "회사명은 최대 100자까지 입력 가능합니다." }),
   })
   .refine(
-    (data) => {
+    data => {
       if (data.newPassword && !data.currentPassword) return false;
       return true;
     },
     { path: ["currentPassword"], message: "현재 비밀번호를 입력하세요." },
   )
   .refine(
-    (data) => {
+    data => {
+      if (data.newPassword && !data.newPasswordConfirm) return false;
+      return true;
+    },
+    {
+      path: ["newPasswordConfirm"],
+      message: "비밀번호 확인을 입력하세요.",
+    },
+  )
+  .refine(
+    data => {
       if (data.newPassword && data.newPassword !== data.newPasswordConfirm)
         return false;
       return true;
@@ -96,7 +98,6 @@ export function MyInfoForm() {
     resolver: zodResolver(myInfoSchema),
     mode: "onTouched",
     defaultValues: {
-      email: "",
       currentPassword: "",
       newPassword: "",
       newPasswordConfirm: "",
@@ -112,7 +113,6 @@ export function MyInfoForm() {
     if (data?.data) {
       const member = data.data;
       reset({
-        email: member.email,
         name: member.name,
         phoneNumber: formatPhoneForDisplay(member.phoneNumber),
         gender: member.gender,
@@ -129,7 +129,7 @@ export function MyInfoForm() {
 
   const newPassword = watch("newPassword");
   const isPasswordLengthValid = checkPasswordLength(newPassword || "");
-  const isPasswordComplexityValid = checkPasswordComplexity(newPassword || "");
+  const isPasswordHasEnglish = checkPasswordHasEnglish(newPassword || "");
 
   const handleImageChange = (
     imageId: number | null,
@@ -188,11 +188,7 @@ export function MyInfoForm() {
       {/* 상단 헤더 영역 */}
       <div className="sticky top-0 bg-white z-10 px-4 pt-safe-top pt-3 pb-3 border-b">
         <div className="flex items-center justify-between">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate(-1)}
-          >
+          <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <h1 className="text-lg font-semibold">내 정보 수정</h1>
@@ -212,13 +208,31 @@ export function MyInfoForm() {
             />
           </div>
 
-          {/* 이메일 - disabled */}
+          {/* 전화번호 */}
           <FloatingLabelInput
-            label="이메일"
-            type="email"
-            value={watch("email") || ""}
-            onChange={() => {}}
-            disabled
+            label="전화번호"
+            type="tel"
+            value={watch("phoneNumber") || ""}
+            onChange={value =>
+              setValue("phoneNumber", value, { shouldValidate: true })
+            }
+            placeholder="010-1234-5678"
+            hasError={!!errors.phoneNumber}
+            errorMessage={errors.phoneNumber?.message}
+            disabled={isPending}
+            required
+          />
+
+          {/* 이름 */}
+          <FloatingLabelInput
+            label="이름"
+            value={watch("name") || ""}
+            onChange={value =>
+              setValue("name", value, { shouldValidate: true })
+            }
+            hasError={!!errors.name}
+            errorMessage={errors.name?.message}
+            disabled={isPending}
             required
           />
 
@@ -227,7 +241,7 @@ export function MyInfoForm() {
             label="현재 비밀번호"
             type="password"
             value={watch("currentPassword") || ""}
-            onChange={(value) =>
+            onChange={value =>
               setValue("currentPassword", value, { shouldValidate: true })
             }
             placeholder="현재 비밀번호를 입력하세요"
@@ -242,55 +256,49 @@ export function MyInfoForm() {
               label="새 비밀번호"
               type="password"
               value={watch("newPassword") || ""}
-              onChange={(value) =>
+              onChange={value =>
                 setValue("newPassword", value, { shouldValidate: true })
               }
-              placeholder="8~20자, 영문+숫자+특수문자 포함"
+              placeholder="영문 6자 이상"
               hasError={!!errors.newPassword}
               errorMessage={errors.newPassword?.message}
               disabled={isPending}
             />
-            {/* 새 비밀번호 체크표시 UI - 입력 시에만 표시 */}
-            {(watch("newPassword") || "").length > 0 && (
-              <div className="space-y-1">
-                <div className="flex items-center gap-1">
-                  <Check
-                    className={cn(
-                      "h-4 w-4",
-                      isPasswordLengthValid ? "text-teal-500" : "text-gray-400",
-                    )}
-                  />
-                  <span
-                    className={cn(
-                      "text-sm",
-                      isPasswordLengthValid ? "text-teal-500" : "text-gray-400",
-                    )}
-                  >
-                    8자 이상
-                  </span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Check
-                    className={cn(
-                      "h-4 w-4",
-                      isPasswordComplexityValid
-                        ? "text-teal-500"
-                        : "text-gray-400",
-                    )}
-                  />
-                  <span
-                    className={cn(
-                      "text-sm",
-                      isPasswordComplexityValid
-                        ? "text-teal-500"
-                        : "text-gray-400",
-                    )}
-                  >
-                    영문, 숫자, 특수문자 포함
-                  </span>
-                </div>
+            {/* 새 비밀번호 체크표시 UI (회원가입과 동일) */}
+            <div className="space-y-1">
+              <div className="flex items-center gap-1">
+                <Check
+                  className={cn(
+                    "h-4 w-4",
+                    isPasswordLengthValid ? "text-teal-500" : "text-gray-400",
+                  )}
+                />
+                <span
+                  className={cn(
+                    "text-sm",
+                    isPasswordLengthValid ? "text-teal-500" : "text-gray-400",
+                  )}
+                >
+                  6자 이상
+                </span>
               </div>
-            )}
+              <div className="flex items-center gap-1">
+                <Check
+                  className={cn(
+                    "h-4 w-4",
+                    isPasswordHasEnglish ? "text-teal-500" : "text-gray-400",
+                  )}
+                />
+                <span
+                  className={cn(
+                    "text-sm",
+                    isPasswordHasEnglish ? "text-teal-500" : "text-gray-400",
+                  )}
+                >
+                  영문 포함
+                </span>
+              </div>
+            </div>
           </div>
 
           {/* 새 비밀번호 확인 */}
@@ -298,7 +306,7 @@ export function MyInfoForm() {
             label="새 비밀번호 확인"
             type="password"
             value={watch("newPasswordConfirm") || ""}
-            onChange={(value) =>
+            onChange={value =>
               setValue("newPasswordConfirm", value, { shouldValidate: true })
             }
             hasError={!!errors.newPasswordConfirm}
@@ -306,38 +314,10 @@ export function MyInfoForm() {
             disabled={isPending}
           />
 
-          {/* 이름 */}
-          <FloatingLabelInput
-            label="이름"
-            value={watch("name") || ""}
-            onChange={(value) =>
-              setValue("name", value, { shouldValidate: true })
-            }
-            hasError={!!errors.name}
-            errorMessage={errors.name?.message}
-            disabled={isPending}
-            required
-          />
-
-          {/* 전화번호 */}
-          <FloatingLabelInput
-            label="전화번호"
-            type="tel"
-            value={watch("phoneNumber") || ""}
-            onChange={(value) =>
-              setValue("phoneNumber", value, { shouldValidate: true })
-            }
-            placeholder="010-1234-5678"
-            hasError={!!errors.phoneNumber}
-            errorMessage={errors.phoneNumber?.message}
-            disabled={isPending}
-            required
-          />
-
           {/* 성별 */}
           <GenderToggle
             value={watch("gender") || ""}
-            onChange={(value) =>
+            onChange={value =>
               setValue("gender", value, { shouldValidate: true })
             }
             hasError={!!errors.gender}
@@ -348,7 +328,7 @@ export function MyInfoForm() {
           <FloatingLabelInput
             label="회사명"
             value={watch("company") || ""}
-            onChange={(value) =>
+            onChange={value =>
               setValue("company", value, { shouldValidate: true })
             }
             hasError={!!errors.company}
