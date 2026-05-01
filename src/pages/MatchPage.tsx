@@ -1,5 +1,11 @@
+import { useSearchParams } from "react-router";
 import { MainLayout } from "@/shared/components/layouts/MainLayout";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/shared/components/ui/tabs";
+import {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+} from "@/shared/components/ui/tabs";
 import { useReceivedMatches } from "@/features/match/hooks/useReceivedMatches";
 import { useSentMatches } from "@/features/match/hooks/useSentMatches";
 import { useMatchedMatches } from "@/features/match/hooks/useMatchedMatches";
@@ -7,6 +13,13 @@ import { useMatchAlarm } from "@/features/match/hooks/useMatchAlarm";
 import { MatchCard } from "@/features/match/components/MatchCard";
 
 export function MatchPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = searchParams.get("tab") ?? "received";
+
+  const handleTabChange = (value: string) => {
+    setSearchParams({ tab: value }, { replace: true });
+  };
+
   // 받은 매칭
   const {
     data: receivedData,
@@ -38,9 +51,11 @@ export function MatchPage() {
   const { data: alarmData } = useMatchAlarm();
 
   // 모든 페이지의 매칭 데이터를 평탄화
-  const receivedMatches = receivedData?.pages.flatMap(page => page.data.list) || [];
+  const receivedMatches =
+    receivedData?.pages.flatMap(page => page.data.list) || [];
   const sentMatches = sentData?.pages.flatMap(page => page.data.list) || [];
-  const matchedMatches = matchedData?.pages.flatMap(page => page.data.list) || [];
+  const matchedMatches =
+    matchedData?.pages.flatMap(page => page.data.list) || [];
 
   // 알림 개수 (API 우선, fallback으로 newChatCnt 합산)
   const receivedAlarmCount =
@@ -55,7 +70,11 @@ export function MatchPage() {
 
   return (
     <MainLayout>
-      <Tabs defaultValue="received" className="flex flex-col">
+      <Tabs
+        value={activeTab}
+        onValueChange={handleTabChange}
+        className="flex flex-col"
+      >
         {/* 헤더 - 고정 */}
         <div className="sticky top-0 bg-white z-10 px-4 pt-safe-top pt-3 pb-3 border-b">
           <h1 className="text-xl font-bold mb-3">매칭 관리</h1>
@@ -186,7 +205,11 @@ export function MatchPage() {
               // 매칭 목록
               <>
                 {matchedMatches.map(match => (
-                  <MatchCard key={match.matchId} match={match} variant="matched" />
+                  <MatchCard
+                    key={match.matchId}
+                    match={match}
+                    variant="matched"
+                  />
                 ))}
 
                 {/* 무한 스크롤 트리거 */}
