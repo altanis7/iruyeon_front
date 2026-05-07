@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, useNavigationType } from "react-router";
 import { Menu, Plus } from "lucide-react";
 import { MainLayout } from "@/shared/components/layouts/MainLayout";
 import { Button } from "@/shared/components/ui/button";
@@ -23,10 +23,11 @@ import { MatchRequestDialog } from "@/features/match/components/MatchRequestDial
 
 export function HomePage() {
   const navigate = useNavigate();
+  const navigationType = useNavigationType();
   const { currentUser } = useAuth();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false);
-  const { filters: committedFilters, setFilters: setCommittedFilters } = useFilterPersistence();
+  const { filters: committedFilters, setFilters: setCommittedFilters } = useFilterPersistence(navigationType);
   const [matchDialogOpen, setMatchDialogOpen] = useState(false);
   const [selectedProfile, setSelectedProfile] =
     useState<ClientDisplayData | null>(null);
