@@ -5,6 +5,7 @@ import { MainLayout } from "@/shared/components/layouts/MainLayout";
 import { Button } from "@/shared/components/ui/button";
 import { useClients } from "@/features/profile/hooks/useClients";
 import { useSearchClients } from "@/features/profile/hooks/useSearchClients";
+import { useFilterPersistence } from "@/features/profile/hooks/useFilterPersistence";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { ProfileGrid } from "@/features/profile/components/ProfileGrid";
 import { ProfileSearchBar } from "@/features/profile/components/ProfileSearchBar";
@@ -13,10 +14,8 @@ import { FilterPanel } from "@/features/profile/components/FilterPanel";
 import {
   mapClientToDisplay,
   type ClientDisplayData,
-  type FilterSearchParams,
 } from "@/features/profile/api/profileApi";
 import {
-  INITIAL_FILTER_STATE,
   countActiveFilters,
   hasActiveFilters,
 } from "@/features/profile/utils/filterOptions";
@@ -27,7 +26,7 @@ export function HomePage() {
   const { currentUser } = useAuth();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false);
-  const [committedFilters, setCommittedFilters] = useState<FilterSearchParams>(INITIAL_FILTER_STATE);
+  const { filters: committedFilters, setFilters: setCommittedFilters } = useFilterPersistence();
   const [matchDialogOpen, setMatchDialogOpen] = useState(false);
   const [selectedProfile, setSelectedProfile] =
     useState<ClientDisplayData | null>(null);
