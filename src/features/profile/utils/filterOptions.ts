@@ -78,8 +78,8 @@ export const FILTER_CATEGORY_ORDER: FilterCategory[] = [
 
 export const INITIAL_FILTER_STATE: FilterSearchParams = {
   keyword: "",
-  minBirthYear: BIRTH_YEAR_MIN,
-  maxBirthYear: BIRTH_YEAR_MAX,
+  minBirthYear: BIRTH_YEAR_MAX,
+  maxBirthYear: BIRTH_YEAR_MIN,
   job: [],
   religion: [],
   gender: [],
@@ -97,9 +97,9 @@ export function getFilterSummaryText(
 ): string {
   switch (category) {
     case "birthYear": {
-      const minBY = filters.minBirthYear ?? BIRTH_YEAR_MIN;
-      const maxBY = filters.maxBirthYear ?? BIRTH_YEAR_MAX;
-      if (minBY === BIRTH_YEAR_MIN && maxBY === BIRTH_YEAR_MAX)
+      const minBY = filters.minBirthYear ?? BIRTH_YEAR_MAX;
+      const maxBY = filters.maxBirthYear ?? BIRTH_YEAR_MIN;
+      if (minBY === BIRTH_YEAR_MAX && maxBY === BIRTH_YEAR_MIN)
         return "모든 출생년도";
       const currentYear = new Date().getFullYear();
       return `${currentYear - minBY}세(${minBY}년생) 이상 ~ ${currentYear - maxBY}세(${maxBY}년생) 이하`;
@@ -141,9 +141,9 @@ export function getFilterSummaryText(
 export function countActiveFilters(filters: FilterSearchParams): number {
   let count = 0;
   if (filters.keyword?.trim()) count++;
-  const minBY = filters.minBirthYear ?? BIRTH_YEAR_MIN;
-  const maxBY = filters.maxBirthYear ?? BIRTH_YEAR_MAX;
-  if (minBY !== BIRTH_YEAR_MIN || maxBY !== BIRTH_YEAR_MAX) count++;
+  const minBY = filters.minBirthYear ?? BIRTH_YEAR_MAX;
+  const maxBY = filters.maxBirthYear ?? BIRTH_YEAR_MIN;
+  if (minBY !== BIRTH_YEAR_MAX || maxBY !== BIRTH_YEAR_MIN) count++;
   if ((filters.job?.length ?? 0) > 0) count++;
   if ((filters.religion?.length ?? 0) > 0) count++;
   if ((filters.gender?.length ?? 0) > 0) count++;
@@ -170,8 +170,8 @@ export function resetCategoryFilter(
     case "birthYear":
       return {
         ...filters,
-        minBirthYear: BIRTH_YEAR_MIN,
-        maxBirthYear: BIRTH_YEAR_MAX,
+        minBirthYear: BIRTH_YEAR_MAX,
+        maxBirthYear: BIRTH_YEAR_MIN,
       };
     case "height":
       return { ...filters, minHeight: HEIGHT_MIN, maxHeight: HEIGHT_MAX };

@@ -15,6 +15,7 @@ interface DualRangeSliderProps {
   onMaxChange: (val: number) => void;
   unit?: string;
   className?: string;
+  reverse?: boolean;
 }
 
 export function DualRangeSlider({
@@ -27,6 +28,7 @@ export function DualRangeSlider({
   onMaxChange,
   unit = "",
   className,
+  reverse = false,
 }: DualRangeSliderProps) {
   const rangeRef = useRef<HTMLDivElement>(null);
   const [minOnTop, setMinOnTop] = useState(false);
@@ -108,8 +110,8 @@ export function DualRangeSlider({
 
       {/* 최소/최대 레이블 */}
       <div className="flex justify-between mt-3 px-1">
-        <span className="text-xs text-gray-400">{min}{unit}</span>
-        <span className="text-xs text-gray-400">{max}{unit}</span>
+        <span className="text-xs text-gray-400">{reverse ? max : min}{unit}</span>
+        <span className="text-xs text-gray-400">{reverse ? min : max}{unit}</span>
       </div>
     </div>
   );

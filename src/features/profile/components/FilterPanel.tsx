@@ -227,39 +227,47 @@ export function FilterPanel({
 
         <div className="flex-1 overflow-y-auto">
           {/* 출생년도 범위 슬라이더 */}
-          {selectedCategory === "birthYear" && (
-            <div className="px-4 py-6">
-              <p className="text-sm text-gray-500 mb-4">
-                원하는 상대방 출생년도 범위를 선택하세요
-              </p>
-              <div className="flex justify-between items-center mb-6">
-                <span className="text-sm text-rose-500 font-medium">
-                  {new Date().getFullYear() -
-                    (draft.minBirthYear ?? BIRTH_YEAR_MIN)}
-                  세({draft.minBirthYear ?? BIRTH_YEAR_MIN}년생) 이상
-                </span>
-                <span className="text-sm text-rose-500 font-medium">
-                  {new Date().getFullYear() -
-                    (draft.maxBirthYear ?? BIRTH_YEAR_MAX)}
-                  세({draft.maxBirthYear ?? BIRTH_YEAR_MAX}년생) 이하
-                </span>
+          {selectedCategory === "birthYear" && (() => {
+            // 값 변환 공식: 슬라이더 값과 실제 값을 반전
+            // minBirthYear = 2005 (나이 어린), maxBirthYear = 1960 (나이 많은)
+            // 슬라이더: 좌(1960) → 우(2005)
+            // 좌측 핸들 조작 → 좌측 텍스트(minBirthYear) 변경
+            // 우측 핸들 조작 → 우측 텍스트(maxBirthYear) 변경
+            const BIRTH_YEAR_SUM = BIRTH_YEAR_MIN + BIRTH_YEAR_MAX; // 1960 + 2005 = 3965
+            const currentYear = new Date().getFullYear();
+            const minBirth = draft.minBirthYear ?? BIRTH_YEAR_MAX; // 기본 2005
+            const maxBirth = draft.maxBirthYear ?? BIRTH_YEAR_MIN; // 기본 1960
+
+            return (
+              <div className="px-4 py-6">
+                <p className="text-sm text-gray-500 mb-4">
+                  원하는 상대방 출생년도 범위를 선택하세요
+                </p>
+                <div className="flex justify-between items-center mb-6">
+                  <span className="text-sm text-rose-500 font-medium">
+                    {currentYear - minBirth}세({minBirth}년생) 이상
+                  </span>
+                  <span className="text-sm text-rose-500 font-medium">
+                    {currentYear - maxBirth}세({maxBirth}년생) 이하
+                  </span>
+                </div>
+                <DualRangeSlider
+                  min={BIRTH_YEAR_MIN}
+                  max={BIRTH_YEAR_MAX}
+                  step={1}
+                  minValue={BIRTH_YEAR_SUM - minBirth}
+                  maxValue={BIRTH_YEAR_SUM - maxBirth}
+                  onMinChange={v =>
+                    setDraft(prev => ({ ...prev, minBirthYear: BIRTH_YEAR_SUM - v }))
+                  }
+                  onMaxChange={v =>
+                    setDraft(prev => ({ ...prev, maxBirthYear: BIRTH_YEAR_SUM - v }))
+                  }
+                  unit="년"
+                />
               </div>
-              <DualRangeSlider
-                min={BIRTH_YEAR_MIN}
-                max={BIRTH_YEAR_MAX}
-                step={1}
-                minValue={draft.minBirthYear ?? BIRTH_YEAR_MIN}
-                maxValue={draft.maxBirthYear ?? BIRTH_YEAR_MAX}
-                onMinChange={v =>
-                  setDraft(prev => ({ ...prev, minBirthYear: v }))
-                }
-                onMaxChange={v =>
-                  setDraft(prev => ({ ...prev, maxBirthYear: v }))
-                }
-                unit="년"
-              />
-            </div>
-          )}
+            );
+          })()}
 
           {/* 키 범위 슬라이더 */}
           {selectedCategory === "height" && (
