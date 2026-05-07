@@ -141,10 +141,10 @@ export function FilterPanel({
           <button onClick={handleBackFromLevel3} className="p-1 -ml-1">
             <ArrowLeft className="h-5 w-5" />
           </button>
-          <span className="font-semibold text-base">전문직</span>
+          <span className="font-semibold text-lg">전문직</span>
           <button
             onClick={() => handleResetCategory("job")}
-            className="text-sm text-gray-500 active:text-rose-500"
+            className="text-base text-gray-500 active:text-rose-500"
           >
             삭제
           </button>
@@ -163,13 +163,13 @@ export function FilterPanel({
                     <div>
                       <span
                         className={cn(
-                          "text-sm",
+                          "text-base",
                           isSelected && "text-rose-500 font-medium",
                         )}
                       >
                         {option}
                       </span>
-                      <span className="block text-xs text-gray-400 mt-0.5">
+                      <span className="block text-sm text-gray-400 mt-0.5">
                         {option === "법조계 전문직" &&
                           "판사, 검사, 변호사, 변리사"}
                         {option === "의료계 전문직" && "의사, 약사"}
@@ -189,7 +189,7 @@ export function FilterPanel({
 
         <div className="px-4 py-4 border-t shrink-0">
           <Button
-            className="w-full h-12 bg-rose-500 hover:bg-rose-600 text-white rounded-full text-base font-semibold"
+            className="w-full h-12 bg-rose-500 hover:bg-rose-600 text-white rounded-full text-lg font-semibold"
             onClick={handleConfirmLevel3}
           >
             선택
@@ -214,12 +214,12 @@ export function FilterPanel({
           <button onClick={handleBackFromLevel2} className="p-1 -ml-1">
             <ArrowLeft className="h-5 w-5" />
           </button>
-          <span className="font-semibold text-base">
+          <span className="font-semibold text-lg">
             {FILTER_LABELS[selectedCategory]}
           </span>
           <button
             onClick={() => handleResetCategory(selectedCategory)}
-            className="text-sm text-gray-500 active:text-rose-500"
+            className="text-base text-gray-500 active:text-rose-500"
           >
             삭제
           </button>
@@ -240,14 +240,14 @@ export function FilterPanel({
 
             return (
               <div className="px-4 py-6">
-                <p className="text-sm text-gray-500 mb-4">
+                <p className="text-base text-gray-500 mb-4">
                   원하는 상대방 출생년도 범위를 선택하세요
                 </p>
                 <div className="flex justify-between items-center mb-6">
-                  <span className="text-sm text-rose-500 font-medium">
+                  <span className="text-base text-rose-500 font-medium">
                     {currentYear - minBirth}세({minBirth}년생) 이상
                   </span>
-                  <span className="text-sm text-rose-500 font-medium">
+                  <span className="text-base text-rose-500 font-medium">
                     {currentYear - maxBirth}세({maxBirth}년생) 이하
                   </span>
                 </div>
@@ -272,14 +272,14 @@ export function FilterPanel({
           {/* 키 범위 슬라이더 */}
           {selectedCategory === "height" && (
             <div className="px-4 py-6">
-              <p className="text-sm text-gray-500 mb-4">
+              <p className="text-base text-gray-500 mb-4">
                 원하는 상대방 키 범위를 선택하세요
               </p>
               <div className="flex justify-between items-center mb-6">
-                <span className="text-sm text-rose-500 font-medium">
+                <span className="text-base text-rose-500 font-medium">
                   {draft.minHeight ?? HEIGHT_MIN}cm 이상
                 </span>
-                <span className="text-sm text-rose-500 font-medium">
+                <span className="text-base text-rose-500 font-medium">
                   {draft.maxHeight ?? HEIGHT_MAX}cm 이하
                 </span>
               </div>
@@ -299,7 +299,7 @@ export function FilterPanel({
           {/* 키워드 입력 */}
           {selectedCategory === "keyword" && (
             <div className="px-4 py-6 space-y-3">
-              <p className="text-sm text-gray-500">예: 의사, 여행, 강아지</p>
+              <p className="text-base text-gray-500">예: 의사, 여행, 강아지</p>
               <FloatingLabelInput
                 label="키워드 입력"
                 value={draft.keyword ?? ""}
@@ -323,7 +323,7 @@ export function FilterPanel({
                       >
                         <span
                           className={cn(
-                            "text-sm",
+                            "text-base",
                             hasProfessionalSub && "text-rose-500 font-medium",
                           )}
                         >
@@ -344,7 +344,7 @@ export function FilterPanel({
                     >
                       <span
                         className={cn(
-                          "text-sm",
+                          "text-base",
                           isSelected && "text-rose-500 font-medium",
                         )}
                       >
@@ -363,7 +363,7 @@ export function FilterPanel({
 
         <div className="px-4 py-4 border-t shrink-0">
           <Button
-            className="w-full h-12 bg-rose-500 hover:bg-rose-600 text-white rounded-full text-base font-semibold"
+            className="w-full h-12 bg-rose-500 hover:bg-rose-600 text-white rounded-full text-lg font-semibold"
             onClick={handleConfirmLevel2}
           >
             선택
@@ -379,14 +379,14 @@ export function FilterPanel({
       <div className="flex items-center justify-between px-4 h-14 border-b shrink-0">
         <button
           onClick={onClose}
-          className="text-sm text-gray-600 active:text-gray-900"
+          className="text-base text-gray-600 active:text-gray-900"
         >
           취소
         </button>
-        <span className="font-semibold text-base">필터</span>
+        <span className="font-semibold text-lg">필터</span>
         <button
           onClick={handleResetAll}
-          className="text-sm text-gray-500 active:text-rose-500"
+          className="text-base text-gray-500 active:text-rose-500"
         >
           모두 삭제
         </button>
@@ -404,12 +404,12 @@ export function FilterPanel({
                   onClick={() => handleSelectCategory(category)}
                 >
                   <div className="flex-1 min-w-0">
-                    <div className="text-sm font-semibold">
+                    <div className="text-base font-semibold">
                       {FILTER_LABELS[category]}
                     </div>
                     <div
                       className={cn(
-                        "text-sm mt-0.5 truncate",
+                        "text-base mt-0.5 truncate",
                         isActive ? "text-rose-500" : "text-gray-400",
                       )}
                     >
@@ -426,7 +426,7 @@ export function FilterPanel({
 
       <div className="px-4 py-4 border-t shrink-0">
         <Button
-          className="w-full h-12 bg-rose-500 hover:bg-rose-600 text-white rounded-full text-base font-semibold"
+          className="w-full h-12 bg-rose-500 hover:bg-rose-600 text-white rounded-full text-lg font-semibold"
           onClick={handleSearch}
         >
           결과 보기
