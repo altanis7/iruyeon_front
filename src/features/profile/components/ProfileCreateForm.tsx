@@ -53,8 +53,9 @@ export function ProfileCreateForm({
   const {
     watch,
     setValue,
+    reset,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
     mode: "onTouched",
@@ -88,6 +89,9 @@ export function ProfileCreateForm({
       family: [],
     },
   });
+  const defaultValuesKey = externalDefaults
+    ? JSON.stringify(externalDefaults)
+    : "";
 
   // 다이얼로그 상태
   const [birthYearDialogOpen, setBirthYearDialogOpen] = useState(false);
@@ -101,10 +105,14 @@ export function ProfileCreateForm({
 
   // 비동기 데이터 동기화 (React Query에서 데이터 도착 시 상태 업데이트)
   useEffect(() => {
-    if (initialImageUrls.length > 0) {
-      setImageUrls(initialImageUrls);
-    }
+    setImageUrls(initialImageUrls);
   }, [initialImageUrls]);
+
+  useEffect(() => {
+    if (mode === "edit" && externalDefaults && !isDirty) {
+      reset(externalDefaults);
+    }
+  }, [defaultValuesKey, externalDefaults, isDirty, mode, reset]);
 
   // Watch 필드
   const gender = watch("gender");

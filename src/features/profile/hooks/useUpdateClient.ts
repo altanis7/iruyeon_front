@@ -18,6 +18,9 @@ export function useUpdateClient() {
       queryClient.invalidateQueries({
         queryKey: ["client", String(variables.clientId)],
       });
+      queryClient.invalidateQueries({
+        queryKey: ["clientInfo", String(variables.clientId)],
+      });
 
       // Invalidate my clients list
       queryClient.invalidateQueries({
