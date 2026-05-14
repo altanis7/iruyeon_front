@@ -125,12 +125,6 @@ export function HeroSection({
         </button>
       )}
 
-      {/* 상단 그라디언트 */}
-      <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-black/40 via-black/20 to-transparent pointer-events-none" />
-
-      {/* 하단 그라디언트 */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent pointer-events-none" />
-
       {/* 상단 네비게이션 */}
       <div className="absolute top-0 left-0 right-0 p-4 flex justify-between items-start z-10">
         <GlassButton size="icon" onClick={onBack}>
