@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from "react-router";
+import { useLocation, useNavigate, useParams } from "react-router";
 import { ArrowLeft } from "lucide-react";
 import RootLayout from "@/shared/components/layouts/RootLayout";
 import { Button } from "@/shared/components/ui/button";
@@ -12,10 +12,22 @@ import { clientDetailToFormData } from "@/features/profile/utils/clientDetailToF
  */
 export function ProfileEditPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { id } = useParams<{ id: string }>();
   const { data: response, isLoading } = useClientInfo(id!);
 
   const client = response?.data;
+  const cameFromClientDetail =
+    (location.state as { fromClientDetail?: boolean } | null)
+      ?.fromClientDetail === true;
+  const handleUpdateSuccess = () => {
+    if (cameFromClientDetail) {
+      navigate(-1);
+      return;
+    }
+
+    navigate(`/client/${id}?source=profile`, { replace: true });
+  };
 
   // 로딩 상태
   if (isLoading) {
@@ -102,7 +114,7 @@ export function ProfileEditPage() {
         defaultValues={formData}
         initialImageUrls={client.profileImages}
         clientId={Number(id)}
-        onSuccess={() => navigate(`/client/${id}?source=profile`)}
+        onSuccess={handleUpdateSuccess}
       />
     </RootLayout>
   );

@@ -209,7 +209,11 @@ export function ClientDetailPage() {
           isOwner={!!isOwner}
           onBack={() => navigate(-1)}
           onToggleStatus={handleToggleStatus}
-          onEdit={() => navigate(`/profile/${clientId}/edit?source=profile`)}
+          onEdit={() =>
+            navigate(`/profile/${clientId}/edit?source=profile`, {
+              state: { fromClientDetail: true },
+            })
+          }
           onDelete={handleDeleteClick}
           onReviewList={() => navigate(`/reviews?clientId=${client.id}`)}
         />
