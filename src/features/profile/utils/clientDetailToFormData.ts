@@ -41,7 +41,6 @@ export function clientDetailToFormData(
   return {
     // 필수 필드
     name: client.name,
-    phoneNumber: client.phoneNumber ?? "",
     gender: client.gender,
     birthYear: parseBirthYearFromAge(client.age),
     address: client.address,
@@ -67,14 +66,15 @@ export function clientDetailToFormData(
     info: client.info || undefined,
     minPreferredAge: client.minPreferredAge || undefined,
     maxPreferredAge: client.maxPreferredAge || undefined,
-    totalMeetingCnt: undefined, // ClientDetail에 없음
+    totalMeetingCnt: client.totalMeetingCnt ?? undefined,
+    currentMeetingCnt: client.currentMeetingCnt ?? undefined,
 
     // 가족 정보: ClientFamilyMember[] -> FamilyMember[]
     family:
       client.families?.map(f => {
         const isInfoFamily = "age" in f;
         return {
-          name: f.name,
+          name: f.name || undefined,
           relationship: f.relationship,
           job: f.job ?? undefined,
           birthYear: isInfoFamily

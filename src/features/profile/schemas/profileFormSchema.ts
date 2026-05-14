@@ -7,9 +7,8 @@ import { z } from "zod";
  * 가족 구성원 스키마 (기획서 기준 - 간소화)
  */
 export const familyMemberSchema = z.object({
-  name: z.string().min(1, "이름을 입력해주세요"),
+  name: z.string().optional(),
   relationship: z.string().min(1, "관계를 선택해주세요"),
-  phoneNumber: z.string().optional(),
   job: z.string().optional(),
   birthYear: z.number().optional(),
   religion: z.string().optional(),
@@ -22,12 +21,11 @@ export const familyMemberSchema = z.object({
 
 /**
  * 프로필 스키마 (단일 Step)
- * 필수 필드: 10개 (name, phoneNumber, gender, birthYear, address, eduLevel, job, height, religion, maritalStatus)
+ * 필수 필드: 9개 (name, gender, birthYear, address, eduLevel, job, height, religion, maritalStatus)
  */
 export const profileSchema = z.object({
-  // ===== 필수 필드 (10개) =====
+  // ===== 필수 필드 (9개) =====
   name: z.string().min(1, "이름을 입력해주세요"),
-  phoneNumber: z.string().min(1, "전화번호를 입력해주세요"),
   gender: z.string().min(1, "성별을 선택해주세요"),
   birthYear: z.number().min(1950, "출생년도를 확인해주세요"),
   address: z.string().min(1, "거주지를 입력해주세요"),
@@ -61,7 +59,7 @@ export const profileSchema = z.object({
   personality: z.string().optional(),
   idealType: z.string().optional(),
 
-  // 본적/본가/기타
+  // 본적/고향/기타
   lastNameOrigin: z.string().optional(),
   homeTown: z.string().optional(),
   info: z
@@ -76,7 +74,11 @@ export const profileSchema = z.object({
   // 만남 횟수
   totalMeetingCnt: z
     .number()
-    .min(0, "만남 횟수는 0 이상이어야 합니다")
+    .min(0, "총 만남 횟수는 0 이상이어야 합니다")
+    .optional(),
+  currentMeetingCnt: z
+    .number()
+    .min(0, "현재 만남 횟수는 0 이상이어야 합니다")
     .optional(),
 
   // 가족

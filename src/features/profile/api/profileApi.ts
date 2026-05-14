@@ -6,9 +6,8 @@
  * 가족 구성원 정보 (기획서 기준 - 간소화)
  */
 export interface FamilyMember {
-  name: string; // 이름 (필수)
+  name?: string; // 이름 (선택)
   relationship: string; // 관계 (필수) - PATCH API 기준 소문자 통일
-  phoneNumber?: string; // 전화번호 (선택)
   job?: string; // 직업 (선택)
   birthYear?: number; // 출생년도 (선택)
   religion?: string; // 종교 (선택)
@@ -20,13 +19,12 @@ export interface FamilyMember {
 }
 
 // 프로필 타입 정의 (API 필드명과 일치)
-// 필수 필드: 10개 (name, phoneNumber, gender, birthYear, address, eduLevel, job, height, religion, maritalStatus)
+// 필수 필드: 9개 (name, gender, birthYear, address, eduLevel, job, height, religion, maritalStatus)
 export interface Profile {
   id?: string; // 생성 시 선택
 
-  // ===== 필수 필드 (10개) =====
+  // ===== 필수 필드 (9개) =====
   name: string; // 이름
-  phoneNumber: string; // 전화번호
   gender: string; // 성별
   birthYear: number; // 출생년도
   address: string; // 거주지
@@ -57,9 +55,9 @@ export interface Profile {
   personality?: string; // 성격 - 키워드 쉼표 연결
   idealType?: string; // 이상형 - 키워드 쉼표 연결
 
-  // 본적/본가/기타
+  // 본적/고향/기타
   lastNameOrigin?: string; // 본적
-  homeTown?: string; // 본가 - hometown → homeTown
+  homeTown?: string; // 고향 - hometown → homeTown
   info?: string; // 기타 특이사항 (최대 100자) - notes → info
 
   // 희망 상대 조건
@@ -68,6 +66,7 @@ export interface Profile {
 
   // 만남 횟수
   totalMeetingCnt?: number; // 전체 만남 횟수
+  currentMeetingCnt?: number; // 현재 만남 횟수
 
   // 가족 정보
   family?: FamilyMember[]; // familyMembers → family
@@ -273,7 +272,7 @@ export interface ClientDetail {
   previousJob: string; // 이전 직업
   info: string; // 기타 특이사항
   lastNameOrigin?: string; // 본적
-  homeTown: string; // 본가
+  homeTown: string; // 고향
   gender: string; // 성별
   status: string; // 상태 (ACTIVE 등)
   minPreferredAge: number; // 희망 최소 나이
@@ -478,7 +477,6 @@ export interface UpdateClientRequest {
 
   // 필수 필드
   name: string;
-  phoneNumber: string;
   gender: string;
   birthYear: number;
   address: string;
@@ -507,11 +505,12 @@ export interface UpdateClientRequest {
 
   // 만남 횟수
   totalMeetingCnt?: number; // 전체 만남 횟수
+  currentMeetingCnt?: number; // 현재 만남 횟수
 
   // 가족 정보
   family?: Array<{
     relationship: string;
-    name: string;
+    name?: string;
     birthYear: number;
     address: string;
     property: string;

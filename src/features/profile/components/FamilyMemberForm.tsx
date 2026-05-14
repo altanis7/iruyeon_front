@@ -1,6 +1,6 @@
 /**
  * 단일 가족 구성원 입력 폼 컴포넌트 (기획서 기준)
- * 11개 필드: 이름, 관계, 전화번호, 직업, 출생년도, 종교, 직업 상세, 거주지, 대학교, 재산, 기타 정보
+ * 10개 필드: 이름, 관계, 직업, 출생년도, 종교, 직업 상세, 거주지, 대학교, 재산, 기타 정보
  */
 import { useState } from "react";
 import { X, ChevronDown, ChevronUp } from "lucide-react";
@@ -93,7 +93,6 @@ export function FamilyMemberForm({
           value={member.name || ""}
           onChange={value => handleUpdate({ name: value })}
           placeholder="이름을 입력하세요"
-          required
         />
 
         {/* 2. 관계 */}
@@ -105,16 +104,7 @@ export function FamilyMemberForm({
           required
         />
 
-        {/* 3. 전화번호 */}
-        <FloatingLabelInput
-          label="전화번호"
-          value={member.phoneNumber || ""}
-          onChange={value => handleUpdate({ phoneNumber: value })}
-          placeholder="01012345678"
-          type="tel"
-        />
-
-        {/* 4. 직업 */}
+        {/* 3. 직업 */}
         <FloatingLabelInput
           label="직업"
           value={member.job || ""}
@@ -122,7 +112,7 @@ export function FamilyMemberForm({
           placeholder="직업을 입력하세요"
         />
 
-        {/* 5. 나이 (출생년도) */}
+        {/* 4. 나이 (출생년도) */}
         <FloatingLabelSelect
           label="나이"
           value={member.birthYear}
@@ -135,7 +125,7 @@ export function FamilyMemberForm({
           placeholder="출생년도를 선택하세요"
         />
 
-        {/* 6. 종교 */}
+        {/* 5. 종교 */}
         <FloatingLabelSelect
           label="종교"
           value={member.religion}
@@ -154,7 +144,7 @@ export function FamilyMemberForm({
         <div className="px-4 pb-4 space-y-4 border-t border-gray-100 pt-4">
           <p className="text-xs text-gray-400 font-medium">상세 정보</p>
 
-          {/* 7. 직업 상세 */}
+          {/* 6. 직업 상세 */}
           <FloatingLabelInput
             label="직업 상세"
             value={member.jobDetail || ""}
@@ -162,7 +152,7 @@ export function FamilyMemberForm({
             placeholder="예: 삼성전자"
           />
 
-          {/* 8. 거주지 */}
+          {/* 7. 거주지 */}
           <FloatingLabelInput
             label="거주지"
             value={member.address || ""}
@@ -170,7 +160,7 @@ export function FamilyMemberForm({
             placeholder="거주지를 입력하세요"
           />
 
-          {/* 9. 대학교 */}
+          {/* 8. 대학교 */}
           <FloatingLabelInput
             label="대학교"
             value={member.university || ""}
@@ -178,7 +168,7 @@ export function FamilyMemberForm({
             placeholder="대학교를 입력하세요"
           />
 
-          {/* 10. 재산 */}
+          {/* 9. 재산 */}
           <FloatingLabelInput
             label="재산"
             value={member.property || ""}
@@ -186,7 +176,7 @@ export function FamilyMemberForm({
             placeholder="재산 정보를 입력하세요"
           />
 
-          {/* 11. 기타 정보 */}
+          {/* 10. 기타 정보 */}
           <FloatingLabelInput
             label="기타 정보"
             value={member.info || ""}

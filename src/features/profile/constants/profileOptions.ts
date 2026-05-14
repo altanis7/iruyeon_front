@@ -29,11 +29,11 @@ export const PROFESSIONAL_JOB_SUBOPTIONS = [
 
 // 학력 수준 (기존 EDUCATION_TIERS 대체)
 export const EDUCATION_LEVELS = [
-  "고졸",
   "학사",
   "석사",
   "박사",
   "전문대",
+  "고졸",
 ] as const;
 
 // 종교 목록 (기획서 기준)

@@ -18,7 +18,6 @@ export function convertFormDataToUpdateRequest(
 
     // 필수 필드
     name: formData.name,
-    phoneNumber: formData.phoneNumber,
     gender: formData.gender,
     birthYear: formData.birthYear,
     address: formData.address,
@@ -47,12 +46,13 @@ export function convertFormDataToUpdateRequest(
     minPreferredAge: formData.minPreferredAge ?? undefined,
     maxPreferredAge: formData.maxPreferredAge ?? undefined,
     totalMeetingCnt: formData.totalMeetingCnt ?? undefined,
+    currentMeetingCnt: formData.currentMeetingCnt ?? undefined,
 
     // 가족 정보: FamilyMember[] -> UpdateClientRequest.family[]
     family: formData.family?.length
       ? formData.family.map(f => ({
           relationship: f.relationship,
-          name: f.name,
+          name: f.name?.trim() || undefined,
           birthYear: f.birthYear ?? 0,
           address: f.address ?? "",
           property: f.property ?? "",

@@ -1,6 +1,6 @@
 /**
  * 프로필 생성 폼 (전면 개편 - 단일 Step)
- * 기획서 기준: 24개 필드 단일 페이지 스크롤
+ * 기획서 기준: 25개 필드 단일 페이지 스크롤
  */
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -14,6 +14,7 @@ import { YearSelectDialog } from "./YearSelectDialog";
 import { EducationSelect } from "./EducationSelect";
 import { FamilyMembersSection } from "./FamilyMembersSection";
 import { GenderToggle } from "./GenderToggle";
+import { MaritalStatusToggle } from "./MaritalStatusToggle";
 import { KeywordPickerSection } from "./KeywordPickerSection";
 import { PropertyInput } from "./PropertyInput";
 import { HeightInputDialog } from "./HeightInputDialog";
@@ -27,24 +28,9 @@ import type { ProfileFormData } from "../schemas/profileFormSchema";
 import {
   JOB_OPTIONS,
   RELIGION_OPTIONS,
-  MARITAL_STATUS_OPTIONS,
   PERSONALITY_KEYWORDS,
   PROFESSIONAL_JOB_SUBOPTIONS,
 } from "../constants/profileOptions";
-
-// 전화번호 하이픈 포매팅 유틸
-const formatPhoneNumber = (digits: string): string => {
-  const d = digits.replace(/\D/g, "").slice(0, 11);
-  if (d.startsWith("02")) {
-    if (d.length <= 2) return d;
-    if (d.length <= 5) return `${d.slice(0, 2)}-${d.slice(2)}`;
-    if (d.length <= 9) return `${d.slice(0, 2)}-${d.slice(2, 5)}-${d.slice(5)}`;
-    return `${d.slice(0, 2)}-${d.slice(2, 6)}-${d.slice(6)}`;
-  }
-  if (d.length <= 3) return d;
-  if (d.length <= 7) return `${d.slice(0, 3)}-${d.slice(3)}`;
-  return `${d.slice(0, 3)}-${d.slice(3, 7)}-${d.slice(7)}`;
-};
 
 interface ProfileCreateFormProps {
   mode?: "create" | "edit";
@@ -76,7 +62,6 @@ export function ProfileCreateForm({
       imageIdList: [],
       name: "",
       lastNameOrigin: "",
-      phoneNumber: "",
       gender: "",
       birthYear: undefined,
       address: "",
@@ -98,20 +83,11 @@ export function ProfileCreateForm({
       info: "",
       minPreferredAge: undefined,
       maxPreferredAge: undefined,
+      totalMeetingCnt: undefined,
+      currentMeetingCnt: undefined,
       family: [],
     },
   });
-
-  // 전화번호 표시용 상태 (하이픈 포함)
-  const [displayPhoneNumber, setDisplayPhoneNumber] = useState(
-    formatPhoneNumber(externalDefaults?.phoneNumber ?? ""),
-  );
-
-  // 수정 모드에서 외부 데이터 도착 시 동기화
-  useEffect(() => {
-    const raw = externalDefaults?.phoneNumber ?? "";
-    setDisplayPhoneNumber(formatPhoneNumber(raw));
-  }, [externalDefaults?.phoneNumber]);
 
   // 다이얼로그 상태
   const [birthYearDialogOpen, setBirthYearDialogOpen] = useState(false);
@@ -119,7 +95,6 @@ export function ProfileCreateForm({
   const [jobSubDialogOpen, setJobSubDialogOpen] = useState(false);
   const [heightDialogOpen, setHeightDialogOpen] = useState(false);
   const [religionDialogOpen, setReligionDialogOpen] = useState(false);
-  const [maritalStatusDialogOpen, setMaritalStatusDialogOpen] = useState(false);
 
   // 이미지 URL 상태 (미리보기용 - imageId는 form에, imageUrl은 로컬 상태로)
   const [imageUrls, setImageUrls] = useState<string[]>(initialImageUrls);
@@ -148,6 +123,21 @@ export function ProfileCreateForm({
   const handleImagesChange = (ids: number[], urls: string[]) => {
     setValue("imageIdList", ids);
     setImageUrls(urls);
+  };
+
+  const handleOptionalNumberChange = (
+    field: "totalMeetingCnt" | "currentMeetingCnt",
+    value: string,
+  ) => {
+    if (value === "") {
+      setValue(field, undefined, { shouldValidate: true });
+      return;
+    }
+
+    const numericValue = Number(value);
+    if (!Number.isNaN(numericValue)) {
+      setValue(field, numericValue, { shouldValidate: true });
+    }
   };
 
   // 성격/이상형: 문자열 → 배열 변환
@@ -201,7 +191,17 @@ export function ProfileCreateForm({
             )}
           </div>
 
-          {/* 2. 이름 */}
+          {/* 2. 혼인 여부 */}
+          <MaritalStatusToggle
+            value={maritalStatus}
+            onChange={value =>
+              setValue("maritalStatus", value, { shouldValidate: true })
+            }
+            hasError={!!errors.maritalStatus}
+            errorMessage={errors.maritalStatus?.message}
+          />
+
+          {/* 3. 이름 */}
           <FloatingLabelInput
             label="이름"
             value={watch("name")}
@@ -217,22 +217,6 @@ export function ProfileCreateForm({
             value={watch("lastNameOrigin") || ""}
             onChange={value => setValue("lastNameOrigin", value)}
             placeholder="예: 경주 김씨"
-          />
-
-          {/* 3. 전화번호 */}
-          <FloatingLabelInput
-            label="전화번호"
-            value={displayPhoneNumber}
-            onChange={value => {
-              const digits = value.replace(/\D/g, "").slice(0, 11);
-              setDisplayPhoneNumber(formatPhoneNumber(digits));
-              setValue("phoneNumber", digits);
-            }}
-            placeholder="010-1234-5678"
-            type="tel"
-            required
-            hasError={!!errors.phoneNumber}
-            errorMessage={errors.phoneNumber?.message}
           />
 
           {/* 4. 성별 */}
@@ -397,26 +381,41 @@ export function ProfileCreateForm({
             onMaxChange={year => setValue("maxPreferredAge", year)}
           />
 
-          {/* 21. 혼인 여부 */}
-          <FloatingLabelSelect
-            label="혼인 여부"
-            value={maritalStatus}
-            onClick={() => setMaritalStatusDialogOpen(true)}
-            placeholder="혼인 여부를 선택하세요"
-            required
-            hasError={!!errors.maritalStatus}
-            errorMessage={errors.maritalStatus?.message}
+          {/* 21. 총 만남 횟수 */}
+          <FloatingLabelInput
+            label="총 만남 횟수"
+            value={String(watch("totalMeetingCnt") ?? "")}
+            onChange={value =>
+              handleOptionalNumberChange("totalMeetingCnt", value)
+            }
+            placeholder="0"
+            type="number"
+            hasError={!!errors.totalMeetingCnt}
+            errorMessage={errors.totalMeetingCnt?.message}
           />
 
-          {/* 22. 본가 */}
+          {/* 22. 현재 만남 횟수 */}
           <FloatingLabelInput
-            label="본가"
+            label="현재 만남 횟수"
+            value={String(watch("currentMeetingCnt") ?? "")}
+            onChange={value =>
+              handleOptionalNumberChange("currentMeetingCnt", value)
+            }
+            placeholder="0"
+            type="number"
+            hasError={!!errors.currentMeetingCnt}
+            errorMessage={errors.currentMeetingCnt?.message}
+          />
+
+          {/* 23. 고향 */}
+          <FloatingLabelInput
+            label="고향"
             value={watch("homeTown") || ""}
             onChange={value => setValue("homeTown", value)}
             placeholder="예: 서울"
           />
 
-          {/* 23. 기타 특이사항 */}
+          {/* 24. 기타 특이사항 */}
           <FloatingLabelTextarea
             label="기타 특이사항"
             value={watch("info") || ""}
@@ -428,7 +427,7 @@ export function ProfileCreateForm({
             errorMessage={errors.info?.message}
           />
 
-          {/* 24. 가족 정보 */}
+          {/* 25. 가족 정보 */}
           <FamilyMembersSection
             familyMembers={family || []}
             onFamilyMembersChange={members => setValue("family", members)}
@@ -515,15 +514,6 @@ export function ProfileCreateForm({
         options={RELIGION_OPTIONS}
         selectedValue={religion || ""}
         onConfirm={value => setValue("religion", value)}
-      />
-
-      <ProfilePickerDialog
-        open={maritalStatusDialogOpen}
-        onOpenChange={setMaritalStatusDialogOpen}
-        title="혼인 여부 선택"
-        options={MARITAL_STATUS_OPTIONS}
-        selectedValue={maritalStatus || ""}
-        onConfirm={value => setValue("maritalStatus", value)}
       />
     </div>
   );

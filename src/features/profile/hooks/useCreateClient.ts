@@ -13,7 +13,6 @@ function convertFormDataToProfile(
   return {
     imageIdList: formData.imageIdList?.length ? formData.imageIdList : undefined,
     name: formData.name,
-    phoneNumber: formData.phoneNumber,
     gender: formData.gender,
     birthYear: formData.birthYear,
     address: formData.address,
@@ -36,7 +35,13 @@ function convertFormDataToProfile(
     minPreferredAge: formData.minPreferredAge ?? undefined,
     maxPreferredAge: formData.maxPreferredAge ?? undefined,
     totalMeetingCnt: formData.totalMeetingCnt ?? undefined,
-    family: formData.family?.length ? formData.family : undefined,
+    currentMeetingCnt: formData.currentMeetingCnt ?? undefined,
+    family: formData.family?.length
+      ? formData.family.map(({ name, ...member }) => ({
+          ...member,
+          name: name?.trim() || undefined,
+        }))
+      : undefined,
   };
 }
 
