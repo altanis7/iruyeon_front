@@ -2,6 +2,8 @@ import axios from "axios";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 const API_VERSION = "v0";
+const DEFAULT_API_ERROR_MESSAGE =
+  "오류가 발생했습니다.\n문제가 지속될 경우 관리자에게 문의해주세요.";
 
 export const apiClient = axios.create({
   baseURL: `${API_BASE_URL}/api/${API_VERSION}`,
@@ -29,6 +31,15 @@ export function removeCookie(name: string): void {
   document.cookie = `${name}=; path=/; max-age=0`;
 }
 
+function getBackendErrorMessage(data: unknown): string | null {
+  if (!data || typeof data !== "object" || !("message" in data)) {
+    return null;
+  }
+
+  const message = (data as { message?: unknown }).message;
+  return typeof message === "string" && message.trim() ? message : null;
+}
+
 apiClient.interceptors.request.use(
   config => {
     const token = getCookie("access_token");
@@ -44,7 +55,18 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   response => response,
   error => {
-    // 401 Unauthorized 처리 등
+    if (axios.isAxiosError(error)) {
+      const status = error.response?.status;
+
+      if (status && status >= 400 && status < 600) {
+        const message =
+          getBackendErrorMessage(error.response?.data) ??
+          DEFAULT_API_ERROR_MESSAGE;
+
+        return Promise.reject(new Error(message));
+      }
+    }
+
     return Promise.reject(error);
   },
 );
