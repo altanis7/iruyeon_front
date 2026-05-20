@@ -8,11 +8,11 @@ import {
 import { Button } from "@/shared/components/ui/button";
 import { Textarea } from "@/shared/components/ui/textarea";
 import { ProfileImage } from "@/shared/components/ui/profile-image";
-import { useMyClients } from "@/features/profile/hooks/useMyClients";
 import {
   mapMyClientToDisplay,
   type MyClientDisplayData,
 } from "@/features/profile/api/profileApi";
+import { useMatchMyClients } from "../hooks/useMatchMyClients";
 import { useSendMatchRequest } from "../hooks/useSendMatchRequest";
 import { cn } from "@/lib/utils";
 import { Search, Check, Send } from "lucide-react";
@@ -36,7 +36,7 @@ export function MatchRequestDialog({
   const [message, setMessage] = useState("");
   const [searchKeyword, setSearchKeyword] = useState("");
 
-  const { data, isLoading } = useMyClients();
+  const { data, isLoading } = useMatchMyClients(toClientId, open);
   const { mutate: sendMatchRequest, isPending } = useSendMatchRequest();
 
   // InfiniteQuery 페이지네이션 데이터 평탄화

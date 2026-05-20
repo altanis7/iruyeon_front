@@ -3,7 +3,11 @@
  */
 
 import { apiClient } from "@/lib/api/client";
-import type { ApiResponse } from "@/features/profile/api/profileApi";
+import type {
+  ApiResponse,
+  MyClientListData,
+  PaginationParams,
+} from "@/features/profile/api/profileApi";
 
 /**
  * 매칭 상태
@@ -196,6 +200,22 @@ export const matchApi = {
   getMatchAlarm: async (): Promise<ApiResponse<MatchAlarmData>> => {
     const response =
       await apiClient.get<ApiResponse<MatchAlarmData>>("/match/alarm");
+    return response.data;
+  },
+
+  /**
+   * 매칭 신청 가능한 내 관리 회원 목록 조회
+   */
+  getMyClientsForMatch: async (
+    clientId: number,
+    params: PaginationParams,
+  ): Promise<ApiResponse<MyClientListData>> => {
+    const response = await apiClient.get<ApiResponse<MyClientListData>>(
+      `/match/${clientId}/search/myClient`,
+      {
+        params,
+      },
+    );
     return response.data;
   },
 
