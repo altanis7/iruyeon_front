@@ -46,7 +46,10 @@ export function ChatModal({ matchId, open, onOpenChange }: ChatModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md h-[80vh] flex flex-col p-0">
+      <DialogContent
+        onOpenAutoFocus={e => e.preventDefault()}
+        className="sm:max-w-md h-[80vh] flex flex-col p-0"
+      >
         <DialogHeader className="px-4 py-3 border-b">
           <DialogTitle>채팅</DialogTitle>
         </DialogHeader>
