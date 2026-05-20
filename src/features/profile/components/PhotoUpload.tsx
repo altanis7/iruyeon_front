@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/shared/components/ui/button";
 import { Card } from "@/shared/components/ui/card";
 import { Label } from "@/shared/components/ui/label";
@@ -61,7 +62,7 @@ export function PhotoUpload({
       }
     } catch (error) {
       console.error("사진 업로드 실패:", error);
-      alert("사진 업로드에 실패했습니다.");
+      toast.error("사진 업로드에 실패했습니다.");
     }
   };
 
@@ -113,7 +114,7 @@ export function PhotoUpload({
       }
     } catch (error) {
       console.error("사진 업로드 실패:", error);
-      alert("사진 업로드에 실패했습니다.");
+      toast.error("사진 업로드에 실패했습니다.");
     }
   };
 

@@ -1,5 +1,6 @@
 import { useRef } from "react";
 import { Camera, Loader2, User } from "lucide-react";
+import { toast } from "sonner";
 import { useUploadImage } from "@/features/upload/hooks/useUploadImage";
 import { cn } from "@/lib/utils";
 
@@ -29,13 +30,13 @@ export function ProfileImageUpload({
 
     // 이미지 파일 검증
     if (!file.type.startsWith("image/")) {
-      alert("이미지 파일만 업로드 가능합니다.");
+      toast.warning("이미지 파일만 업로드 가능합니다.");
       return;
     }
 
     // 파일 크기 검증 (5MB)
     if (file.size > 5 * 1024 * 1024) {
-      alert("파일 크기는 5MB 이하만 가능합니다.");
+      toast.warning("파일 크기는 5MB 이하만 가능합니다.");
       return;
     }
 
@@ -46,7 +47,7 @@ export function ProfileImageUpload({
         onImageChange(imageId, uploadedUrl);
       },
       onError: error => {
-        alert(`이미지 업로드 실패: ${error.message}`);
+        toast.error(`이미지 업로드 실패: ${error.message}`);
       },
     });
 

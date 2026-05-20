@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Check } from "lucide-react";
+import { toast } from "sonner";
 
 import { Button } from "@/shared/components/ui/button";
 import { useSignup } from "@/features/auth/hooks/useSignup";
@@ -119,12 +120,12 @@ export function SignupForm() {
   const onSubmit = (data: SignupFormData) => {
     // 전화번호 중복확인 필수
     if (phoneCheckStatus !== "available") {
-      alert("전화번호 중복확인을 해주세요.");
+      toast.warning("전화번호 중복확인을 해주세요.");
       return;
     }
 
     if (!termsAgreed || !privacyAgreed) {
-      alert("이용약관 및 개인정보 처리방침에 모두 동의해주세요.");
+      toast.warning("이용약관 및 개인정보 처리방침에 모두 동의해주세요.");
       return;
     }
 
@@ -142,7 +143,7 @@ export function SignupForm() {
         setShowSuccessDialog(true);
       },
       onError: error => {
-        alert(`회원가입 실패: ${error.message}`);
+        toast.error(`회원가입 실패: ${error.message}`);
       },
     });
   };

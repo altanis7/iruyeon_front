@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { toast } from "sonner";
 import {
   BottomSheet,
   BottomSheetContent,
@@ -49,7 +50,7 @@ export function ProfileSelectDialog({
       } else {
         // 선택되지 않은 경우 추가 (최대 개수 확인)
         if (maxSelection && tempSelected.length >= maxSelection) {
-          alert(`최대 ${maxSelection}개까지 선택 가능합니다.`);
+          toast.warning(`최대 ${maxSelection}개까지 선택 가능합니다.`);
           return;
         }
         setTempSelected([...tempSelected, value]);
@@ -74,7 +75,7 @@ export function ProfileSelectDialog({
   // 확인
   const handleConfirm = () => {
     if (!multiSelect && tempSelected.length === 0) {
-      alert("항목을 선택해주세요.");
+      toast.warning("항목을 선택해주세요.");
       return;
     }
     onConfirm(tempSelected);

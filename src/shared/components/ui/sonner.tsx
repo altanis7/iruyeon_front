@@ -8,7 +8,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
       duration={3500}
       position="top-center"
       gap={12}
-      visibleToasts={3}
+      visibleToasts={1}
       className="toaster group"
       icons={{
         success: <Check size={16} />,
@@ -19,6 +19,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
           toast: "toast-custom",
           title: "toast-title",
           description: "toast-description",
+          closeButton: "toast-close-button",
           success: "toast-success",
           error: "toast-error",
           info: "toast-info",
@@ -28,9 +29,9 @@ const Toaster = ({ ...props }: ToasterProps) => {
       style={
         {
           "--width": "400px",
-          "--normal-bg": "var(--popover)",
-          "--normal-text": "var(--popover-foreground)",
-          "--normal-border": "var(--border)",
+          "--normal-bg": "var(--toast-glass-bg)",
+          "--normal-text": "var(--toast-glass-text)",
+          "--normal-border": "var(--toast-glass-border)",
           "--border-radius": "8px",
           "--success-bg": "var(--toast-success-bg)",
           "--success-border": "var(--toast-success-border)",
