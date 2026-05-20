@@ -175,7 +175,12 @@ export function HeroSection({
         <div className="flex items-baseline gap-2 mb-1">
           <h1 className="text-3xl font-bold">{client.name}</h1>
           <span className="text-xl text-white/80">{client.age}</span>
-          <span className="text-sm bg-blue-500/80 px-2 py-0.5 rounded-md">
+          <span
+            className={[
+              "text-sm px-2 py-0.5 rounded-md",
+              client.gender === "여자" ? "bg-pink-500/80" : "bg-blue-500/80",
+            ].join(" ")}
+          >
             {client.gender}
           </span>
         </div>
