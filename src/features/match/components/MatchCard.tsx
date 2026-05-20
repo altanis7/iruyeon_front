@@ -221,11 +221,11 @@ export function MatchCard({
       <CardContent className="p-4">
         {/* 프로필 이미지 영역 */}
         <div className="relative flex gap-2 items-center">
-          {/* 우리측 클라이언트 */}
+          {/* 상대측 클라이언트 */}
           <ClientProfileCard
-            data={memberClientResponseDTO}
+            data={oppositeMemberClientDTO}
             onClick={() =>
-              navigate(`/client/${memberClientResponseDTO.clientId}`)
+              navigate(`/client/${oppositeMemberClientDTO.clientId}`)
             }
           />
 
@@ -272,11 +272,11 @@ export function MatchCard({
             </div>
           </div>
 
-          {/* 상대측 클라이언트 */}
+          {/* 우리측 클라이언트 */}
           <ClientProfileCard
-            data={oppositeMemberClientDTO}
+            data={memberClientResponseDTO}
             onClick={() =>
-              navigate(`/client/${oppositeMemberClientDTO.clientId}`)
+              navigate(`/client/${memberClientResponseDTO.clientId}`)
             }
           />
         </div>
