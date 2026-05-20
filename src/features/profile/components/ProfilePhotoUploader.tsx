@@ -36,6 +36,15 @@ const MAX_UPLOAD_SIZE = 5 * 1024 * 1024;
 const HERO_CROP_MAX_WIDTH = 1080;
 const HERO_CROP_MAX_HEIGHT = 1920;
 
+const arePhotoSlotsEqual = (a: PhotoSlot[], b: PhotoSlot[]) =>
+  a.length === b.length &&
+  a.every(
+    (slot, index) =>
+      slot.imageId === b[index]?.imageId &&
+      slot.imageUrl === b[index]?.imageUrl &&
+      slot.isUploading === b[index]?.isUploading,
+  );
+
 export function ProfilePhotoUploader({
   imageIds,
   imageUrls,
@@ -74,6 +83,8 @@ export function ProfilePhotoUploader({
       imageUrl: imageUrls[i] ?? null,
       isUploading: slotsRef.current[i]?.isUploading ?? false,
     }));
+    if (arePhotoSlotsEqual(slotsRef.current, nextSlots)) return;
+
     slotsRef.current = nextSlots;
     setSlots(nextSlots);
   }, [imageIds, imageUrls]);

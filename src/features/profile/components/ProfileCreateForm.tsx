@@ -40,10 +40,16 @@ interface ProfileCreateFormProps {
   onSuccess?: () => void;
 }
 
+const EMPTY_IMAGE_IDS: number[] = [];
+const EMPTY_IMAGE_URLS: string[] = [];
+
+const areStringArraysEqual = (a: string[], b: string[]) =>
+  a.length === b.length && a.every((value, index) => value === b[index]);
+
 export function ProfileCreateForm({
   mode = "create",
   defaultValues: externalDefaults,
-  initialImageUrls = [],
+  initialImageUrls = EMPTY_IMAGE_URLS,
   clientId,
   onSuccess,
 }: ProfileCreateFormProps = {}) {
@@ -105,7 +111,9 @@ export function ProfileCreateForm({
 
   // 비동기 데이터 동기화 (React Query에서 데이터 도착 시 상태 업데이트)
   useEffect(() => {
-    setImageUrls(initialImageUrls);
+    setImageUrls(prev =>
+      areStringArraysEqual(prev, initialImageUrls) ? prev : initialImageUrls,
+    );
   }, [initialImageUrls]);
 
   useEffect(() => {
@@ -125,7 +133,7 @@ export function ProfileCreateForm({
   const personality = watch("personality");
   const idealType = watch("idealType");
   const family = watch("family");
-  const imageIdList = watch("imageIdList") || [];
+  const imageIdList = watch("imageIdList") ?? EMPTY_IMAGE_IDS;
 
   // 이미지 변경 핸들러
   const handleImagesChange = (ids: number[], urls: string[]) => {
