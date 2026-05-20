@@ -1,4 +1,5 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
+import type { CSSProperties } from "react";
 import {
   Dialog,
   DialogContent,
@@ -17,6 +18,11 @@ interface ChatModalProps {
   onOpenChange: (open: boolean) => void;
 }
 
+type ChatViewportStyle = CSSProperties & {
+  "--chat-visual-height": string;
+  "--chat-visual-top": string;
+};
+
 /**
  * 채팅 모달 컴포넌트
  * - 채팅 내역 조회 및 표시
@@ -28,17 +34,62 @@ export function ChatModal({ matchId, open, onOpenChange }: ChatModalProps) {
   const { data, isLoading, isError } = useChat(matchId, open);
   const sendChat = useSendChat();
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [viewportStyle, setViewportStyle] = useState<ChatViewportStyle>({
+    "--chat-visual-height": "100dvh",
+    "--chat-visual-top": "0px",
+  });
 
   const chatData = data?.data;
   const messages = chatData?.message ?? [];
   const currentUserId = currentUser?.id ? Number(currentUser.id) : null;
 
+  useEffect(() => {
+    if (!open) return;
+
+    const updateViewport = () => {
+      const visualViewport = window.visualViewport;
+      const height = visualViewport?.height ?? window.innerHeight;
+      const top = visualViewport?.offsetTop ?? 0;
+      const nextHeight = `${height}px`;
+      const nextTop = `${top}px`;
+
+      setViewportStyle(previous => {
+        if (
+          previous["--chat-visual-height"] === nextHeight &&
+          previous["--chat-visual-top"] === nextTop
+        ) {
+          return previous;
+        }
+
+        return {
+          "--chat-visual-height": nextHeight,
+          "--chat-visual-top": nextTop,
+        };
+      });
+    };
+
+    updateViewport();
+    window.addEventListener("resize", updateViewport);
+    window.visualViewport?.addEventListener("resize", updateViewport);
+    window.visualViewport?.addEventListener("scroll", updateViewport);
+
+    return () => {
+      window.removeEventListener("resize", updateViewport);
+      window.visualViewport?.removeEventListener("resize", updateViewport);
+      window.visualViewport?.removeEventListener("scroll", updateViewport);
+    };
+  }, [open]);
+
   // 새 메시지 추가 시 스크롤
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
-  }, [messages.length]);
+    const frame = window.requestAnimationFrame(() => {
+      if (scrollRef.current) {
+        scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      }
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [messages.length, viewportStyle]);
 
   const handleSend = (message: string) => {
     sendChat.mutate({ matchId, message });
@@ -48,16 +99,17 @@ export function ChatModal({ matchId, open, onOpenChange }: ChatModalProps) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         onOpenAutoFocus={e => e.preventDefault()}
-        className="sm:max-w-md h-[80vh] flex flex-col p-0"
+        style={viewportStyle}
+        className="top-[var(--chat-visual-top,0px)] flex h-[var(--chat-visual-height,100dvh)] max-h-[var(--chat-visual-height,100dvh)] w-full max-w-md translate-y-0 flex-col gap-0 overflow-hidden rounded-none border-0 bg-white p-0 shadow-none duration-0 sm:top-[50%] sm:h-[80vh] sm:max-h-[80vh] sm:translate-y-[-50%] sm:rounded-lg sm:border sm:shadow-lg sm:duration-200 [&>button]:top-[calc(env(safe-area-inset-top)+1rem)] sm:[&>button]:top-4"
       >
-        <DialogHeader className="px-4 py-3 border-b">
+        <DialogHeader className="shrink-0 border-b px-4 pb-3 pt-[calc(env(safe-area-inset-top)+0.75rem)]">
           <DialogTitle>채팅</DialogTitle>
         </DialogHeader>
 
         {/* 메시지 영역 */}
         <div
           ref={scrollRef}
-          className="flex-1 overflow-y-auto px-4 py-4 space-y-4"
+          className="min-h-0 flex-1 space-y-4 overflow-y-auto px-4 py-4"
         >
           {isLoading && (
             <div className="flex items-center justify-center h-full">

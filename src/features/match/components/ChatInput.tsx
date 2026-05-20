@@ -30,7 +30,7 @@ export function ChatInput({ onSend, disabled = false }: ChatInputProps) {
   };
 
   return (
-    <div className="flex items-center gap-2 p-4 border-t bg-white">
+    <div className="flex shrink-0 items-center gap-3 border-t bg-white px-4 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-3 sm:gap-2 sm:p-4">
       <input
         type="text"
         value={message}
@@ -39,7 +39,7 @@ export function ChatInput({ onSend, disabled = false }: ChatInputProps) {
         placeholder="메시지를 입력하세요"
         disabled={disabled}
         className={cn(
-          "flex-1 px-4 py-2.5 border rounded-full text-sm",
+          "h-11 min-w-0 flex-1 rounded-full border px-4 text-base sm:h-10 sm:py-2.5 sm:text-sm",
           "focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent",
           "disabled:bg-gray-100 disabled:cursor-not-allowed"
         )}
@@ -47,7 +47,7 @@ export function ChatInput({ onSend, disabled = false }: ChatInputProps) {
       <Button
         onClick={handleSend}
         disabled={disabled || !message.trim()}
-        className="bg-pink-500 hover:bg-pink-600 text-white rounded-full px-6"
+        className="h-11 shrink-0 rounded-full bg-pink-500 px-6 text-base font-semibold text-white hover:bg-pink-600 sm:h-10 sm:text-sm"
       >
         전송
       </Button>
