@@ -109,20 +109,22 @@ export function HeroSection({
 
       {/* 캐러셀 커스텀 화살표 */}
       {current > 1 && (
-        <button
+        <GlassButton
+          size="icon"
           onClick={() => api?.scrollPrev()}
-          className="absolute left-3 top-1/2 -translate-y-1/2 z-10 text-white/80 hover:text-white"
+          className="absolute left-3 top-1/2 -translate-y-1/2 z-10"
         >
-          <ChevronLeft className="w-8 h-8 drop-shadow-lg" strokeWidth={1.5} />
-        </button>
+          <ChevronLeft className="w-7 h-7" strokeWidth={1.5} />
+        </GlassButton>
       )}
       {current < count && (
-        <button
+        <GlassButton
+          size="icon"
           onClick={() => api?.scrollNext()}
-          className="absolute right-3 top-1/2 -translate-y-1/2 z-10 text-white/80 hover:text-white"
+          className="absolute right-3 top-1/2 -translate-y-1/2 z-10"
         >
-          <ChevronRight className="w-8 h-8 drop-shadow-lg" strokeWidth={1.5} />
-        </button>
+          <ChevronRight className="w-7 h-7" strokeWidth={1.5} />
+        </GlassButton>
       )}
 
       {/* 상단 네비게이션 */}
@@ -165,7 +167,7 @@ export function HeroSection({
         {/* 페이지네이션 */}
         {hasImages && count > 0 && (
           <div className="mb-4">
-            <span className="px-2.5 py-1 bg-black/40 backdrop-blur-md border border-white/10 rounded-full text-xs">
+            <span className="inline-flex items-center px-2.5 py-1 bg-black/35 backdrop-blur-md border border-white/25 rounded-full text-xs font-semibold ring-1 ring-black/10 shadow-[0_6px_18px_rgba(15,23,42,0.28),inset_0_1px_0_rgba(255,255,255,0.22)] [text-shadow:0_1px_3px_rgba(0,0,0,0.55)]">
               {current} / {count}
             </span>
           </div>
