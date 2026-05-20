@@ -125,32 +125,55 @@ function ClientProfileCard({
   onClick?: () => void;
 }) {
   const navigate = useNavigate();
+  const isDeleted = data.status === "DELETED";
+
+  const handleProfileClick = () => {
+    if (isDeleted) return;
+    onClick?.();
+  };
 
   const handleManagerClick = (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (isDeleted) return;
     navigate(`/manager/${String(data.memberId)}`);
   };
 
   return (
     <div
-      className="relative flex-1 aspect-[3/4] rounded-2xl overflow-hidden cursor-pointer"
-      onClick={onClick}
+      className={cn(
+        "relative flex-1 aspect-[3/4] rounded-2xl overflow-hidden transition",
+        isDeleted ? "cursor-not-allowed" : "cursor-pointer",
+      )}
+      onClick={handleProfileClick}
+      aria-disabled={isDeleted}
     >
       {/* 배경 이미지 */}
       <ProfileImage
         src={data.clientImage}
         alt={data.clientName}
-        className="absolute inset-0 w-full h-full object-cover"
+        className={cn(
+          "absolute inset-0 w-full h-full object-cover",
+          isDeleted && "grayscale opacity-70",
+        )}
         fallbackSrc="/noImage.png"
       />
 
       {/* 그라데이션 오버레이 */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+      {isDeleted && (
+        <div className="absolute inset-0 bg-black/45 backdrop-blur-[1px]" />
+      )}
 
       {/* 매니저 뱃지 (이미지 위 왼쪽 상단) */}
       <div
-        className="absolute top-2 left-2 flex items-center gap-1.5 bg-black/50 backdrop-blur-sm rounded-full px-2.5 py-1 cursor-pointer hover:bg-black/70 transition-colors"
+        className={cn(
+          "absolute top-2 left-2 flex items-center gap-1.5 bg-black/50 backdrop-blur-sm rounded-full px-2.5 py-1 transition-colors",
+          isDeleted
+            ? "cursor-not-allowed opacity-75"
+            : "cursor-pointer hover:bg-black/70",
+        )}
         onClick={handleManagerClick}
+        aria-disabled={isDeleted}
       >
         <Avatar className="h-4 w-4">
           <AvatarImage src={data.memberImage ?? undefined} />

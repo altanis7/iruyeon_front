@@ -36,15 +36,25 @@ export function MyClientCard({
   const displayJob = formatValue(client.job);
   const displayAddress = formatValue(client.address);
   const isActive = client.status === "ACTIVE";
+  const isDeleted = client.status === "DELETED";
   const statusLabel = formatClientStatus(client.status);
+
+  const handleClick = () => {
+    if (isDeleted) return;
+    onClick?.();
+  };
 
   return (
     <Card
       className={cn(
-        "cursor-pointer transition-all hover:shadow-md hover:scale-[1.02] overflow-hidden isolate",
+        "transition-all overflow-hidden isolate",
+        isDeleted
+          ? "cursor-not-allowed"
+          : "cursor-pointer hover:shadow-md hover:scale-[1.02]",
         className,
       )}
-      onClick={onClick}
+      onClick={handleClick}
+      aria-disabled={isDeleted}
     >
       {/* 상단 영역: 프로필 사진 (카드 전체 너비) */}
       <div className="relative aspect-[4/5] overflow-hidden bg-gray-100">
@@ -52,7 +62,10 @@ export function MyClientCard({
         <ProfileImage
           src={client.image}
           alt={client.name}
-          className="w-full h-full object-cover"
+          className={cn(
+            "w-full h-full object-cover",
+            isDeleted && "grayscale opacity-70",
+          )}
           fallbackSrc="/noImage.png"
         />
 
@@ -143,7 +156,11 @@ export function MyClientCard({
           variant="outline"
           size="sm"
           className="w-full rounded-full text-xs h-9"
-          onClick={onClick}
+          onClick={event => {
+            event.stopPropagation();
+            handleClick();
+          }}
+          disabled={isDeleted}
         >
           프로필 보기
         </Button>

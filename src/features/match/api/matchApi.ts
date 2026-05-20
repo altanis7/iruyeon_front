@@ -5,6 +5,7 @@
 import { apiClient } from "@/lib/api/client";
 import type {
   ApiResponse,
+  ClientStatus,
   MyClientListData,
   PaginationParams,
 } from "@/features/profile/api/profileApi";
@@ -33,6 +34,7 @@ export interface MemberClientDTO {
   clientImage: string | null;
   clientJob: string;
   clientSchool: string;
+  status: ClientStatus;
 }
 
 /**
