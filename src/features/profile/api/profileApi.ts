@@ -577,7 +577,7 @@ export const clientManagementApi = {
     const response = await apiClient.delete<ApiResponse<DeleteClientResponse>>(
       `/client`,
       {
-        params: { id: clientId },
+        params: { clientId },
       },
     );
     return response.data;

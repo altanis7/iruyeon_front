@@ -18,6 +18,9 @@ export function useDeleteClient() {
       queryClient.removeQueries({
         queryKey: ["client", String(clientId)],
       });
+      queryClient.removeQueries({
+        queryKey: ["clientInfo", String(clientId)],
+      });
 
       // Invalidate my clients list
       queryClient.invalidateQueries({
