@@ -129,7 +129,10 @@ export function ProfileCreateForm({
 
   // 이미지 변경 핸들러
   const handleImagesChange = (ids: number[], urls: string[]) => {
-    setValue("imageIdList", ids);
+    setValue("imageIdList", ids, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
     setImageUrls(urls);
   };
 

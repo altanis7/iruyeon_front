@@ -51,7 +51,7 @@ export function clientDetailToFormData(
     maritalStatus: client.maritalStatus,
 
     // 선택 필드
-    imageIdList: [], // 이미지 ID는 URL에서 추출 불가, 추후 구현 시 별도 처리 필요
+    imageIdList: client.profileImageIds ?? client.imageIdList ?? [],
     university: client.university || undefined,
     highSchool: client.highSchool || undefined,
     major: client.major || undefined,

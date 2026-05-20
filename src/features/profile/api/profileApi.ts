@@ -284,6 +284,8 @@ export interface ClientDetail {
   hobby: string; // 취미
   maritalStatus: string; // 혼인상태
   phoneNumber: string | null;
+  profileImageIds?: number[]; // 프로필 이미지 ID 배열 (profileImages와 동일 순서)
+  imageIdList?: number[]; // 프로필 이미지 ID 배열 (profileImages와 동일 순서)
   profileImages: string[]; // 프로필 이미지 배열 (최대 3개)
   families: ClientFamilyMember[]; // 가족 구성원 배열
   totalMeetingCnt?: number | null; // 전체 만남 횟수 (내 회원 API에서만 값 존재)
